@@ -4,10 +4,21 @@
   <meta charset="utf-8">
   <title>NFTCreatorForChrome</title>
   <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta property="og:title" content="NFTForChrome">
+  <meta property="og:description" content="Raccourcisseur d'url">
+
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, viewport-fit=cover">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'wasm-unsafe-eval' 'inline-speculation-rules' http://localhost:* http://127.0.0.1:* 'unsafe-inline';">
+
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
-<body>
+
+<body class="mat-typography" style="overflow: hidden;background-color: black;text-align: center;">
   <app-root></app-root>
+  <noscript>Please enable JavaScript to continue using this application.</noscript>
 </body>
 </html>

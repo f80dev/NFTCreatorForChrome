@@ -1,0 +1,13 @@
+<div class="mainform">
+  <p>main works!</p>
+
+  <button mat-raised-button (click)="Create_NFT()">NFT</button>
+  <app-input label="Name" [value]="name" (valueChange)="name=$event"></app-input>
+
+  <div class="vignette" *ngFor="let src of urls">
+    <img [src]="src" style="width: 100%;">
+  </div>
+
+
+</div>
+

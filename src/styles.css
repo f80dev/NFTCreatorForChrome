@@ -1,1 +1,16 @@
 /* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.mainform {
+  width:350px;
+  height: 500px;
+  color: white;
+  background-color: black;
+  padding:0;
+  margin:0;
+  text-align: center;
+  overflow: scroll;
+  scrollbar-width: none;
+}

@@ -1,0 +1,6 @@
+.vignette {
+  display:inline-block;
+  width:100px;
+  height: 100px;
+  object-fit: cover;
+}
