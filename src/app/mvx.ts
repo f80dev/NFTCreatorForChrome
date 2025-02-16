@@ -12,9 +12,10 @@ import {ApiService} from "./api.service";
 import {UserService} from "./user.service";
 import {Octokit} from "@octokit/rest";
 import {$$, now} from "../tools";
-import {utf8ToHex} from '@multiversx/sdk-core/out/utils.codec';
+import {numberToPaddedHex, utf8ToHex} from '@multiversx/sdk-core/out/utils.codec';
 import {gatherAllEvents} from '@multiversx/sdk-core/out/transactionsOutcomeParsers/resources';
 import {abi, settings} from '../environments/settings';
+import {bufferToHex, stringToBuffer} from "@multiversx/sdk-core/out/tokenOperations/codec";
 
 export const DEVNET="https://devnet-api.multiversx.com"
 export const MAINNET="https://api.multiversx.com"
@@ -412,25 +413,32 @@ export function toText(array:Uint8Array) : string {
   return new TextDecoder('utf-8').decode(array)
 }
 
+export async function create_collection(name:string) {
+  //exemple : issueSemiFungible@546f6b656d6f6e@544f4b454d4f4e
+  //puis appel de setSpecialRole@544f4b454d4f4e2d346561303466@15432c1a00ea0f72466e099db66e6059d4becc9bb9eed17f3db817f29a0fc26b@45534454526f6c654e4654437265617465@45534454526f6c654e46544164645175616e74697479
+
+}
 
 
+export async function get_collections(user:UserService,api:ApiService) {
+  //voir https://devnet-api.multiversx.com/#/accounts/AccountController_getAccountCollectionsWithRoles
+  let domain=user.get_domain()
+  let rc: any=await api._service("accounts/"+user.address+"/roles/collections","",domain)
+  return rc
+}
 
-export async function createNFT(name:string,visual:string,collection:string,user:UserService,network="elrond-devnet", gasLimit=50000000n) {
-  const apiNetworkProvider = new ApiNetworkProvider(network=="devnet" ? "https://devnet-api.multiversx.com" : "https://api.multiversx.com")
-  const factoryConfig = new TransactionsFactoryConfig({ chainID: "D" });
-  let factory = new SmartContractTransactionsFactory({config: factoryConfig});
-   let _sender=await apiNetworkProvider.getAccount(Address.fromBech32(user.address))
+export async function createNFT(identifier:string,quantity:number,name:string,visual:string,user:UserService,network="elrond-devnet", gasLimit=50000000n) {
+  //Voir https://docs.multiversx.com/tokens/nft-tokens/#creation-of-an-nft
+  let args=[
+    utf8ToHex(identifier),numberToPaddedHex(quantity),utf8ToHex(name),
+    numberToPaddedHex(1),utf8ToHex(""),
+    utf8ToHex(""),utf8ToHex(visual)
+  ]
+  let rc=await send_transaction(user,"ESDTNFTCreate",args,user.address)
+
   //voir https://docs.multiversx.com/tokens/nft-tokens/#creation-of-an-nft
   //voir https://docs.multiversx.com/developers/sc-calls-format/#converting-numeric-values-in-javascript
   //voir https://github.com/multiversx/mx-sdk-js-core/blob/main/src/utils.codec.ts
-  let args=[utf8ToHex(collection)]
-  let transaction = factory.createTransactionForExecute({
-    sender: _sender.address,
-    contract: Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"),
-    function: "ESDTNFTCreate",
-    gasLimit: gasLimit,
-    arguments: args
-  })
 }
 
 

@@ -14,7 +14,7 @@ import {DeviceService} from "../device.service";
 import { WalletConnectV2Provider } from "@multiversx/sdk-wallet-connect-provider";
 import { ExtensionProvider } from "@multiversx/sdk-extension-provider";
 import {WALLET_PROVIDER_DEVNET, WALLET_PROVIDER_MAINNET, WalletProvider} from "@multiversx/sdk-web-wallet-provider";
-import {Socket, SocketIoConfig} from "ngx-socket-io";
+import {Socket} from "ngx-socket-io";
 import {EvmWalletServiceService} from "../evm-wallet-service.service";
 import {_prompt} from "../prompt/prompt.component";
 import {MatDialog} from "@angular/material/dialog";
@@ -33,7 +33,6 @@ import {settings} from '../../environments/settings';
 
 //Installation de @multiversx/sdk-wallet-connect-provider via yarn add @multiversx/sdk-wallet-connect-provider
 
-const config: SocketIoConfig = { url: environment.server, options: {} };
 
 enum Wallet_Operation {
   Connect = "connect",
@@ -247,7 +246,7 @@ export class AuthentComponent implements OnInit,OnChanges {
       this.refresh();
       //Création d'un validateur nécéssaire pour le nfluent wallet connect
       let validator_name="val_"+now("rand")
-      if(this.connexion.nfluent_wallet_connect){
+      if(this.connexion.nfluent_wallet_connect && this.socket){
         this.socket.on(validator_name,((data:any) => {
           this.address=data.address;
           this.success()

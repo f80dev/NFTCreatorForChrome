@@ -4,11 +4,11 @@ html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 .mainform {
-  width:350px;
-  height: 500px;
+  width:400px;
+  height: 600px;
   color: white;
-  background-color: black;
-  padding:0;
+  background-color: darkgrey;
+  padding:10px;
   margin:0;
   text-align: center;
   overflow: scroll;

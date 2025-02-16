@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {showMessage} from "../../tools";
-import {NgIf, NgStyle} from "@angular/common";
+import {NgIf} from "@angular/common";
 import {MatIcon} from "@angular/material/icon";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {environment} from "../../environments/environment";

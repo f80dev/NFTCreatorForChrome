@@ -1,7 +1,7 @@
 
 import {ActivatedRoute} from "@angular/router";
 import {Clipboard} from "@angular/cdk/clipboard";
-import {environment} from "./environment/environment";
+import {environment} from "./environments/environment";
 
 
 export interface CryptoKey {

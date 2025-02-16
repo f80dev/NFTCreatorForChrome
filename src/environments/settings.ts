@@ -1,7 +1,7 @@
 export const settings={
-  contract_addr:"erd1qqqqqqqqqqqqqpgqh8p6gslvuzjx88rkvdhjy4sz2yk05n54835sv9zgjl",
+  contract_addr:"",
   ihm_level:2,
-  appname: "TOKEMON World (beta)",
+  appname: "InstantNFT",
   appli:"https://tokemonbeta.f80.fr",
   network: "elrond-devnet"
 }

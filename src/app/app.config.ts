@@ -1,13 +1,50 @@
-import { ApplicationConfig } from '@angular/core';
+import {ApplicationConfig, importProvidersFrom, isDevMode} from '@angular/core';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import {MainComponent} from "./main/main.component";
 import {provideRouter, Routes} from "@angular/router";
+import {MAT_DIALOG_DATA} from "@angular/material/dialog";
+import {SocketIoConfig, SocketIoModule} from "ngx-socket-io";
+import {environment} from "../environments/environment";
+import {GoogleLoginProvider, SocialAuthServiceConfig, SocialLoginModule} from "@abacritt/angularx-social-login";
+import {GOOGLE_CLIENT_ID} from "../definitions";
+import {provideHttpClient} from "@angular/common/http";
+import {provideServiceWorker} from "@angular/service-worker";
 
 
 export const routes: Routes = [
+  { path: 'main', component: MainComponent },
   { path: '**', component: MainComponent },
 ];
 
+const config: SocketIoConfig = { url: environment.server, options: {} };
+
 export const appConfig: ApplicationConfig = {
-  providers: [provideAnimationsAsync('noop'),provideRouter(routes)]
+  providers: [
+    provideAnimationsAsync('noop'),provideRouter(routes),
+    {provide: MAT_DIALOG_DATA, useValue: {hasBackdrop: false}},
+    importProvidersFrom(
+      SocketIoModule.forRoot(config),
+      SocialLoginModule,
+    ),
+    {provide: 'SocialAuthServiceConfig',
+      useValue: {
+        autoLogin: false,
+        providers: [
+          {
+            id: GoogleLoginProvider.PROVIDER_ID,
+            provider: new GoogleLoginProvider(GOOGLE_CLIENT_ID),
+          }
+        ],
+      } as SocialAuthServiceConfig
+    },
+
+    provideRouter(routes),
+    provideHttpClient(),
+    provideAnimationsAsync(),
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000'
+    })
+
+  ]
 };
