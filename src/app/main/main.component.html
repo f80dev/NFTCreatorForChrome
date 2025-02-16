@@ -4,12 +4,13 @@
     <img [src]="src" style="width: 100%;" (click)="visual=src">
   </div>
 
-
-  <div *ngIf="!user.isConnected()">
-    <app-upload-file filter="pem" title="Upload a PEM file" (uploaded)="upload_pem($event)">Your PEM file</app-upload-file>
-    <button mat-raised-button  (click)="login()">login</button>
+  <div *ngIf="!user.isConnected()" style="display: inline-flex;width: 100%;">
+    <div style="display: inline-block;width:150px;">
+      <app-upload-file filter="pem" title="Upload a PEM file"
+                       (uploaded)="upload_pem($event)">Your PEM file</app-upload-file>
+    </div>
+    <button mat-raised-button (click)="login()">login</button>
   </div>
-
 
   <div *ngIf="user.isConnected()">
     <button mat-raised-button *ngIf="user.isConnected()" (click)="user.logout(true)">logout</button>
@@ -29,12 +30,8 @@
       <br>
       <app-input label="Name" [value]="name" (valueChange)="name=$event"></app-input>
       <app-input label="Quantity" [value]="quantity" (valueChange)="quantity=$event"></app-input>
-
     </div>
 
-
   </div>
-
-
 </div>
 

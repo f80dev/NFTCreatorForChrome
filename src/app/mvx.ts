@@ -295,7 +295,7 @@ export async function send_transaction(user:UserService,function_name:string,
       abi:await create_abi(_abi)
     });
     //voir https://github.com/multiversx/mx-sdk-js-web-wallet-provider/blob/main/src/walletProvider.ts
-    const apiNetworkProvider = new ApiNetworkProvider(DEVNET);
+    const apiNetworkProvider = new ApiNetworkProvider(user.get_domain());
 
     //voir https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook-v13#signing-objects
 
@@ -427,12 +427,16 @@ export async function get_collections(user:UserService,api:ApiService) {
   return rc
 }
 
-export async function createNFT(identifier:string,quantity:number,name:string,visual:string,user:UserService,network="elrond-devnet", gasLimit=50000000n) {
+export async function makeNFT(identifier:string,name:string,visual:string,user:UserService,quantity=1) {
   //Voir https://docs.multiversx.com/tokens/nft-tokens/#creation-of-an-nft
   let args=[
-    utf8ToHex(identifier),numberToPaddedHex(quantity),utf8ToHex(name),
-    numberToPaddedHex(1),utf8ToHex(""),
-    utf8ToHex(""),utf8ToHex(visual)
+    utf8ToHex(identifier),
+    numberToPaddedHex(quantity),
+    utf8ToHex(name),
+    numberToPaddedHex(1),
+    utf8ToHex(""),
+    utf8ToHex(""),
+    utf8ToHex(visual)
   ]
   let rc=await send_transaction(user,"ESDTNFTCreate",args,user.address)
 

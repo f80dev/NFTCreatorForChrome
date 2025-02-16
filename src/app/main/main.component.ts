@@ -7,9 +7,8 @@ import {UserService} from "../user.service";
 import {ApiService} from "../api.service";
 import {Router} from "@angular/router";
 import {MatDialog} from "@angular/material/dialog";
-import {createNFT, get_collections} from "../mvx";
+import {get_collections, makeNFT} from "../mvx";
 import {MatList, MatListItem} from "@angular/material/list";
-import {$$} from "../../tools";
 import {UploadFileComponent} from "../upload-file/upload-file.component";
 
 @Component({
@@ -59,9 +58,9 @@ export class MainComponent implements OnInit {
 
 
   async Create_NFT() {
-    let pem=localStorage.getItem("pem") || ""
-    await this.user.login(this,"",pem,true)
-    await createNFT(this.sel_collection.ticker,this.quantity,this.name,this.visual,this.user,this.user.network)
+    await this.user.login(this,"",localStorage.getItem("pem") || "",true)
+    let col=this.sel_collection.value
+    await makeNFT(col.ticker,this.name,this.visual,this.user,this.quantity)
   }
 
   upload_pem($event: any) {
