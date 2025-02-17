@@ -1,12 +1,18 @@
 .vignette {
   display:inline-block;
-  width:100px;
-  height: 100px;
+  width:80vw;
+  height: 80vw;
+  max-width: 400px;
+  max-height: 400px;
   object-fit: cover;
 }
 
 app-input {
   width: 90%;
-  margin: 5%;
+  max-width: 300px;
   display: inline-block;
+}
+
+button {
+  width:150px;
 }

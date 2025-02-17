@@ -6,10 +6,11 @@ import {MAT_DIALOG_DATA} from "@angular/material/dialog";
 import {SocketIoConfig, SocketIoModule} from "ngx-socket-io";
 import {environment} from "../environments/environment";
 import {GoogleLoginProvider, SocialAuthServiceConfig, SocialLoginModule} from "@abacritt/angularx-social-login";
-import {GOOGLE_CLIENT_ID} from "../definitions";
+
 import {provideHttpClient} from "@angular/common/http";
 import {provideServiceWorker} from "@angular/service-worker";
 
+const GOOGLE_CLIENT_ID="794055474370-nj8dfh004epum0h6ne1chq903dr4rofe.apps.googleusercontent.com"
 
 export const routes: Routes = [
   { path: 'main', component: MainComponent },
@@ -26,7 +27,8 @@ export const appConfig: ApplicationConfig = {
       SocketIoModule.forRoot(config),
       SocialLoginModule,
     ),
-    {provide: 'SocialAuthServiceConfig',
+    {
+      provide: 'SocialAuthServiceConfig',
       useValue: {
         autoLogin: false,
         providers: [

@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --configuration development",
-    "build": "ng build --configuration development",
+    "start": "ng serve --configuration development --ssl true",
+    "build": "ng build --configuration development --watch",
     "prod": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
@@ -32,6 +32,7 @@
     "@multiversx/sdk-wallet": "^4.6.0",
     "@multiversx/sdk-wallet-connect-provider": "^5.0.2",
     "@multiversx/sdk-web-wallet-provider": "^4.1.0",
+
 
     "@abacritt/angularx-social-login": "^2.2.0",
     "angularx-qrcode": "^19.0.0",

@@ -1,23 +1,40 @@
 <div class="mainform">
 
-  <div class="vignette" *ngFor="let src of urls">
-    <img [src]="src" style="width: 100%;" (click)="visual=src">
+  <h4>Create this NFT</h4>
+  <div class="vignette">
+    <img [src]="visual" style="width: 100%">
   </div>
 
-  <div *ngIf="!user.isConnected()" style="display: inline-flex;width: 100%;">
+  <br>
+
+  <div style="display: inline-flex;align-content: center;">
+    <app-input label="Image generator and bank" value_type="list"
+               [options]="generators" [value]="sel_generator" (select)="sel_generator=$event"></app-input>
+    <button mat-raised-button (click)="open_generator()">Open</button>
+  </div>
+
+  <app-input label="Name" [value]="name" value_type="text" (valueChange)="name=$event"></app-input>
+  <app-input label="Quantity" [value]="quantity" value_type="number" (valueChange)="quantity=$event"></app-input>
+  <br>
+  <app-input label="Royalties" [value]="royalties" [min]="0" [max]="100"
+             unity="%"
+             value_type="slider" (valueChange)="royalties=$event"></app-input>
+
+  <br>
+  <div *ngIf="!user.isConnected()" style="display: inline-flex;width: 100%;align-content: center;">
     <div style="display: inline-block;width:150px;">
       <app-upload-file filter="pem" title="Upload a PEM file"
                        (uploaded)="upload_pem($event)">Your PEM file</app-upload-file>
     </div>
     <button mat-raised-button (click)="login()">login</button>
   </div>
+  <br><br>
 
   <div *ngIf="user.isConnected()">
-    <button mat-raised-button *ngIf="user.isConnected()" (click)="user.logout(true)">logout</button>
+    <button mat-raised-button (click)="user.logout(true)">logout</button>
 
-    <mat-list>
-      <mat-list-item *ngFor="let item of collections">{{item.title}}</mat-list-item>
-    </mat-list>
+<!--    <mat-slide-toggle [checked]="permanent_pem" (toggleChange)="update_pem_storage()">Store PEM on this device</mat-slide-toggle>-->
+    <br>
 
     <app-input label="Collection" value_type="list"
                [value]="sel_collection"
@@ -25,11 +42,9 @@
 
     <div *ngIf="sel_collection">
       <br>
-      <button mat-raised-button (click)="Create_NFT()">NFT</button>
-
+      <button mat-raised-button (click)="Create_NFT()">Build NFT</button>
       <br>
-      <app-input label="Name" [value]="name" (valueChange)="name=$event"></app-input>
-      <app-input label="Quantity" [value]="quantity" (valueChange)="quantity=$event"></app-input>
+
     </div>
 
   </div>

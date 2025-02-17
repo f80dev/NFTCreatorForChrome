@@ -11,6 +11,8 @@ import {settings} from "../environments/settings";
 import {environment} from "../environments/environment";
 import {UserSigner} from "@multiversx/sdk-core/out";
 
+(window as any).global = window;
+
 @Injectable({
   providedIn: 'root'
 })
@@ -26,12 +28,9 @@ export class UserService {
 
   network:string=settings.network || "elrond-devnet"
   params:any
-  lang="fr"
   nonce:number=0
 
-  expert_mode:boolean=false
   tokemons: any[] = []
-  zoom: number=16
   visibility: number = 0
   account: any;
   idx:number=0
