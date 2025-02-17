@@ -30,28 +30,32 @@ import {MatSlideToggle} from "@angular/material/slide-toggle";
 })
 export class MainComponent implements OnInit {
 
-  name="MyNFT"
+  name= "MyNFT"
+  visual= ""
+  quantity= 1
+  royalties=0
+
   user=inject(UserService)
   api=inject(ApiService)
   routes=inject(ActivatedRoute)
   router=inject(Router)
   dialog=inject(MatDialog)
-  collections: any[]=[];
+
+  collections: any[]=[]
   sel_collection:any
-  visual=""
-  quantity=1
-  royalties=0
-  sel_generator: any;
+  sel_generator: any
   generators=[
     {label:"Stable Diffusion",value:"https://gen.akash.network/"},
     {label:"Pixabay",value:"https://pixabay.com/"}
   ]
+
 
   async ngOnInit() {
     let params:any=await getParams(this.routes)
     this.visual=params.url || "https://www.lecadeauartistique.com/img/produits/decoration-murale/affiche-monet-nenuphars-saules-reflets-nuages.jpg"
     this.login()
   }
+
 
   async login(){
     await this.user.login(this,"",localStorage.getItem("pem") || "",false)
@@ -69,6 +73,7 @@ export class MainComponent implements OnInit {
     await makeNFT(col.ticker,this.name,this.visual,this.user,this.quantity)
   }
 
+
   upload_pem($event: any) {
     let content=atob($event.file.split("base64,")[1])
     localStorage.setItem("pem",content)
@@ -79,6 +84,4 @@ export class MainComponent implements OnInit {
   open_generator() {
     open(this.sel_generator.value,"Images")
   }
-
-
 }
