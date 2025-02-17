@@ -7,7 +7,7 @@
 
   <br>
 
-  <div style="display: inline-flex;align-content: center;">
+  <div style="display: flex;justify-content:center;align-content: center;width: 100%;">
     <app-input label="Image generator and bank" value_type="list"
                [options]="generators" [value]="sel_generator" (select)="sel_generator=$event"></app-input>
     <button mat-raised-button (click)="open_generator()">Open</button>

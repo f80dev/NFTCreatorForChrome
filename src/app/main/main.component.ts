@@ -79,4 +79,6 @@ export class MainComponent implements OnInit {
   open_generator() {
     open(this.sel_generator.value,"Images")
   }
+
+
 }
