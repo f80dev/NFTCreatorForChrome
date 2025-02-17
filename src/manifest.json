@@ -8,7 +8,7 @@
     "64": "assets/icon_@0.25x.png"
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self';",
+    "extension_pages": "script-src 'self'; object-src 'self'; 'unsafe-inline'",
     "sandbox": "sandbox allow-scripts allow-forms allow-popups allow-modals; 'unsafe-inline' 'unsafe-eval'; child-src 'self';"
   },
   "action": {

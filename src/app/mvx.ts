@@ -1,6 +1,6 @@
 import {
-  Address, BytesValue,
-  SmartContractTransactionsFactory,
+  Address, BigIntValue, BigUIntValue, BytesValue,
+  SmartContractTransactionsFactory, TokenManagementTransactionsFactory,
   TokenTransfer, Transaction,
   TransactionsFactoryConfig
 } from "@multiversx/sdk-core/out";
@@ -15,7 +15,6 @@ import {$$, now} from "../tools";
 import {numberToPaddedHex, utf8ToHex} from '@multiversx/sdk-core/out/utils.codec';
 import {gatherAllEvents} from '@multiversx/sdk-core/out/transactionsOutcomeParsers/resources';
 import {abi, settings} from '../environments/settings';
-import {bufferToHex, stringToBuffer} from "@multiversx/sdk-core/out/tokenOperations/codec";
 
 export const DEVNET="https://devnet-api.multiversx.com"
 export const MAINNET="https://api.multiversx.com"
@@ -45,6 +44,8 @@ export function network_config(network="") : Promise<any> {
 }
 
 
+
+
 export function get_nft(identifier: string, api:any,network: string) {
   //voir https://api.multiversx.com/#/nfts/NftController_getNft
   return mvx_api("/nfts/" + identifier,"",api,network)
@@ -58,6 +59,8 @@ export function is_image(url:string) {
   }
   return false
 }
+
+
 
 export function upload_content(content:any,filename="") : Promise<{url:string,filename:string}>{
   return new Promise(async (resolve, reject) => {
@@ -89,6 +92,8 @@ export function upload_content(content:any,filename="") : Promise<{url:string,fi
     //const reponse=await this.octokit.createGi({owner:"f80dev",repo:"promptmarket",branch:"storage"})
   })
 }
+
+
 
 export async function create_abi(abi_content:any,api:any=null): Promise<AbiRegistry> {
   //voir https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook-v13/#load-the-abi-from-an-url
@@ -131,6 +136,8 @@ export function toAccount(addr:string,network:string=DEVNET) : Promise<AccountOn
     }
   })
 }
+
+
 
 
 export function usersigner_from_pem(pemText:string) : UserSigner {
@@ -195,6 +202,32 @@ export function level(lv=1) : boolean {
   return settings.ihm_level>=lv
 }
 
+function execute_transaction(transaction:Transaction,function_name:string,user:UserService) {
+  return new Promise(async (resolve, reject) => {
+    try{
+      const apiNetworkProvider = new ApiNetworkProvider(user.network.indexOf("devnet")>-1 ? DEVNET : MAINNET);
+
+      let sign_transaction=await user.provider.signTransaction(transaction)
+
+      const transactionOnNetworkUsingApi = await new TransactionWatcher(apiNetworkProvider)
+        .awaitCompleted(await apiNetworkProvider.sendTransaction(sign_transaction));
+      const transactionOutcome = new TransactionsConverter().transactionOnNetworkToOutcome(transactionOnNetworkUsingApi);
+      if(transactionOutcome.directSmartContractCallOutcome.returnCode!="ok"){
+        reject({message:transactionOutcome.directSmartContractCallOutcome.returnCode})
+      }else{
+        //voir https://multiversx.github.io/mx-sdk-js-core/v13/classes/SmartContractTransactionsOutcomeParser.html
+        const parsedOutcome = new SmartContractTransactionsOutcomeParser({abi:await create_abi(abi)}).parseExecute(
+          { transactionOutcome:transactionOutcome,function:function_name }
+        );
+        $$("Resultat transaction ",parsedOutcome)
+        resolve(parsedOutcome)
+      }
+    } catch (e:any) {
+      reject(e.message)
+    }
+  })
+
+}
 
 export function send_transaction_with_transfers(user:UserService,function_name:string,args:any[],
                                                 tokens_to_transfer: TokenTransfer[],
@@ -205,35 +238,16 @@ export function send_transaction_with_transfers(user:UserService,function_name:s
     $$("Appel de "+function_name+" avec les arguments "+args.join(" , "))
     if(tokens_to_transfer.length>0)$$(" ... avec transfert de token")
     let transaction = await create_transaction(function_name,args,user,tokens_to_transfer,gasLimit,contract_addr)
-    const apiNetworkProvider = new ApiNetworkProvider(user.network.indexOf("devnet")>-1 ? DEVNET : MAINNET);
 
     await user.refresh()
     transaction.nonce=BigInt(user.account.nonce)
 
     try{
-      let sign_transaction=await user.provider.signTransaction(transaction)
-      let hash=await apiNetworkProvider.sendTransaction(sign_transaction)
-
-      const transactionOnNetworkUsingApi = await new TransactionWatcher(apiNetworkProvider).awaitCompleted(hash);
-
-      const converter = new TransactionsConverter();
-      const parser = new SmartContractTransactionsOutcomeParser({abi:await create_abi(abi)});
-
-
-      const transactionOutcome = converter.transactionOnNetworkToOutcome(transactionOnNetworkUsingApi);
-      if(transactionOutcome.directSmartContractCallOutcome.returnCode!="ok"){
-        reject({message:transactionOutcome.directSmartContractCallOutcome.returnCode})
-      }else{
-        //voir https://multiversx.github.io/mx-sdk-js-core/v13/classes/SmartContractTransactionsOutcomeParser.html
-        const parsedOutcome = parser.parseExecute(
-          { transactionOutcome:transactionOutcome,function:function_name }
-        );
-        $$("Resultat transaction ",parsedOutcome)
-        resolve(parsedOutcome)
-      }
-    } catch (e:any) {
-      reject(e.message)
+      resolve(await execute_transaction(transaction,function_name,user))
+    }catch (e){
+      reject(e)
     }
+
   })
 }
 
@@ -277,30 +291,32 @@ export async function send_transaction(user:UserService,function_name:string,
 
   return new Promise(async (resolve, reject) => {
 
-    if(contract_addr=="")contract_addr=user.get_sc_address()
-    if(!user.provider){
+    if (contract_addr == "") contract_addr = user.get_sc_address()
+    if (!user.provider) {
       reject("Impossible de determiner l'envoyeur")
     }
 
-    let user_signer=null
-    if(typeof(user.provider)=="object" && user.provider.hasOwnProperty("file")){user.provider=atob(user.provider.file.split("base64,")[1])}
-    if(typeof(user.provider)=="string"){
-      user_signer=UserSigner.fromPem(user.provider)
-      user.address=user_signer.getAddress().bech32()
+    let user_signer = null
+    if (typeof (user.provider) == "object" && user.provider.hasOwnProperty("file")) {
+      user.provider = atob(user.provider.file.split("base64,")[1])
+    }
+    if (typeof (user.provider) == "string") {
+      user_signer = UserSigner.fromPem(user.provider)
+      user.address = user_signer.getAddress().bech32()
     }
 
-    const factoryConfig = new TransactionsFactoryConfig({ chainID: "D" });
+    const factoryConfig = new TransactionsFactoryConfig({chainID: "D"});
     let factory = new SmartContractTransactionsFactory({
       config: factoryConfig,
-      abi:await create_abi(_abi)
+      abi: await create_abi(_abi)
     });
     //voir https://github.com/multiversx/mx-sdk-js-web-wallet-provider/blob/main/src/walletProvider.ts
     const apiNetworkProvider = new ApiNetworkProvider(user.get_domain());
 
     //voir https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook-v13#signing-objects
 
-    let sender=Address.fromBech32(user.address);
-    let _sender=await apiNetworkProvider.getAccount(sender)
+    let sender = Address.fromBech32(user.address);
+    let _sender = await apiNetworkProvider.getAccount(sender)
 
     // const pemText = await promises.readFile("../wallet/user1.pem", { encoding: "utf8" });
     // let signer = UserSigner.fromPem(pemText);
@@ -310,103 +326,79 @@ export async function send_transaction(user:UserService,function_name:string,
 
     //voir https://multiversx.github.io/mx-sdk-js-core/v13/classes/TokenTransfer.html
 
-    let token_transfer=null
-    let transaction:Transaction | undefined
-    console.log("Transaction sur le contrat https://devnet-explorer.multiversx.com/accounts/"+contract_addr)
+    let transaction: Transaction | undefined
+    console.log("Transaction sur le contrat https://devnet-explorer.multiversx.com/accounts/" + contract_addr)
 
-    if(_type==""){
-      transaction = factory.createTransactionForExecute({
-        sender: sender,
-        contract: Address.fromBech32(contract_addr),
-        function: function_name,
-        gasLimit: gasLimit,
-        arguments: args
-      });
-    }
-
-    if(_type.startsWith("Semi")){
-      let _t=TokenTransfer.semiFungible(token,nonce,value)
-      transaction = factory.createTransactionForExecute({
-        sender: sender,
-        contract: Address.fromBech32(contract_addr),
-        function: function_name,
-        gasLimit: gasLimit,
-        arguments: args,
-        tokenTransfers:[_t]
-      });
-    }
-
-
-    if(_type.startsWith("Fungible")){
-      let _t=TokenTransfer.fungibleFromAmount(token,value,18)
-      transaction = factory.createTransactionForExecute({
-          sender: sender,
-          contract: Address.fromBech32(contract_addr),
-          function: function_name,
-          gasLimit: gasLimit,
-          arguments: args,
-          tokenTransfers: [_t]
-        })
-    }
-
-    if(_type.startsWith("NonFungible")){
-      let _t=TokenTransfer.nonFungible(token,nonce)
-        transaction = factory.createTransactionForExecute({
-          sender: sender,
-          contract: Address.fromBech32(contract_addr),
-          function: function_name,
-          gasLimit: gasLimit,
-          tokenTransfers: [_t],
-          arguments: args
-        });
-      }
-
+    // if(_type==""){
+    //   transaction = factory.createTransactionForExecute({
+    //     sender: sender,
+    //     contract: Address.fromBech32(contract_addr),
+    //     function: function_name,
+    //     gasLimit: gasLimit,
+    //     arguments: args
+    //   });
+    // }
+    //
+    // if(_type.startsWith("Semi")){
+    //   let _t=TokenTransfer.semiFungible(token,nonce,value)
+    //   transaction = factory.createTransactionForExecute({
+    //     sender: sender,
+    //     contract: Address.fromBech32(contract_addr),
+    //     function: function_name,
+    //     gasLimit: gasLimit,
+    //     arguments: args,
+    //     tokenTransfers:[_t]
+    //   });
+    // }
+    //
+    //
+    // if(_type.startsWith("Fungible")){
+    //   let _t=TokenTransfer.fungibleFromAmount(token,value,18)
+    //   transaction = factory.createTransactionForExecute({
+    //       sender: sender,
+    //       contract: Address.fromBech32(contract_addr),
+    //       function: function_name,
+    //       gasLimit: gasLimit,
+    //       arguments: args,
+    //       tokenTransfers: [_t]
+    //     })
+    // }
+    //
+    // if(_type.startsWith("NonFungible")){
+    //   let _t=TokenTransfer.nonFungible(token,nonce)
+    //     transaction = factory.createTransactionForExecute({
+    //       sender: sender,
+    //       contract: Address.fromBech32(contract_addr),
+    //       function: function_name,
+    //       gasLimit: gasLimit,
+    //       tokenTransfers: [_t],
+    //       arguments: args
+    //     });
+    //   }
+    //
 
     //voir https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook-v13#transfer--execute
 
     //voir https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-signing-providers/#signing-transactions-1
     //voir exemple https://github.com/multiversx/mx-sdk-js-examples/blob/0d35714c9172ea5a31a7563a155a942b9249782e/signing-providers/src/extension.js#L52
-    if(transaction){
-      transaction.nonce=BigInt(_sender.nonce)
+    if (transaction) {
+      transaction.nonce = BigInt(_sender.nonce)
 
       let sign_transaction
-      if(!user_signer){
-        sign_transaction=await user.provider.signTransaction(transaction)
-      }else{
-        transaction.signature=await user_signer.sign(transaction.serializeForSigning())
-        sign_transaction=transaction
+      if (!user_signer) {
+        sign_transaction = await user.provider.signTransaction(transaction)
+      } else {
+        transaction.signature = await user_signer.sign(transaction.serializeForSigning())
+        sign_transaction = transaction
       }
 
-
-      //voir https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook-v13#creating-network-providers
-      //const proxyNetworkProvider = new ProxyNetworkProvider("https://devnet-gateway.multiversx.com");
-
-
-      //Voir https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook-v13#broadcast-using-a-network-provider
-      //const txHash = await proxyNetworkProvider.sendTransaction(transaction);
-      try{
-        let hash=await apiNetworkProvider.sendTransaction(sign_transaction)
-
-        const watcherUsingApi = new TransactionWatcher(apiNetworkProvider);
-        const transactionOnNetworkUsingApi = await watcherUsingApi.awaitCompleted(hash);
-
-        const converter = new TransactionsConverter();
-        const parser = new SmartContractTransactionsOutcomeParser({ abi:await create_abi(_abi)});
-
-        const transactionOutcome = converter.transactionOnNetworkToOutcome(transactionOnNetworkUsingApi);
-        const parsedOutcome = parser.parseExecute({transactionOutcome: transactionOutcome ,function: function_name});
-
-        const [event] = gatherAllEvents(transactionOutcome);
-
-        resolve(parsedOutcome)
+      try {
+        resolve(await execute_transaction(transaction, function_name, user))
       } catch (e) {
-        console.log(e)
         reject(e)
       }
     }
-
   })
-
 }
 
 export function toText(array:Uint8Array) : string {
@@ -427,18 +419,40 @@ export async function get_collections(user:UserService,api:ApiService) {
   return rc
 }
 
+
+//buildNFT
 export async function makeNFT(identifier:string,name:string,visual:string,user:UserService,quantity=1) {
   //Voir https://docs.multiversx.com/tokens/nft-tokens/#creation-of-an-nft
-  let args=[
-    utf8ToHex(identifier),
-    numberToPaddedHex(quantity),
-    utf8ToHex(name),
-    numberToPaddedHex(1),
-    utf8ToHex(""),
-    utf8ToHex(""),
-    utf8ToHex(visual)
-  ]
-  let rc=await send_transaction(user,"ESDTNFTCreate",args,user.address)
+  const factoryConfig = new TransactionsFactoryConfig({ chainID: "D" });
+  let factory = new TokenManagementTransactionsFactory({config: factoryConfig});
+  let transaction=factory.createTransactionForCreatingNFT({
+    attributes: new TextEncoder().encode(""),
+    hash: "",
+    initialQuantity: BigInt(quantity),
+    name: name,
+    royalties: 0,
+    sender: Address.fromBech32(user.address),
+    tokenIdentifier: identifier,
+    uris: [visual]
+  })
+
+  user.refresh()
+  transaction.nonce=BigInt(user.account.nonce)
+
+  let sign_transaction
+  try{
+    sign_transaction=await user.provider.signTransaction(transaction)
+  }catch(e){
+    sign_transaction=await user.provider.sign(transaction.serializeForSigning())
+  }
+
+  try{
+    const apiNetworkProvider = new ApiNetworkProvider(user.network.indexOf("devnet")>-1 ? DEVNET : MAINNET);
+    let hash=await apiNetworkProvider.sendTransaction(sign_transaction)
+    const transactionOnNetworkUsingApi = await new TransactionWatcher(apiNetworkProvider).awaitCompleted(hash);
+  }catch(e){
+    $$("erreur ",e)
+  }
 
   //voir https://docs.multiversx.com/tokens/nft-tokens/#creation-of-an-nft
   //voir https://docs.multiversx.com/developers/sc-calls-format/#converting-numeric-values-in-javascript

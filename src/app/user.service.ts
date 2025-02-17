@@ -9,6 +9,7 @@ import {DeviceService} from './device.service';
 import {Connexion} from '../operation';
 import {settings} from "../environments/settings";
 import {environment} from "../environments/environment";
+import {UserSigner} from "@multiversx/sdk-core/out";
 
 @Injectable({
   providedIn: 'root'
@@ -77,10 +78,14 @@ export class UserService {
 
 
   logout(strong=false) {
-    if(strong)localStorage.removeItem("address")
+    if(strong){
+      localStorage.removeItem("address")
+      localStorage.removeItem("pem")
+    }
     this.address=""
     this.idx=0
     this.provider=null;
+
   }
 
 
@@ -109,7 +114,7 @@ export class UserService {
         if(pem_file.length>0){
           let r={
             address:usersigner_from_pem(pem_file).getAddress().bech32(),
-            provider:pem_file,
+            provider:UserSigner.fromPem(pem_file),
             strong: true,
             encrypted:"",
             url_direct_xportal_connect:""
@@ -145,6 +150,8 @@ export class UserService {
     return this.network.indexOf("devnet")>-1 ? "https://devnet-api.multiversx.com/" : "https://api.multiversx.com/"
   }
 
+
+
   refresh(){
     return new Promise(async (resolve)=>{
       this.account=await toAccount(this.address,this.get_domain())
@@ -164,7 +171,6 @@ export class UserService {
         reject("Address not initialize")
       }else{
         await this.refresh()
-
         let tokens=await api._service("accounts/"+this.address+"/tokens","",this.get_domain())
         let egld_prefix=this.network.indexOf("devnet")>-1 ? "x" : ""
         tokens.push({identifier:egld_prefix+"EGLD",name:egld_prefix+"EGLD",balance:Number(this.account.balance)})
@@ -176,7 +182,6 @@ export class UserService {
 
         resolve(true)
       }
-
     })
   }
 
@@ -196,9 +201,6 @@ export class UserService {
   get_default_token(): string {
     return this.network.indexOf("devnet")>-1 ? environment.token["elrond-devnet"] : environment.token["elrond-mainnet"]
   }
-
-
-
 
 
   isDevnet() {
