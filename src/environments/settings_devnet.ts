@@ -5,3 +5,5 @@ export const settings={
   appli:"https://devnet.nft.f80.fr",
   network: "elrond-devnet"
 }
+
+export const abi={}
