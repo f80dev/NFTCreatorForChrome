@@ -16,7 +16,6 @@ import {ScannerComponent} from "../scanner/scanner.component";
 import {WebcamImage, WebcamModule} from "ngx-webcam";
 import {HourglassComponent, wait_message} from "../hourglass/hourglass.component";
 import {MatSnackBar} from "@angular/material/snack-bar";
-import {Clipboard} from "@angular/cdk/clipboard";
 import {_prompt} from "../prompt/prompt.component";
 import {ClipboardService} from "../clipboard.service";
 
@@ -148,7 +147,6 @@ export class MainComponent implements OnInit {
 
   async paste() {
     let content=await this.clipboard.paste()
-    debugger
     if(content.startsWith("http"))this.visual=content
   }
 }
