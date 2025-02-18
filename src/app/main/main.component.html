@@ -2,14 +2,17 @@
 
 <div class="mainform" *ngIf="message==''">
 
-  <h4>Create this NFT</h4>
+  <button *ngIf="sel_collection && visual!=''" mat-raised-button
+          style="width:150px;margin:20px;"
+          (click)="Create_NFT()">Build this NFT</button>
 
+  <br>
   <div style="display: flex;justify-content:center;align-content: center;width: 100%;height:300px;" *ngIf="!show_scanner && visual==''">
     <app-input label="Image generator and bank" value_type="list"
                [options]="generators" [value]="sel_generator" (valueChange)="sel_generator=$event"></app-input>
     <button mat-raised-button (click)="open_generator()">Open</button>
     <button mat-raised-button *ngIf="level(2)" (click)="open_photo()">Photo</button>
-    <button mat-raised-button *ngIf="level(2)" (click)="paste_url()">URL</button>
+    <button mat-raised-button *ngIf="level(1)" (click)="paste()">URL</button>
 
   </div>
 
@@ -50,14 +53,10 @@
 
 
   <br>
-
-
   <div *ngIf="user.isConnected()">
-
-
     <br>
     <button mat-raised-button (click)="logout()">logout</button>
-    <button *ngIf="sel_collection && visual!=''" mat-raised-button (click)="Create_NFT()">Build NFT</button>
+
 
   </div>
 </div>

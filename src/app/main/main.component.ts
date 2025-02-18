@@ -18,6 +18,7 @@ import {HourglassComponent, wait_message} from "../hourglass/hourglass.component
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {Clipboard} from "@angular/cdk/clipboard";
 import {_prompt} from "../prompt/prompt.component";
+import {ClipboardService} from "../clipboard.service";
 
 @Component({
   selector: 'app-main',
@@ -52,6 +53,7 @@ export class MainComponent implements OnInit {
   router=inject(Router)
   dialog=inject(MatDialog)
   toast=inject(MatSnackBar)
+  clipboard=inject(ClipboardService)
 
   collections: {label:string,value:string}[]=[]
   sel_collection:{label:string,value:string} | undefined
@@ -142,5 +144,11 @@ export class MainComponent implements OnInit {
     if(r){
       this.visual=r
     }
+  }
+
+  async paste() {
+    let content=await this.clipboard.paste()
+    debugger
+    if(content.startsWith("http"))this.visual=content
   }
 }
