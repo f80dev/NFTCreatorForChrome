@@ -8,7 +8,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {MatDialog} from "@angular/material/dialog";
 import {MatList, MatListItem} from "@angular/material/list";
 import {UploadFileComponent} from "../upload-file/upload-file.component";
-import {getParams, showError} from "../../tools";
+import {getParams, showError, showMessage} from "../../tools";
 import {get_collections, level, makeNFT} from "../mvx";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
 import {MatIcon} from "@angular/material/icon";
@@ -16,6 +16,8 @@ import {ScannerComponent} from "../scanner/scanner.component";
 import {WebcamImage, WebcamModule} from "ngx-webcam";
 import {HourglassComponent, wait_message} from "../hourglass/hourglass.component";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {Clipboard} from "@angular/cdk/clipboard";
+import {_prompt} from "../prompt/prompt.component";
 
 @Component({
   selector: 'app-main',
@@ -87,6 +89,8 @@ export class MainComponent implements OnInit {
       wait_message(this,"NFT building ...")
       try{
         await makeNFT(col.collection,this.name,this.visual,this.user,this.quantity,this.royalties)
+        showMessage(this,"Your new NFT is available in your wallet")
+        this.visual=""
       } catch (e) {
         showError(this,e)
       }
@@ -131,5 +135,12 @@ export class MainComponent implements OnInit {
     this.collections=[]
     this.sel_collection=undefined
     this.user.logout(true)
+  }
+
+  async paste_url() {
+    let r=await _prompt(this,"Paste your url","","","text","Paste","Cancel",false)
+    if(r){
+      this.visual=r
+    }
   }
 }

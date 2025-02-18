@@ -9,6 +9,8 @@
                [options]="generators" [value]="sel_generator" (valueChange)="sel_generator=$event"></app-input>
     <button mat-raised-button (click)="open_generator()">Open</button>
     <button mat-raised-button *ngIf="level(2)" (click)="open_photo()">Photo</button>
+    <button mat-raised-button *ngIf="level(2)" (click)="paste_url()">URL</button>
+
   </div>
 
   <webcam [width]="300" [height]="300" *ngIf="show_scanner"
