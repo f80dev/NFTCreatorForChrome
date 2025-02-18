@@ -1,51 +1,61 @@
-<div class="mainform">
+<app-hourglass [message]="message"></app-hourglass>
+
+<div class="mainform" *ngIf="message==''">
 
   <h4>Create this NFT</h4>
-  <div class="vignette">
-    <img [src]="visual" style="width: 100%">
-  </div>
 
-  <br>
-
-  <div style="display: flex;justify-content:center;align-content: center;width: 100%;">
+  <div style="display: flex;justify-content:center;align-content: center;width: 100%;height:300px;" *ngIf="!show_scanner && visual==''">
     <app-input label="Image generator and bank" value_type="list"
-               [options]="generators" [value]="sel_generator" (select)="sel_generator=$event"></app-input>
+               [options]="generators" [value]="sel_generator" (valueChange)="sel_generator=$event"></app-input>
     <button mat-raised-button (click)="open_generator()">Open</button>
+    <button mat-raised-button *ngIf="level(2)" (click)="open_photo()">Photo</button>
   </div>
 
-  <app-input label="Name" [value]="name" value_type="text" (valueChange)="name=$event"></app-input>
-  <app-input label="Quantity" [value]="quantity" value_type="number" (valueChange)="quantity=$event"></app-input>
-  <br>
-  <app-input label="Royalties" [value]="royalties" [min]="0" [max]="100"
-             unity="%"
-             value_type="slider" (valueChange)="royalties=$event"></app-input>
+  <webcam [width]="300" [height]="300" *ngIf="show_scanner"
+          style="margin: 20px;"
+          (click)="take_photo()" (imageCapture)="capture_image($event)"></webcam>
 
-  <br>
-  <div *ngIf="!user.isConnected()" style="display: inline-flex;width: 100%;align-content: center;">
-    <div style="display: inline-block;width:150px;">
-      <app-upload-file filter="pem" title="Upload a PEM file"
-                       (uploaded)="upload_pem($event)">Your PEM file</app-upload-file>
+
+  <div *ngIf="visual!=''">
+    <div class="vignette">
+      <mat-icon style="position:absolute;left:5px;top:5px;display: block;cursor: pointer;color:black;" (click)="reset_image()">cancel</mat-icon>
+      <img [src]="visual" style="height: 100%" [title]="visual">
     </div>
-    <button mat-raised-button (click)="login()">login</button>
+
+    <br><br>
+
+    <app-input label="Name" [value]="name" value_type="text" (valueChange)="name=$event"></app-input>
+    <app-input label="Quantity" [value]="quantity" value_type="number" (valueChange)="quantity=$event"></app-input>
+    <br>
+    <app-input label="Royalties" [value]="royalties" [min]="0" [max]="100"
+               unity="%"
+               value_type="slider" (valueChange)="royalties=$event"></app-input>
+
   </div>
-  <br><br>
+
+  <br>
+  <div *ngIf="!user.isConnected()" style="display: inline-flex;width: 100%;align-content: center;justify-content: center;">
+
+      <app-upload-file filter="pem" title="Upload a PEM file" style="display: inline-block;width:150px;"
+                       (uploaded)="upload_pem($event)">Your PEM file</app-upload-file>
+    <button mat-raised-button (click)="login()" style="margin-top: -2px;">login</button>
+  </div>
+  <br>
+
+  <app-input label="Collection" value_type="list"
+             [value]="sel_collection" *ngIf="collections.length>0"
+             [options]="collections" (valueChange)="sel_collection=$event"></app-input>
+
+
+  <br>
+
 
   <div *ngIf="user.isConnected()">
-    <button mat-raised-button (click)="user.logout(true)">logout</button>
 
-<!--    <mat-slide-toggle [checked]="permanent_pem" (toggleChange)="update_pem_storage()">Store PEM on this device</mat-slide-toggle>-->
+
     <br>
-
-    <app-input label="Collection" value_type="list"
-               [value]="sel_collection"
-               [options]="collections" (valueChange)="sel_collection=$event"></app-input>
-
-    <div *ngIf="sel_collection">
-      <br>
-      <button mat-raised-button (click)="Create_NFT()">Build NFT</button>
-      <br>
-
-    </div>
+    <button mat-raised-button (click)="logout()">logout</button>
+    <button *ngIf="sel_collection && visual!=''" mat-raised-button (click)="Create_NFT()">Build NFT</button>
 
   </div>
 </div>

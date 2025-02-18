@@ -8,9 +8,14 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {MatDialog} from "@angular/material/dialog";
 import {MatList, MatListItem} from "@angular/material/list";
 import {UploadFileComponent} from "../upload-file/upload-file.component";
-import {getParams} from "../../tools";
-import {get_collections, makeNFT} from "../mvx";
+import {getParams, showError} from "../../tools";
+import {get_collections, level, makeNFT} from "../mvx";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
+import {MatIcon} from "@angular/material/icon";
+import {ScannerComponent} from "../scanner/scanner.component";
+import {WebcamImage, WebcamModule} from "ngx-webcam";
+import {HourglassComponent, wait_message} from "../hourglass/hourglass.component";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-main',
@@ -22,7 +27,11 @@ import {MatSlideToggle} from "@angular/material/slide-toggle";
     MatList,
     MatListItem,
     UploadFileComponent,
-    MatSlideToggle
+    MatSlideToggle,
+    MatIcon,
+    ScannerComponent,
+    WebcamModule,
+    HourglassComponent
   ],
   standalone:true,
   templateUrl: './main.component.html',
@@ -33,26 +42,28 @@ export class MainComponent implements OnInit {
   name= "MyNFT"
   visual= ""
   quantity= 1
-  royalties=0
+  royalties=5
 
   user=inject(UserService)
   api=inject(ApiService)
   routes=inject(ActivatedRoute)
   router=inject(Router)
   dialog=inject(MatDialog)
+  toast=inject(MatSnackBar)
 
-  collections: any[]=[]
-  sel_collection:any
-  sel_generator: any
+  collections: {label:string,value:string}[]=[]
+  sel_collection:{label:string,value:string} | undefined
   generators=[
     {label:"Stable Diffusion",value:"https://gen.akash.network/"},
     {label:"Pixabay",value:"https://pixabay.com/"}
   ]
+  sel_generator=this.generators[0]
+  show_scanner: boolean = false;
 
 
   async ngOnInit() {
     let params:any=await getParams(this.routes)
-    this.visual=params.url || "https://www.lecadeauartistique.com/img/produits/decoration-murale/affiche-monet-nenuphars-saules-reflets-nuages.jpg"
+    this.visual=params.url || ""
     this.login()
   }
 
@@ -61,16 +72,27 @@ export class MainComponent implements OnInit {
     await this.user.login(this,"",localStorage.getItem("pem") || "",false)
     this.collections=[]
     for(let col of await get_collections(this.user,this.api)) {
-      this.collections.push({title:col.name,value:col})
+      this.collections.push({label:col.name,value:col})
     }
-    if(this.collections.length>0)this.sel_collection=this.collections[0]
+    if(this.collections.length>0){
+      this.sel_collection=this.collections[0]
+    }
   }
 
 
   async Create_NFT() {
-    await this.user.login(this,"",localStorage.getItem("pem") || "",true)
-    let col=this.sel_collection.value
-    await makeNFT(col.ticker,this.name,this.visual,this.user,this.quantity)
+    if(this.sel_collection){
+      await this.user.login(this,"",localStorage.getItem("pem") || "",true)
+      let col:any=this.sel_collection.value
+      wait_message(this,"NFT building ...")
+      try{
+        await makeNFT(col.collection,this.name,this.visual,this.user,this.quantity,this.royalties)
+      } catch (e) {
+        showError(this,e)
+      }
+      wait_message(this)
+
+    }
   }
 
 
@@ -83,5 +105,31 @@ export class MainComponent implements OnInit {
 
   open_generator() {
     open(this.sel_generator.value,"Images")
+  }
+
+  reset_image() {
+    this.visual=""
+  }
+
+  open_photo() {
+    this.show_scanner=true
+  }
+
+  message: string=""
+
+  capture_image($event: WebcamImage) {
+    this.show_scanner=false
+  }
+
+  take_photo() {
+    this.show_scanner=false
+  }
+
+  protected readonly level = level;
+
+  logout() {
+    this.collections=[]
+    this.sel_collection=undefined
+    this.user.logout(true)
   }
 }

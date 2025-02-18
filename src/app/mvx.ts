@@ -421,7 +421,7 @@ export async function get_collections(user:UserService,api:ApiService) {
 
 
 //buildNFT
-export async function makeNFT(identifier:string,name:string,visual:string,user:UserService,quantity=1) {
+export async function makeNFT(identifier:string,name:string,visual:string,user:UserService,quantity=1,royalties=0) {
   //Voir https://docs.multiversx.com/tokens/nft-tokens/#creation-of-an-nft
   const factoryConfig = new TransactionsFactoryConfig({ chainID: "D" });
   let factory = new TokenManagementTransactionsFactory({config: factoryConfig});
@@ -430,7 +430,7 @@ export async function makeNFT(identifier:string,name:string,visual:string,user:U
     hash: "",
     initialQuantity: BigInt(quantity),
     name: name,
-    royalties: 0,
+    royalties: Math.round(royalties*100),
     sender: Address.fromBech32(user.address),
     tokenIdentifier: identifier,
     uris: [visual]
