@@ -18,6 +18,8 @@ import {HourglassComponent, wait_message} from "../hourglass/hourglass.component
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {_prompt} from "../prompt/prompt.component";
 import {ClipboardService} from "../clipboard.service";
+import {MatExpansionPanel, MatExpansionPanelHeader} from "@angular/material/expansion";
+import {JsonEditorComponent} from "ang-jsoneditor";
 
 @Component({
   selector: 'app-main',
@@ -34,7 +36,9 @@ import {ClipboardService} from "../clipboard.service";
     ScannerComponent,
     WebcamModule,
     HourglassComponent,
-    MatIconButton
+    MatIconButton,
+    MatExpansionPanel,MatExpansionPanelHeader,
+    JsonEditorComponent
   ],
   standalone:true,
   templateUrl: './main.component.html',
@@ -63,6 +67,9 @@ export class MainComponent implements OnInit {
   ]
   sel_generator=this.generators[0]
   show_scanner: boolean = false;
+  zoom: number=1
+  x: number=0
+  y: number=0
 
 
   async ngOnInit() {
@@ -90,7 +97,7 @@ export class MainComponent implements OnInit {
       let col:any=this.sel_collection.value
       wait_message(this,"NFT building ...")
       try{
-        await makeNFT(col.collection,this.name,this.visual,this.user,this.quantity,this.royalties)
+        await makeNFT(col.collection,this.name,this.visual,this.user,this.quantity,this.royalties,this.uris)
         showMessage(this,"Your new NFT is available in your wallet")
         this.visual=""
       } catch (e) {
@@ -134,6 +141,7 @@ export class MainComponent implements OnInit {
   protected readonly level = level;
   self_storage: boolean = false;
   uris:string[]=[]
+  metadata: Object={}
 
   logout() {
     this.collections=[]
@@ -163,5 +171,15 @@ export class MainComponent implements OnInit {
   add_uri() {
     this.uris.push('https://')
     this.update_uri('https://')
+  }
+
+  update_zoom($event: any) {
+    this.zoom++;
+  }
+
+
+  update_position($event: MouseEvent) {
+    this.x=$event.clientX
+    this.y=$event.clientY
   }
 }

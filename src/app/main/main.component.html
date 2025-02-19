@@ -22,12 +22,17 @@
 
 
   <div *ngIf="visual!=''">
-    <div class="vignette">
+    <div class="vignette" (click)="update_position($event)" (mousewheel)="update_zoom($event)">
       <mat-icon style="position:absolute;left:5px;top:5px;display: block;cursor: pointer;color:black;" (click)="reset_image()">cancel</mat-icon>
-      <img [src]="visual" style="height: 100%" [title]="visual">
+      <img [src]="visual" style="position: absolute;"
+           [style.left]="x" [style.top]="y" [title]="visual">
+<!--           [style.width]="img_w*zoom" [style.height]="img_h*zoom" -->
+
     </div>
     <br>
-    <mat-slide-toggle [checked]="self_storage">Self storage</mat-slide-toggle>
+    <mat-slide-toggle *ngIf="visual && visual.startsWith('http')" [checked]="self_storage" style="width:250px;">
+      Self storage
+    </mat-slide-toggle>
 
     <br><br>
 
@@ -36,6 +41,12 @@
     <br>
     <app-input label="Royalties" [value]="royalties" [min]="0" [max]="100" unity="%"
                value_type="slider" (valueChange)="royalties=$event"></app-input>
+
+    <br><br>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>Metadata</mat-expansion-panel-header>
+      <json-editor [data]="metadata"></json-editor>
+    </mat-expansion-panel>
 
     <br>
     <button mat-icon-button class="icon-button" (click)="add_uri()">
@@ -63,6 +74,8 @@
     <button mat-raised-button (click)="login()" style="margin-top: -2px;">login</button>
   </div>
   <br>
+
+
 
 
   <div style="display: inline-flex;width:100%;align-items: center;justify-content: center;">

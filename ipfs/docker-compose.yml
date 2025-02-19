@@ -4,19 +4,27 @@
 version: '3'
 
 services:
-  ipfs_node:
+  ipfs:
     container_name: ipfs
     image: ipfs/go-ipfs
     restart: unless-stopped
     ports:
-      - "0.0.0.0:4001:4001"  # IPFS Swarm Port
-      - "0.0.0.0:5001:5001"  # IPFS API Port
       - "0.0.0.0:8080:8080"  # IPFS Gateway Port
     volumes:
-      - /root/ipfs:/data/ipfs
+      - /root/ipfs/data:/data/ipfs
     command:
       - "daemon"
       - "--migrate=true"
 
-volumes:
-  ipfs_data:
+  nginx:
+    container_name: nginx
+    image: nginx:latest
+    ports:
+      - '5001:5001'
+    volumes:
+      - '/root/ipfs/default.conf:/etc/nginx/conf.d/default.conf:ro'
+      - '/root/ipfs/htpasswd:/htpasswd:ro'
+      - '/root/ipfs/fullchain.pem:/fullchain.pem'
+      - '/root/ipfs/privkey.pem:/privkey.pem'
+    restart: unless-stopped
+

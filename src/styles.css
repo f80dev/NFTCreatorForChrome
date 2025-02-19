@@ -1,5 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
 
+@import "jsoneditor/dist/jsoneditor.min.css";
+
+
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
@@ -7,7 +10,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   width:100vw;
   height: 100vh;
   color: white;
-  background-color: #171717;
+  background-color: #0a191b;
   padding:5px;
   margin:0;
   text-align: center;
