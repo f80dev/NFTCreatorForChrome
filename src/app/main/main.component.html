@@ -34,9 +34,24 @@
     <app-input label="Name" [value]="name" value_type="text" (valueChange)="name=$event"></app-input>
     <app-input label="Quantity" [value]="quantity" value_type="number" (valueChange)="quantity=$event"></app-input>
     <br>
-    <app-input label="Royalties" [value]="royalties" [min]="0" [max]="100"
-               unity="%"
+    <app-input label="Royalties" [value]="royalties" [min]="0" [max]="100" unity="%"
                value_type="slider" (valueChange)="royalties=$event"></app-input>
+
+    <br>
+    <button mat-icon-button class="icon-button" (click)="add_uri()">
+      <mat-icon>add</mat-icon>
+    </button>
+    <br>
+    <table style="width: 100%;max-width: 500px;display: inline-block;">
+      <tr *ngFor="let uri of uris" style="width: 100%;">
+        <td style="width: 80%;text-align: left;">{{uri}}</td>
+        <td>
+          <mat-icon (click)="update_uri(uri)">edit</mat-icon>
+          <mat-icon (click)="delete_uri(uri)">cancel</mat-icon>
+        </td>
+      </tr>
+
+    </table>
 
   </div>
 
@@ -48,6 +63,15 @@
     <button mat-raised-button (click)="login()" style="margin-top: -2px;">login</button>
   </div>
   <br>
+
+
+  <div style="display: inline-flex;width:100%;align-items: center;justify-content: center;">
+    {{user.address}}
+    &nbsp;
+    <button mat-icon-button class="icon-button" (click)="logout()">
+      <mat-icon>logout</mat-icon>
+    </button>
+  </div>
 
   <app-input label="Collection" value_type="list"
              [value]="sel_collection" *ngIf="collections.length>0"

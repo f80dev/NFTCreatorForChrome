@@ -1,5 +1,5 @@
 import {Component, inject, OnInit} from '@angular/core';
-import {MatButton} from "@angular/material/button";
+import {MatButton, MatIconButton} from "@angular/material/button";
 import {NgForOf, NgIf} from "@angular/common";
 import {InputComponent} from "../input/input.component";
 import {UserService} from "../user.service";
@@ -33,7 +33,8 @@ import {ClipboardService} from "../clipboard.service";
     MatIcon,
     ScannerComponent,
     WebcamModule,
-    HourglassComponent
+    HourglassComponent,
+    MatIconButton
   ],
   standalone:true,
   templateUrl: './main.component.html',
@@ -132,6 +133,7 @@ export class MainComponent implements OnInit {
 
   protected readonly level = level;
   self_storage: boolean = false;
+  uris:string[]=[]
 
   logout() {
     this.collections=[]
@@ -139,15 +141,27 @@ export class MainComponent implements OnInit {
     this.user.logout(true)
   }
 
-  async paste_url() {
-    let r=await _prompt(this,"Paste your url","","","text","Paste","Cancel",false)
-    if(r){
-      this.visual=r
-    }
-  }
 
   async paste() {
-    let content=await this.clipboard.paste()
+    let content=await this.clipboard.paste("text")
     if(content.startsWith("http"))this.visual=content
+  }
+
+
+
+  async update_uri(uri: string) {
+    let idx=this.uris.indexOf(uri)
+    let r=await _prompt(this,"New URI",uri,"","text","Ok","Cancel",false)
+    if(r)this.uris[idx]=r
+  }
+
+  delete_uri(uri: string) {
+    let idx=this.uris.indexOf(uri)
+    this.uris.splice(idx,1)
+  }
+
+  add_uri() {
+    this.uris.push('https://')
+    this.update_uri('https://')
   }
 }

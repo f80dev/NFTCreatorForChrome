@@ -1,0 +1,22 @@
+#      - "config --json API.HTTPHeaders.Access-Control-Allow-Origin '[\"*\"]'"
+#      - "config --json API.HTTPHeaders.Access-Control-Allow-Methods '[\"GET\", \"POST\"]'"
+
+version: '3'
+
+services:
+  ipfs_node:
+    container_name: ipfs
+    image: ipfs/go-ipfs
+    restart: unless-stopped
+    ports:
+      - "0.0.0.0:4001:4001"  # IPFS Swarm Port
+      - "0.0.0.0:5001:5001"  # IPFS API Port
+      - "0.0.0.0:8080:8080"  # IPFS Gateway Port
+    volumes:
+      - /root/ipfs:/data/ipfs
+    command:
+      - "daemon"
+      - "--migrate=true"
+
+volumes:
+  ipfs_data:

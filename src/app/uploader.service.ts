@@ -8,12 +8,12 @@ import {create, IPFSHTTPClient} from 'ipfs-http-client'
 })
 
 //IPFS_SERVER="/ip4/173.249.41.158/tcp/"+str(IPFS_PORT)+"/http"
-export class UploaderService implements OnInit{
+export class UploaderService {
   private client: IPFSHTTPClient | undefined;
 
-  ngOnInit(): void {
-      this.client= create({
-        host: '173.249.41.158',
+  async init() {
+    this.client= create({
+        host: '93.127.202.181',
         port: 5001,
         protocol: 'https',
         headers: {}
