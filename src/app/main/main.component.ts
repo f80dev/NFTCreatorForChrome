@@ -131,6 +131,7 @@ export class MainComponent implements OnInit {
   }
 
   protected readonly level = level;
+  self_storage: boolean = false;
 
   logout() {
     this.collections=[]
