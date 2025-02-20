@@ -4,5 +4,4 @@ import { AppComponent } from './app/app.component';
 
 (window as any).global = window;
 
-bootstrapApplication(AppComponent, appConfig)
-  .catch((err) => console.error(err));
+bootstrapApplication(AppComponent, appConfig).catch((err) => console.error(err));

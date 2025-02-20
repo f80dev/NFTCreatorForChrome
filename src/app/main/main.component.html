@@ -2,9 +2,7 @@
 
 <div class="mainform" *ngIf="message==''">
 
-  <button *ngIf="sel_collection && visual!=''" mat-raised-button
-          style="width:150px;margin:20px;"
-          (click)="Create_NFT()">Build this NFT</button>
+
 
   <br>
   <div style="display: flex;justify-content:center;align-content: center;width: 100%;height:300px;" *ngIf="!show_scanner && visual==''">
@@ -12,21 +10,29 @@
                [options]="generators" [value]="sel_generator" (valueChange)="sel_generator=$event"></app-input>
     <button mat-raised-button (click)="open_generator()">Open</button>
     <button mat-raised-button *ngIf="level(2)" (click)="open_photo()">Photo</button>
-    <button mat-raised-button *ngIf="level(1)" (click)="paste()">URL</button>
+    <button mat-raised-button *ngIf="level(1)" (click)="paste()">Paste</button>
 
   </div>
 
   <webcam [width]="300" [height]="300" *ngIf="show_scanner"
           style="margin: 20px;"
-          (click)="take_photo()" (imageCapture)="capture_image($event)"></webcam>
+          [captureImageData]="true"
+          imageType="image/jpeg"
+          [imageQuality]="0.90"
+          [trigger]="trigger"
+          (click)="take_photo()"
+          (imageCapture)="capture_image($event)"></webcam>
 
 
   <div *ngIf="visual!=''">
-    <div class="vignette" (click)="update_position($event)" (mousewheel)="update_zoom($event)">
-      <mat-icon style="position:absolute;left:5px;top:5px;display: block;cursor: pointer;color:black;" (click)="reset_image()">cancel</mat-icon>
-      <img [src]="visual" style="position: absolute;"
-           [style.left]="x" [style.top]="y" [title]="visual">
-<!--           [style.width]="img_w*zoom" [style.height]="img_h*zoom" -->
+    <div class="vignette"  (mousedown)="start_translate($event)" (mouseup)="update_position($event)" (mousewheel)="update_zoom($event)">
+      <mat-icon style="position:absolute;left:5px;top:5px;display: block;cursor: pointer;color:black;z-index: 10;" (click)="reset_image()">cancel</mat-icon>
+      <img [src]="visual" style="position: absolute;display: block;"
+           #img
+           (load)="getImageDimensions()"
+           [style.height]="(h*zoom)+'px'" [style.width]="(w*zoom)+'px'"
+           [style.left]="x+'px'" [style.top]="y+'px'" [title]="visual">
+      <!--           [style.width]="img_w*zoom" [style.height]="img_h*zoom" -->
 
     </div>
     <br>
@@ -36,67 +42,87 @@
 
     <br><br>
 
-    <app-input label="Name" [value]="name" value_type="text" (valueChange)="name=$event"></app-input>
-    <app-input label="Quantity" [value]="quantity" value_type="number" (valueChange)="quantity=$event"></app-input>
-    <br>
-    <app-input label="Royalties" [value]="royalties" [min]="0" [max]="100" unity="%"
-               value_type="slider" (valueChange)="royalties=$event"></app-input>
+    <mat-accordion>
+      <mat-expansion-panel >
+        <mat-expansion-panel-header>Properties</mat-expansion-panel-header>
+        <app-input label="Name" [value]="name" value_type="text" (valueChange)="name=$event"></app-input>
+        <app-input label="Quantity" [value]="quantity" value_type="number" (valueChange)="quantity=$event"></app-input>
+        <br>
+        <app-input label="Royalties" [value]="royalties" [min]="0" [max]="100" unity="%"
+                   value_type="slider" (valueChange)="royalties=$event"></app-input>
 
-    <br><br>
-    <mat-expansion-panel>
-      <mat-expansion-panel-header>Metadata</mat-expansion-panel-header>
-      <json-editor [data]="metadata"></json-editor>
-    </mat-expansion-panel>
+      </mat-expansion-panel>
 
-    <br>
-    <button mat-icon-button class="icon-button" (click)="add_uri()">
-      <mat-icon>add</mat-icon>
-    </button>
-    <br>
-    <table style="width: 100%;max-width: 500px;display: inline-block;">
-      <tr *ngFor="let uri of uris" style="width: 100%;">
-        <td style="width: 80%;text-align: left;">{{uri}}</td>
-        <td>
-          <mat-icon (click)="update_uri(uri)">edit</mat-icon>
-          <mat-icon (click)="delete_uri(uri)">cancel</mat-icon>
-        </td>
-      </tr>
+      <br>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>Metadata</mat-expansion-panel-header>
+        <json-editor [data]="metadata" style="min-width: 350px;max-width: 800px;width: 100%;"></json-editor>
+      </mat-expansion-panel>
 
-    </table>
+      <br>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>Ressources</mat-expansion-panel-header>
+        <button mat-icon-button class="icon-button" (click)="add_uri()">
+          <mat-icon>add</mat-icon>
+        </button>
+        <br>
+        <table style="width: 100%;max-width: 800px;display: inline-block;">
+          <tr *ngFor="let uri of uris" style="width: 100%;">
+            <td style="width: 80%;text-align: left;">{{uri}}</td>
+            <td style="width: 10%;text-align: right;">
+              <mat-icon (click)="update_uri(uri)">edit</mat-icon>
+              <mat-icon (click)="delete_uri(uri)">cancel</mat-icon>
+            </td>
+          </tr>
+
+        </table>
+
+      </mat-expansion-panel>
+
+    </mat-accordion>
 
   </div>
 
   <br>
   <div *ngIf="!user.isConnected()" style="display: inline-flex;width: 100%;align-content: center;justify-content: center;">
 
-      <app-upload-file filter="pem" title="Upload a PEM file" style="display: inline-block;width:150px;"
-                       (uploaded)="upload_pem($event)">Your PEM file</app-upload-file>
+    <app-upload-file filter="pem" title="Upload a PEM file" style="display: inline-block;width:150px;"
+                     (uploaded)="upload_pem($event)">Your PEM file</app-upload-file>
     <button mat-raised-button (click)="login()" style="margin-top: -2px;">login</button>
   </div>
-  <br>
+  <div *ngIf="visual.length>0">
+
+    <button *ngIf="sel_collection && visual!=''" mat-raised-button
+            style="width:200px;height:70px;margin:20px;"
+            (click)="Create_NFT()">
+      <div style="font-size: medium;margin-bottom: -10px;">
+        Build this NFT
+        <br>
+        <mat-icon>arrow_downward</mat-icon>
+
+      </div>
 
 
-
-
-  <div style="display: inline-flex;width:100%;align-items: center;justify-content: center;">
-    {{user.address}}
-    &nbsp;
-    <button mat-icon-button class="icon-button" (click)="logout()">
-      <mat-icon>logout</mat-icon>
     </button>
-  </div>
 
-  <app-input label="Collection" value_type="list"
-             [value]="sel_collection" *ngIf="collections.length>0"
-             [options]="collections" (valueChange)="sel_collection=$event"></app-input>
-
-
-  <br>
-  <div *ngIf="user.isConnected()">
     <br>
-    <button mat-raised-button (click)="logout()">logout</button>
+    <mat-card style="text-align: center;max-width: 1200px;display:inline-block;padding: 15px;">
+      <div style="display: inline-flex;align-items: center;justify-content: center;">
+        {{user.address.substring(0,10)+"..."+user.address.substring(user.address.length-10)}}
+        &nbsp;
+        <button mat-icon-button class="icon-button" (click)="logout()" title="logout">
+          <mat-icon>logout</mat-icon>
+        </button>
+      </div>
+      <br>
 
-
+      <app-input label="Collection" value_type="list" style="display: inline-block;"
+                 [value]="sel_collection" *ngIf="collections.length>0"
+                 [options]="collections" (valueChange)="sel_collection=$event"></app-input>
+    </mat-card>
   </div>
+
+
+
 </div>
 

@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, ElementRef, inject, OnInit, ViewChild} from '@angular/core';
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {NgForOf, NgIf} from "@angular/common";
 import {InputComponent} from "../input/input.component";
@@ -8,7 +8,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {MatDialog} from "@angular/material/dialog";
 import {MatList, MatListItem} from "@angular/material/list";
 import {UploadFileComponent} from "../upload-file/upload-file.component";
-import {getParams, showError, showMessage} from "../../tools";
+import {$$, getParams, showError, showMessage} from "../../tools";
 import {get_collections, level, makeNFT} from "../mvx";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
 import {MatIcon} from "@angular/material/icon";
@@ -18,8 +18,12 @@ import {HourglassComponent, wait_message} from "../hourglass/hourglass.component
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {_prompt} from "../prompt/prompt.component";
 import {ClipboardService} from "../clipboard.service";
-import {MatExpansionPanel, MatExpansionPanelHeader} from "@angular/material/expansion";
+import {MatAccordion, MatExpansionPanel, MatExpansionPanelHeader} from "@angular/material/expansion";
 import {JsonEditorComponent} from "ang-jsoneditor";
+import {ImageProcessorService} from "../image-processor.service";
+import {UploaderService} from "../uploader.service";
+import {Observable, Subject} from "rxjs";
+import {MatCard} from "@angular/material/card";
 
 @Component({
   selector: 'app-main',
@@ -37,15 +41,15 @@ import {JsonEditorComponent} from "ang-jsoneditor";
     WebcamModule,
     HourglassComponent,
     MatIconButton,
-    MatExpansionPanel,MatExpansionPanelHeader,
-    JsonEditorComponent
+    MatExpansionPanel, MatExpansionPanelHeader,
+    JsonEditorComponent, MatAccordion, MatCard
   ],
   standalone:true,
   templateUrl: './main.component.html',
   styleUrl: './main.component.css'
 })
 export class MainComponent implements OnInit {
-
+  @ViewChild('img', { static: false }) img!: ElementRef;
   name= "MyNFT"
   visual= ""
   quantity= 1
@@ -70,11 +74,17 @@ export class MainComponent implements OnInit {
   zoom: number=1
   x: number=0
   y: number=0
+  w: number=0
+  h:number=0
+  handle: any
+  start_x=0
+  start_y=0
 
 
   async ngOnInit() {
     let params:any=await getParams(this.routes)
     this.visual=params.url || ""
+    setTimeout(()=>{this.autoscale()},200)
     this.login()
   }
 
@@ -90,12 +100,21 @@ export class MainComponent implements OnInit {
     }
   }
 
-
+  imageProcessor=inject(ImageProcessorService)
+  imageUploader=inject(UploaderService)
   async Create_NFT() {
     if(this.sel_collection){
       await this.user.login(this,"",localStorage.getItem("pem") || "",true)
       let col:any=this.sel_collection.value
       wait_message(this,"NFT building ...")
+
+      if(this.self_storage){
+
+        let blob=await this.imageProcessor.getBase64FromUrl(this.visual)
+        let result=await this.imageUploader.upload(this.imageUploader.b64_to_file(blob))
+        this.visual=result.url
+      }
+
       try{
         await makeNFT(col.collection,this.name,this.visual,this.user,this.quantity,this.royalties,this.uris)
         showMessage(this,"Your new NFT is available in your wallet")
@@ -126,15 +145,25 @@ export class MainComponent implements OnInit {
 
   open_photo() {
     this.show_scanner=true
+    this.handle=setInterval(()=>{this.trigger.next()},200)
   }
 
   message: string=""
+  image:WebcamImage | undefined
 
-  capture_image($event: WebcamImage) {
-    this.show_scanner=false
+  trigger = new Subject<void>();
+
+  capture_image(img: WebcamImage) {
+    this.image=img
   }
 
   take_photo() {
+    clearInterval(this.handle)
+    if(this.image){
+      this.visual=this.image?.imageAsDataUrl
+      this.self_storage=true
+      setTimeout(()=>{this.autoscale()},200)
+    }
     this.show_scanner=false
   }
 
@@ -153,6 +182,7 @@ export class MainComponent implements OnInit {
   async paste() {
     let content=await this.clipboard.paste("text")
     if(content.startsWith("http"))this.visual=content
+    setTimeout(()=>{this.autoscale()},200)
   }
 
 
@@ -174,12 +204,33 @@ export class MainComponent implements OnInit {
   }
 
   update_zoom($event: any) {
-    this.zoom++;
+    this.zoom=this.zoom+($event.wheelDelta>0 ? 0.01 : -0.01);
+    if(this.zoom<=0)this.zoom=0.1;
+    this.self_storage=true
   }
 
 
+  getImageDimensions(): void {
+    const img = this.img.nativeElement as HTMLImageElement;
+    this.w = img.naturalWidth;
+    this.h = img.naturalHeight;
+  }
+
+
+
   update_position($event: MouseEvent) {
-    this.x=$event.clientX
-    this.y=$event.clientY
+    this.x=this.x+($event.clientX-this.start_x)
+    this.y=this.y+($event.clientY-this.start_y)
+    this.self_storage=true
+  }
+
+  private autoscale() {
+    this.getImageDimensions()
+    this.zoom=300/this.w;
+  }
+
+  start_translate($event: MouseEvent) {
+    this.start_x=$event.offsetX
+    this.start_y=$event.offsetY
   }
 }
