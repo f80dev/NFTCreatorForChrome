@@ -135,8 +135,8 @@ export class MainComponent implements OnInit {
   }
 
 
-  open_generator() {
-    open(this.sel_generator.value,"Images")
+  open_generator(generator:any) {
+    open(generator.value,"Images")
   }
 
   reset_image() {
@@ -245,5 +245,11 @@ export class MainComponent implements OnInit {
   center_image($event: MouseEvent) {
     this.x=this.x-(300-$event.offsetX)
     this.y=this.y-(300-$event.offsetY)
+  }
+
+  from_device($event: any) {
+    this.visual=$event.file
+    this.self_storage=false
+    setTimeout(()=>{this.autoscale()},400)
   }
 }
