@@ -25,14 +25,16 @@
 
 
   <div *ngIf="visual!=''">
-    <div class="vignette"  (mousedown)="start_translate($event)" (mouseup)="update_position($event)" (mousewheel)="update_zoom($event)">
+    <div class="vignette"  (dblclick)="center_image($event)"
+         (dragstart)="start_translate($event)"
+         (dragend)="update_position($event)" (mousewheel)="update_zoom($event)">
       <mat-icon style="position:absolute;left:5px;top:5px;display: block;cursor: pointer;color:black;z-index: 10;" (click)="reset_image()">cancel</mat-icon>
+      <mat-icon style="position:absolute;left:30px;top:5px;display: block;cursor: pointer;color:black;z-index: 10;" (click)="zoom=1">visibility</mat-icon>
       <img [src]="visual" style="position: absolute;display: block;"
            #img
            (load)="getImageDimensions()"
            [style.height]="(h*zoom)+'px'" [style.width]="(w*zoom)+'px'"
-           [style.left]="x+'px'" [style.top]="y+'px'" [title]="visual">
-      <!--           [style.width]="img_w*zoom" [style.height]="img_h*zoom" -->
+           [style.left]="x+'px'" [style.top]="y+'px'" [title]="visual+'(zoom:'+zoom+')'">
 
     </div>
     <br>

@@ -118,7 +118,7 @@ export class MainComponent implements OnInit {
       try{
         await makeNFT(col.collection,this.name,this.visual,this.user,this.quantity,this.royalties,this.uris)
         showMessage(this,"Your new NFT is available in your wallet")
-        this.visual=""
+        this.reset_image()
       } catch (e) {
         showError(this,e)
       }
@@ -141,6 +141,11 @@ export class MainComponent implements OnInit {
 
   reset_image() {
     this.visual=""
+    this.visual=""
+    this.zoom=1
+    this.x=0
+    this.y=0
+    this.self_storage=false
   }
 
   open_photo() {
@@ -182,9 +187,8 @@ export class MainComponent implements OnInit {
   async paste() {
     let content=await this.clipboard.paste("text")
     if(content.startsWith("http"))this.visual=content
-    setTimeout(()=>{this.autoscale()},200)
+    setTimeout(()=>{this.autoscale()},1000)
   }
-
 
 
   async update_uri(uri: string) {
@@ -217,20 +221,29 @@ export class MainComponent implements OnInit {
   }
 
 
+  private autoscale() {
+    this.getImageDimensions()
+    this.zoom=300/this.w
+    this.x=0
+    this.y=0
+  }
+
+
 
   update_position($event: MouseEvent) {
-    this.x=this.x+($event.clientX-this.start_x)
-    this.y=this.y+($event.clientY-this.start_y)
+    this.x=this.x+(this.start_x-$event.clientX)
+    this.y=this.y+(this.start_y-$event.clientY)
     this.self_storage=true
   }
 
-  private autoscale() {
-    this.getImageDimensions()
-    this.zoom=300/this.w;
-  }
 
   start_translate($event: MouseEvent) {
     this.start_x=$event.offsetX
     this.start_y=$event.offsetY
+  }
+
+  center_image($event: MouseEvent) {
+    this.x=this.x-(300-$event.offsetX)
+    this.y=this.y-(300-$event.offsetY)
   }
 }
