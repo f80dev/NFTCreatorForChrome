@@ -132,6 +132,10 @@
       <app-input label="Collection" value_type="list" style="display: inline-block;"
                  [value]="sel_collection" *ngIf="collections.length>0"
                  [options]="collections" (valueChange)="sel_collection=$event"></app-input>
+
+      <div *ngIf="collections.length==0">You need a collection before mint a NFT<br><br></div>
+
+      <button mat-raised-button (click)="build_collection()">Create Collection</button>
     </mat-card>
   </div>
 

@@ -9,7 +9,7 @@ import {MatDialog} from "@angular/material/dialog";
 import {MatList, MatListItem} from "@angular/material/list";
 import {UploadFileComponent} from "../upload-file/upload-file.component";
 import {$$, getParams, showError, showMessage} from "../../tools";
-import {get_collections, level, makeNFT} from "../mvx";
+import {create_collection, get_collections, level, makeNFT} from "../mvx";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
 import {MatIcon} from "@angular/material/icon";
 import {ScannerComponent} from "../scanner/scanner.component";
@@ -251,5 +251,14 @@ export class MainComponent implements OnInit {
     this.visual=$event.file
     this.self_storage=false
     setTimeout(()=>{this.autoscale()},400)
+  }
+
+  protected readonly create_collection = create_collection;
+
+  async build_collection() {
+    let r=await _prompt(this,"Collection name","","must be inferieur to 20 characters","text","Create","Cancel",false)
+    if(r){
+
+    }
   }
 }
