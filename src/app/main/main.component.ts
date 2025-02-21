@@ -151,6 +151,7 @@ export class MainComponent implements OnInit {
   }
 
   reset_image() {
+    this.uris=[]
     this.visual=""
     this.visual=""
     this.zoom=1
