@@ -1,6 +1,6 @@
 {
-  "name": "Instant NFT Devnet",
-  "short_name": "iNFTdev",
+  "name": "Instant NFT",
+  "short_name": "iNFT",
   "theme_color": "#1976d2",
   "background_color": "#fafafa",
   "display": "standalone",
