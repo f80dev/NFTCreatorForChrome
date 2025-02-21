@@ -1,6 +1,6 @@
 import {Component, ElementRef, inject, OnInit, ViewChild} from '@angular/core';
 import {MatButton, MatIconButton} from "@angular/material/button";
-import {NgForOf, NgIf} from "@angular/common";
+import {Location, NgForOf, NgIf} from "@angular/common";
 import {InputComponent} from "../input/input.component";
 import {UserService} from "../user.service";
 import {ApiService} from "../api.service";
@@ -9,7 +9,7 @@ import {MatDialog} from "@angular/material/dialog";
 import {MatList, MatListItem} from "@angular/material/list";
 import {UploadFileComponent} from "../upload-file/upload-file.component";
 import {getParams, showError, showMessage} from "../../tools";
-import {create_collection, get_collections, level, makeNFT} from "../mvx";
+import {create_collection, get_collections, level, makeNFT, set_roles_to_collection} from "../mvx";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
 import {MatIcon} from "@angular/material/icon";
 import {ScannerComponent} from "../scanner/scanner.component";
@@ -55,6 +55,7 @@ export class MainComponent implements OnInit {
   quantity= 1
   royalties=5
 
+  location=inject(Location)
   user=inject(UserService)
   api=inject(ApiService)
   routes=inject(ActivatedRoute)
@@ -63,8 +64,8 @@ export class MainComponent implements OnInit {
   toast=inject(MatSnackBar)
   clipboard=inject(ClipboardService)
 
-  collections: {label:string,value:string}[]=[]
-  sel_collection:{label:string,value:string} | undefined
+  collections: {label:string,value:any}[]=[]
+  sel_collection:{label:string,value:any} | undefined
   generators=[
     {label:"Stable Diffusion",value:"https://gen.akash.network/"},
     {label:"Pixabay",value:"https://pixabay.com/"}
@@ -88,9 +89,7 @@ export class MainComponent implements OnInit {
     this.login()
   }
 
-
-  async login(){
-    await this.user.login(this,"",localStorage.getItem("pem") || "",false)
+  async refresh_collection(){
     this.collections=[]
     for(let col of await get_collections(this.user,this.api)) {
       this.collections.push({label:col.name,value:col})
@@ -98,6 +97,12 @@ export class MainComponent implements OnInit {
     if(this.collections.length>0){
       this.sel_collection=this.collections[0]
     }
+  }
+
+
+  async login(){
+    await this.user.login(this,"",localStorage.getItem("pem") || "",false)
+    await this.refresh_collection()
   }
 
   imageProcessor=inject(ImageProcessorService)
@@ -115,9 +120,16 @@ export class MainComponent implements OnInit {
       }
 
       try{
-        await makeNFT(col.collection,this.name,this.visual,this.user,this.quantity,this.royalties,this.uris)
-        showMessage(this,"Your new NFT is available in your wallet")
-        this.reset_image()
+
+        let rc=await makeNFT(col.collection,this.name,this.visual,this.user,this.quantity,this.royalties,this.uris)
+        if(rc.returnMessage=="ok"){
+          showMessage(this,"Your new NFT is available in your wallet",5000,()=>this.view_on_gallery(),"View On Wallet")
+          this.reset_image()
+        }else{
+          showMessage(this,rc.returnMessage)
+        }
+
+
       } catch (e) {
         showError(this,e)
       }
@@ -145,6 +157,7 @@ export class MainComponent implements OnInit {
     this.x=0
     this.y=0
     this.self_storage=false
+    this.location.replaceState("/")
   }
 
   open_photo() {
@@ -213,18 +226,24 @@ export class MainComponent implements OnInit {
   }
 
 
-  getImageDimensions(): void {
-    const img = this.img.nativeElement as HTMLImageElement;
-    this.w = img.naturalWidth;
-    this.h = img.naturalHeight;
+  getImageDimensions(): boolean {
+    if(this.img){
+      const img = this.img.nativeElement as HTMLImageElement;
+      this.w = img.naturalWidth;
+      this.h = img.naturalHeight;
+      return true
+    }
+    return false
   }
 
 
-  private autoscale() {
-    this.getImageDimensions()
-    this.zoom=300/this.w
-    this.x=0
-    this.y=0
+  autoscale() {
+    if(this.getImageDimensions()){
+      this.zoom=300/this.w
+      this.x=0
+      this.y=0
+    }
+
   }
 
 
@@ -252,12 +271,53 @@ export class MainComponent implements OnInit {
     setTimeout(()=>{this.autoscale()},400)
   }
 
-  protected readonly create_collection = create_collection;
 
   async build_collection() {
     let r=await _prompt(this,"Collection name","","must be inferieur to 20 characters","text","Create","Cancel",false)
     if(r){
+      await this.user.login(this,"You need a strong authentification to create a collection","",true)
+      try{
+        let rc=await create_collection(r,this.user,this)
+        await this.refresh_collection()
+        this.sel_collection=this.collections[this.collections.length-1]     //On positionne sur la dernière collection
+      }catch (e:any){
+        showMessage(this,"Collection not created")
+        wait_message(this)
+      }
+      setTimeout(()=>{this.set_roles_to_collection()},2500)
+    }
+  }
+
+  update_self_storage() {
+    if(!this.self_storage)this.autoscale()
+  }
+
+  async set_roles_to_collection() {
+    if(this.sel_collection){
+      await this.user.login(this,"","",true)
+      wait_message(this,"Setting roles to the collection")
+      try{
+        await set_roles_to_collection(this.sel_collection.value.collection,this.user)
+      }catch (e:any){
+
+      }
+      wait_message(this)
 
     }
+
+  }
+
+  view_on_gallery() {
+    if(this.sel_collection){
+      let url="https://devnet.xspotlight.com/collections/"+this.sel_collection.value.collection;
+      if(!this.user.isDevnet())url=url.replace("devnet.","")
+      open(url,"Gallery")
+    }
+  }
+
+  view_account_on_gallery() {
+    let url="https://devnet.xspotlight.com/"+this.user.address
+    if(!this.user.isDevnet())url=url.replace("devnet.","")
+    open(url,"Gallery")
   }
 }

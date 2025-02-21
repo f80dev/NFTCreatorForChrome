@@ -9,7 +9,8 @@ import {DeviceService} from './device.service';
 import {Connexion} from '../operation';
 import {settings} from "../environments/settings";
 import {environment} from "../environments/environment";
-import {UserSigner} from "@multiversx/sdk-core/out";
+import {Account, UserSigner} from "@multiversx/sdk-core/out";
+import {AccountOnNetwork} from "@multiversx/sdk-network-providers/out";
 
 (window as any).global = window;
 
@@ -32,7 +33,7 @@ export class UserService {
 
   tokemons: any[] = []
   visibility: number = 0
-  account: any;
+  account: AccountOnNetwork | undefined;
   idx:number=0
   fee=0;
   zone: any;
@@ -172,8 +173,8 @@ export class UserService {
         await this.refresh()
         let tokens=await api._service("accounts/"+this.address+"/tokens","",this.get_domain())
         let egld_prefix=this.network.indexOf("devnet")>-1 ? "x" : ""
-        tokens.push({identifier:egld_prefix+"EGLD",name:egld_prefix+"EGLD",balance:Number(this.account.balance)})
-        this.balance=Number(this.account.balance)/1e18
+        tokens.push({identifier:egld_prefix+"EGLD",name:egld_prefix+"EGLD",balance:Number(this.account!.balance)})
+        this.balance=Number(this.account!.balance)/1e18
 
         for(let t of tokens){
           this.tokens[t.identifier]=t

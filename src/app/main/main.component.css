@@ -1,14 +1,19 @@
 .vignette {
   position: relative;
   display:inline-block;
-  width: 350px;
-  height: 350px;
-  margin: 10px;
+  width: 300px;
+  height: 300px;
+  margin: 0;
+  margin-top: -10px;
   overflow: hidden;
   border: solid 1px grey;
-  background-color: black;
+  background-color: #011010;
 }
 
+
+mat-card {
+  background-color: black;
+}
 
 
 app-input {
@@ -19,16 +24,18 @@ app-input {
 
 button {
   width:120px;
-  margin: 5px;
+  margin: 10px;
 }
 
 .icon-button {
   width:45px;
 }
 
+
 mat-expansion-panel {
   width:90%;
   text-align: center;
+  background-color: black;
   max-width: 1000px;
   min-width: 350px;
   display: inline-block;

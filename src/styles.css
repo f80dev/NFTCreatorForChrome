@@ -17,3 +17,9 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   overflow: scroll;
   scrollbar-width: none;
 }
+
+.bloc-button {
+  line-height: 90%;
+  font-size: small;
+  text-align: left;
+}

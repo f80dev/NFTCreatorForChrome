@@ -1,7 +1,7 @@
 import {
   Address, BigIntValue, BigUIntValue, BytesValue,
   SmartContractTransactionsFactory, TokenManagementTransactionsFactory,
-  TokenTransfer, Transaction,
+  TokenTransfer, Transaction, TransactionOnNetwork,
   TransactionsFactoryConfig
 } from "@multiversx/sdk-core/out";
 import { UserSigner } from "@multiversx/sdk-wallet";
@@ -15,6 +15,7 @@ import {$$, now} from "../tools";
 import {numberToPaddedHex, utf8ToHex} from '@multiversx/sdk-core/out/utils.codec';
 import {gatherAllEvents} from '@multiversx/sdk-core/out/transactionsOutcomeParsers/resources';
 import {abi, settings} from '../environments/settings';
+import {PlainSignedTransaction} from "@multiversx/sdk-web-wallet-provider/out/plainSignedTransaction";
 
 export const DEVNET="https://devnet-api.multiversx.com"
 export const MAINNET="https://api.multiversx.com"
@@ -240,7 +241,7 @@ export function send_transaction_with_transfers(user:UserService,function_name:s
     let transaction = await create_transaction(function_name,args,user,tokens_to_transfer,gasLimit,contract_addr)
 
     await user.refresh()
-    transaction.nonce=BigInt(user.account.nonce)
+    transaction.nonce=BigInt(user.account!.nonce)
 
     try{
       resolve(await execute_transaction(transaction,function_name,user))
@@ -405,10 +406,69 @@ export function toText(array:Uint8Array) : string {
   return new TextDecoder('utf-8').decode(array)
 }
 
-export async function create_collection(name:string) {
+
+async function signTransaction(t:Transaction,user:UserService) : Promise<Transaction>  {
+  try{
+    return await user.provider.signTransaction(t)
+  }catch(e){
+    return await user.provider.sign(t.serializeForSigning())
+  }
+}
+
+export async function set_roles_to_collection(collection_id:string, user:UserService) {
+  let factory = new TokenManagementTransactionsFactory({config: new TransactionsFactoryConfig({ chainID: "D" })});
+  let setRoleTransaction=factory.createTransactionForSettingSpecialRoleOnSemiFungibleToken({
+    sender: Address.fromBech32(user.address),
+    user: Address.fromBech32(user.address),
+    tokenIdentifier: collection_id,
+    addRoleESDTTransferRole: false,
+    addRoleNFTAddQuantity: false,
+    addRoleNFTBurn: false,
+    addRoleNFTCreate: true,
+    addRoleESDTModifyCreator:false
+  })
+  user.refresh()
+  setRoleTransaction.nonce=BigInt(user.account!.nonce)
+  let sign_setRoleTransaction=await signTransaction(setRoleTransaction,user)
+  let rc:any=await executeTransaction(sign_setRoleTransaction,user)
+  return rc
+}
+
+
+export async function create_collection(name:string,user:UserService,vm:any=null) {
   //exemple : issueSemiFungible@546f6b656d6f6e@544f4b454d4f4e
   //puis appel de setSpecialRole@544f4b454d4f4e2d346561303466@15432c1a00ea0f72466e099db66e6059d4becc9bb9eed17f3db817f29a0fc26b@45534454526f6c654e4654437265617465@45534454526f6c654e46544164645175616e74697479
 
+  if(vm)vm.message="Collection building phase"
+  let factory = new TokenManagementTransactionsFactory({config: new TransactionsFactoryConfig({ chainID: "D" })});
+
+  let option={
+    name: name,
+    sender: Address.fromBech32(user.address),
+    tokenName:name,
+    tokenTicker:name.replace(" ","").toUpperCase().substring(0,10)
+  }
+
+  let transaction=factory.createTransactionForIssuingSemiFungible({
+    canAddSpecialRoles: true,
+    canChangeOwner: false,
+    canFreeze: false,
+    canPause: false,
+    canTransferNFTCreateRole: false,
+    canUpgrade: false,
+    canWipe: false,
+    ...option
+  })
+
+  user.refresh()
+  transaction.nonce=BigInt(user.account!.nonce)
+  let sign_transaction=await signTransaction(transaction,user)
+  let result:any=await executeTransaction(sign_transaction,user)
+
+  //Attribution des droits
+  let collection_id=new TextDecoder("utf-8").decode(result.values[0])
+
+  return {result:result,collection_id:collection_id}
 }
 
 
@@ -419,13 +479,28 @@ export async function get_collections(user:UserService,api:ApiService) {
   return rc
 }
 
+async function executeTransaction(sign_transaction:Transaction,user:UserService) : Promise<{ values: any[]; returnCode: string; returnMessage: string}>{
+  try{
+    const apiNetworkProvider = new ApiNetworkProvider(user.network.indexOf("devnet")>-1 ? DEVNET : MAINNET);
+    let hash=await apiNetworkProvider.sendTransaction(sign_transaction)
+    let _t=await new TransactionWatcher(apiNetworkProvider).awaitCompleted(hash);
+    let rc =new SmartContractTransactionsOutcomeParser().parseExecute({transactionOnNetwork:_t});
+    return rc
+  }catch(e:any){
+    $$("erreur ",e)
+    return {values:[],returnCode:"500",returnMessage:e.message}
+  }
+}
+
 
 //buildNFT
-export async function makeNFT(identifier:string,name:string,visual:string,user:UserService,quantity=1,royalties=0,uris:string[]=[]) {
+export async function makeNFT(identifier:string,name:string,visual:string,user:UserService,quantity=1,royalties=0,uris:string[]=[])  {
   //Voir https://docs.multiversx.com/tokens/nft-tokens/#creation-of-an-nft
-  const factoryConfig = new TransactionsFactoryConfig({ chainID: "D" });
-  let factory = new TokenManagementTransactionsFactory({config: factoryConfig});
   uris.unshift(visual)
+
+  let factory = new TokenManagementTransactionsFactory({
+    config: new TransactionsFactoryConfig({ chainID: "D" })
+  });
   let transaction=factory.createTransactionForCreatingNFT({
     attributes: new TextEncoder().encode(""),
     hash: "",
@@ -438,22 +513,10 @@ export async function makeNFT(identifier:string,name:string,visual:string,user:U
   })
 
   user.refresh()
-  transaction.nonce=BigInt(user.account.nonce)
+  transaction.nonce=BigInt(user.account!.nonce)
 
-  let sign_transaction
-  try{
-    sign_transaction=await user.provider.signTransaction(transaction)
-  }catch(e){
-    sign_transaction=await user.provider.sign(transaction.serializeForSigning())
-  }
-
-  try{
-    const apiNetworkProvider = new ApiNetworkProvider(user.network.indexOf("devnet")>-1 ? DEVNET : MAINNET);
-    let hash=await apiNetworkProvider.sendTransaction(sign_transaction)
-    const transactionOnNetworkUsingApi = await new TransactionWatcher(apiNetworkProvider).awaitCompleted(hash);
-  }catch(e){
-    $$("erreur ",e)
-  }
+  let sign_transaction=await signTransaction(transaction,user)
+  return await executeTransaction(sign_transaction,user)
 
   //voir https://docs.multiversx.com/tokens/nft-tokens/#creation-of-an-nft
   //voir https://docs.multiversx.com/developers/sc-calls-format/#converting-numeric-values-in-javascript

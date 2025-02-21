@@ -19,7 +19,6 @@
               mat-raised-button (click)="open_generator(generator)">
         {{generator.label}}
       </button>
-
     </div>
 
 
@@ -38,14 +37,11 @@
   <div *ngIf="visual!=''">
 
     <mat-accordion>
-
       <mat-expansion-panel [expanded]="true">
         <mat-expansion-panel-header>Visual</mat-expansion-panel-header>
         <div class="vignette"  (dblclick)="center_image($event)"
              (dragstart)="start_translate($event)"
              (dragend)="update_position($event)" (mousewheel)="update_zoom($event)">
-          <mat-icon style="position:absolute;left:5px;top:5px;display: block;cursor: pointer;color:grey;z-index: 10;" (click)="reset_image()">cancel</mat-icon>
-          <mat-icon style="position:absolute;left:30px;top:5px;display: block;cursor: pointer;color:grey;z-index: 10;" (click)="zoom=1">visibility</mat-icon>
           <img [src]="visual" style="position: absolute;display: block;"
                #img
                (load)="getImageDimensions()"
@@ -54,8 +50,13 @@
 
         </div>
         <br>
-        <mat-slide-toggle *ngIf="visual && visual.startsWith('http')" [checked]="self_storage" style="width:250px;">
-          Self storage
+        <button mat-raised-button (click)="reset_image()">Change</button>
+        <button mat-raised-button (click)="autoscale()">Autozoom</button>
+
+        <mat-slide-toggle *ngIf="visual && visual.startsWith('http')"
+                          (toggleChange)="update_self_storage()"
+                          [checked]="self_storage" style="width:250px;">
+          <div class="bloc-button">Self<br>storage</div>
         </mat-slide-toggle>
       </mat-expansion-panel>
 
@@ -109,7 +110,7 @@
   <div *ngIf="visual.length>0">
 
     <button *ngIf="sel_collection && visual!=''" mat-raised-button
-            style="width:200px;height:70px;margin:20px;"
+            style="width:200px;height:70px;margin-top:-10px;margin-bottom: 15px;"
             (click)="Create_NFT()">
       <div style="font-size: medium;margin-bottom: -10px;">
         Build this NFT
@@ -126,9 +127,8 @@
       <div style="display: inline-flex;align-items: center;justify-content: center;">
         {{user.address.substring(0,10)+"..."+user.address.substring(user.address.length-10)}}
         &nbsp;
-        <button mat-icon-button class="icon-button" (click)="logout()" title="logout">
-          <mat-icon>logout</mat-icon>
-        </button>
+        <button mat-icon-button class="icon-button" (click)="logout()" title="logout"><mat-icon>logout</mat-icon></button>
+        <button mat-icon-button class="icon-button" (click)="view_account_on_gallery()" title="View all NFTs"><mat-icon>visibility</mat-icon></button>
       </div>
       <br>
 
@@ -138,7 +138,13 @@
 
       <div *ngIf="collections.length==0">You need a collection before mint a NFT<br><br></div>
 
-      <button mat-raised-button (click)="build_collection()">Create Collection</button>
+
+        <button mat-raised-button (click)="build_collection()">Create Collection</button>
+        <button mat-icon-button class="icon-button"*ngIf="sel_collection" (click)="set_roles_to_collection()"><mat-icon>build</mat-icon></button>
+        <button mat-icon-button class="icon-button" *ngIf="sel_collection" (click)="view_on_gallery()"><mat-icon>visibility</mat-icon></button>
+
+
+
     </mat-card>
   </div>
 
