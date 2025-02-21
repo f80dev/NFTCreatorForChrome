@@ -36,26 +36,29 @@
 
 
   <div *ngIf="visual!=''">
-    <div class="vignette"  (dblclick)="center_image($event)"
-         (dragstart)="start_translate($event)"
-         (dragend)="update_position($event)" (mousewheel)="update_zoom($event)">
-      <mat-icon style="position:absolute;left:5px;top:5px;display: block;cursor: pointer;color:grey;z-index: 10;" (click)="reset_image()">cancel</mat-icon>
-      <mat-icon style="position:absolute;left:30px;top:5px;display: block;cursor: pointer;color:grey;z-index: 10;" (click)="zoom=1">visibility</mat-icon>
-      <img [src]="visual" style="position: absolute;display: block;"
-           #img
-           (load)="getImageDimensions()"
-           [style.height]="(h*zoom)+'px'" [style.width]="(w*zoom)+'px'"
-           [style.left]="x+'px'" [style.top]="y+'px'" [title]="visual+'(zoom:'+zoom+')'">
-
-    </div>
-    <br>
-    <mat-slide-toggle *ngIf="visual && visual.startsWith('http')" [checked]="self_storage" style="width:250px;">
-      Self storage
-    </mat-slide-toggle>
-
-    <br><br>
 
     <mat-accordion>
+
+      <mat-expansion-panel [expanded]="true">
+        <mat-expansion-panel-header>Visual</mat-expansion-panel-header>
+        <div class="vignette"  (dblclick)="center_image($event)"
+             (dragstart)="start_translate($event)"
+             (dragend)="update_position($event)" (mousewheel)="update_zoom($event)">
+          <mat-icon style="position:absolute;left:5px;top:5px;display: block;cursor: pointer;color:grey;z-index: 10;" (click)="reset_image()">cancel</mat-icon>
+          <mat-icon style="position:absolute;left:30px;top:5px;display: block;cursor: pointer;color:grey;z-index: 10;" (click)="zoom=1">visibility</mat-icon>
+          <img [src]="visual" style="position: absolute;display: block;"
+               #img
+               (load)="getImageDimensions()"
+               [style.height]="(h*zoom)+'px'" [style.width]="(w*zoom)+'px'"
+               [style.left]="x+'px'" [style.top]="y+'px'" [title]="visual+'(zoom:'+zoom+')'">
+
+        </div>
+        <br>
+        <mat-slide-toggle *ngIf="visual && visual.startsWith('http')" [checked]="self_storage" style="width:250px;">
+          Self storage
+        </mat-slide-toggle>
+      </mat-expansion-panel>
+
       <mat-expansion-panel >
         <mat-expansion-panel-header>Properties</mat-expansion-panel-header>
         <app-input label="Name" [value]="name" value_type="text" (valueChange)="name=$event"></app-input>
@@ -68,15 +71,13 @@
 
       <br>
       <mat-expansion-panel>
-        <mat-expansion-panel-header>Metadata</mat-expansion-panel-header>
+        <mat-expansion-panel-header>Metadata & Ressources</mat-expansion-panel-header>
         <json-editor [data]="metadata" style="min-width: 350px;max-width: 800px;width: 100%;"></json-editor>
-      </mat-expansion-panel>
 
-      <br>
-      <mat-expansion-panel>
-        <mat-expansion-panel-header>Ressources</mat-expansion-panel-header>
-        <button mat-icon-button class="icon-button" (click)="add_uri()">
-          <mat-icon>add</mat-icon>
+        <br>
+        <hr>
+        <button mat-raised-button (click)="add_uri()">
+          <mat-icon>add</mat-icon>Add URI
         </button>
         <br>
         <table style="width: 100%;max-width: 800px;display: inline-block;">
@@ -91,6 +92,8 @@
         </table>
 
       </mat-expansion-panel>
+
+
 
     </mat-accordion>
 

@@ -8,7 +8,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {MatDialog} from "@angular/material/dialog";
 import {MatList, MatListItem} from "@angular/material/list";
 import {UploadFileComponent} from "../upload-file/upload-file.component";
-import {$$, getParams, showError, showMessage} from "../../tools";
+import {getParams, showError, showMessage} from "../../tools";
 import {create_collection, get_collections, level, makeNFT} from "../mvx";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
 import {MatIcon} from "@angular/material/icon";
@@ -22,7 +22,7 @@ import {MatAccordion, MatExpansionPanel, MatExpansionPanelHeader} from "@angular
 import {JsonEditorComponent} from "ang-jsoneditor";
 import {ImageProcessorService} from "../image-processor.service";
 import {UploaderService} from "../uploader.service";
-import {Observable, Subject} from "rxjs";
+import {Subject} from "rxjs";
 import {MatCard} from "@angular/material/card";
 
 @Component({
@@ -109,7 +109,6 @@ export class MainComponent implements OnInit {
       wait_message(this,"NFT building ...")
 
       if(this.self_storage){
-
         let blob=await this.imageProcessor.getBase64FromUrl(this.visual)
         let result=await this.imageUploader.upload(this.imageUploader.b64_to_file(blob))
         this.visual=result.url
