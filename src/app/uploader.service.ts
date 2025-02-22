@@ -99,6 +99,7 @@ export class UploaderService {
       let r=await this.query("add","pin=true",formData)
       r.bafyHash=await this.convertHashToBafyHash(r.Hash)
       r.hash=r.Hash
+      r.alternate_url="https://"+r.bafyHash+".ipfs.dweb.link/?filename="+file.name
       r.url="https://ipfs.io/ipfs/"+r.hash+"?filename="+file.name
       return r
   }
