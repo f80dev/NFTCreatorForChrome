@@ -123,7 +123,7 @@ export class MainComponent implements OnInit {
       try{
         let rc=await makeNFT(col.collection,this.name,this.visual,this.user,this.quantity,this.royalties,this.uris)
         if(rc.returnMessage=="ok"){
-          showMessage(this,"NFT builded",2000,()=>this.view_on_gallery(),"View On Wallet")
+          showMessage(this,"NFT builded",0,()=>this.view_on_gallery(),"View On Wallet")
           this.reset_image()
         }else{
           showMessage(this,rc.returnMessage)
