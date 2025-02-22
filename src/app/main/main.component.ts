@@ -114,8 +114,9 @@ export class MainComponent implements OnInit {
       wait_message(this,"NFT building ...")
 
       if(this.self_storage){
-        let blob=await this.imageProcessor.getBase64FromUrl(this.visual)
-        let result=await this.imageUploader.upload(this.imageUploader.b64_to_file(blob))
+        let img=await this.imageProcessor.createImageFromBase64(this.visual)
+        let s=await img.toDataURL("image/jpeg")
+        let result=await this.imageUploader.upload(this.imageUploader.b64_to_file(s,"image.jpg"))
         this.visual=result.url
       }
 
