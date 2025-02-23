@@ -129,7 +129,6 @@ export class MainComponent implements OnInit {
           showMessage(this,rc.returnMessage)
         }
 
-
       } catch (e) {
         showError(this,e)
       }
@@ -198,7 +197,7 @@ export class MainComponent implements OnInit {
 
 
   async paste() {
-    let content=await this.clipboard.paste("text")
+    let content=await this.clipboard.paste()
     if(content.startsWith("http"))this.visual=content
     setTimeout(()=>{this.autoscale()},1000)
   }

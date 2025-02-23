@@ -2,8 +2,9 @@ import {inject, Injectable} from '@angular/core';
 
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {$$} from "../tools";
-import { Buffer } from 'buffer';
-import base32Encode from "base32-encode";
+import {base32} from "multiformats/bases/base32";
+import {sha256} from "multiformats/hashes/sha2";
+import {CID} from "multiformats";
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +16,7 @@ import base32Encode from "base32-encode";
 export class UploaderService {
   http=inject(HttpClient)
   endpoint="https://ipfs.f80.fr:5001/api/v0/"
+
 
   query(service:string,params="",body={}) : Promise<any> {
     return new Promise(async (resolve, reject)  => {
@@ -34,7 +36,7 @@ export class UploaderService {
     })
   }
 
-  b64_to_file(content:string,filename:string="",contentType="image/jpeg") : File {
+  b64_to_blob(content:string,contentType="image/jpeg") : Blob {
     if(content.indexOf("base64,")>-1){
       contentType=content.split("base64")[0].replace("data:","")
       content=content.split("base64,")[1]
@@ -47,6 +49,12 @@ export class UploaderService {
     }
     const byteArray = new Uint8Array(byteNumbers);
     const  blob= new Blob([byteArray], { type: contentType });
+
+    return blob
+  }
+
+  b64_to_file(content:string,filename:string="",contentType="image/jpeg") : File {
+    let blob=this.b64_to_blob(content,contentType);
     return new File([blob], filename, { type: contentType})
   }
 
@@ -64,17 +72,13 @@ export class UploaderService {
 
   async convertHashToBafyHash(h:string) {
     try {
-      let hash=new TextEncoder().encode(h)
+      const data=new TextEncoder().encode(h)
 
-      // 2. Multihash encoding (dag-pb codec: 0x70)
-      const multihash = Buffer.concat([Buffer.from([0x70, hash.length]), hash]).buffer;
+      const hashBytes = await sha256.digest(data);
 
+      let cid=new CID(1,0x12, hashBytes,data)
 
-      // 3. Base32 encoding
-      const base32Encoded = base32Encode(multihash,"RFC4648",{}).toString()
-      const bafyHash = "bafy" + base32Encoded.slice(2).replace(/=+$/, ''); // Add "bafy" prefix and remove padding
-
-      return bafyHash;
+      return cid.toString(base32);
     } catch (error) {
       console.error("Error converting hash:", error);
       return null;
@@ -92,16 +96,22 @@ export class UploaderService {
     return await this.query("get","arg="+hash)
   }
 
-  async upload(file:File) : Promise<any>{
-      const formData = new FormData()
-      formData.append("files", file)
-      //https://docs.ipfs.tech/reference/kubo/rpc/#api-v0-add
-      let r=await this.query("add","pin=true",formData)
-      r.bafyHash=await this.convertHashToBafyHash(r.Hash)
-      r.hash=r.Hash
-      r.alternate_url="https://"+r.bafyHash+".ipfs.dweb.link/?filename="+file.name
-      r.url="https://ipfs.io/ipfs/"+r.hash+"?filename="+file.name
-      return r
+  async get_formats(){
+    return await this.query("cid/hashes");
+  }
+
+  async convert(hash:string){
+    return await this.query("cid/format","cid="+hash);
+  }
+
+  async upload(file:any,version=1) : Promise<any>{
+    const formData = new FormData()
+    formData.append("file", file)
+
+    //https://docs.ipfs.tech/reference/kubo/rpc/#api-v0-add
+    let r=await this.query("add","pin=true&cid-version="+version,formData)
+    r.url="https://"+r.Hash+".ipfs.dweb.link?filename="+file.name
+    return r
   }
 
 }

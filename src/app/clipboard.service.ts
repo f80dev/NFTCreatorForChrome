@@ -19,14 +19,15 @@ export class ClipboardService {
     });
   }
 
-  paste(s="text"): Promise<any> {
+  paste(s=""): Promise<any> {
     return new Promise(async (resolve, reject) => {
+      debugger
       try {
         resolve(await navigator.clipboard.readText());
       }catch (e){
         $$("On fait la lecture d'une image")
       }
-      if(s.indexOf("image")>-1){
+      if(s=="" || s.indexOf("image")>-1){
         try {
           const clipboardContents = await navigator.clipboard.read();
           for (const item of clipboardContents) {

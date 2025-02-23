@@ -33,6 +33,7 @@ export class ImageProcessorService {
 
 
   async createImageFromBase64(base64: string,x=0,y=0,lx=0,ly=0) {
+    //voir https://image-js.github.io/image-js/#image
     let rc= await Image.load(base64)
     if(lx>0 && ly>0){
       return rc.crop({x:x,y:y,width:lx,height:ly})
@@ -52,8 +53,6 @@ export class ImageProcessorService {
     }
     return new Blob([ab]);
   }
-
-
 
 
 }

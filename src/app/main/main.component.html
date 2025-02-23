@@ -14,7 +14,7 @@
 
     <br>
     <h4 style="margin-top: 60px;">Gallery and AI Generators</h4>
-    <div style="width: 95%;">
+    <div style="width: 95%;display: inline-block;">
       <button *ngFor="let generator of generators"
               mat-raised-button (click)="open_generator(generator)">
         {{generator.label}}
