@@ -58,6 +58,16 @@ export class UploaderService {
     return new File([blob], filename, { type: contentType})
   }
 
+  json_to_file(content:any,filename="file.json",contentType="application/json") : File {
+    const  blob= new Blob([content], { type: contentType });
+    return new File([blob], filename, { type: contentType})
+  }
+
+  string_to_file(content:string,filename="file.json",contentType="application/json") : File {
+    const  blob= new Blob([content], { type: contentType });
+    return new File([blob], filename, { type: contentType})
+  }
+
 
   async list(hash:string=""){
     //https://docs.ipfs.tech/reference/kubo/rpc/#api-v0-files-ls

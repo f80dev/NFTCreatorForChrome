@@ -494,7 +494,7 @@ async function executeTransaction(sign_transaction:Transaction,user:UserService)
 
 
 //buildNFT
-export async function makeNFT(identifier:string,name:string,visual:string,user:UserService,quantity=1,royalties=0,uris:string[]=[])  {
+export async function makeNFT(identifier:string,name:string,visual:string,user:UserService,quantity=1,royalties=0,uris:string[]=[],metadata="")  {
   //Voir https://docs.multiversx.com/tokens/nft-tokens/#creation-of-an-nft
   uris.unshift(visual)
 
@@ -502,7 +502,7 @@ export async function makeNFT(identifier:string,name:string,visual:string,user:U
     config: new TransactionsFactoryConfig({ chainID: "D" })
   });
   let transaction=factory.createTransactionForCreatingNFT({
-    attributes: new TextEncoder().encode(""),
+    attributes: new TextEncoder().encode(metadata),
     hash: "",
     initialQuantity: BigInt(quantity),
     name: name,

@@ -8,7 +8,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {MatDialog} from "@angular/material/dialog";
 import {MatList, MatListItem} from "@angular/material/list";
 import {UploadFileComponent} from "../upload-file/upload-file.component";
-import {getParams, showError, showMessage} from "../../tools";
+import {$$, getParams, showError, showMessage} from "../../tools";
 import {create_collection, get_collections, level, makeNFT, set_roles_to_collection} from "../mvx";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
 import {MatIcon} from "@angular/material/icon";
@@ -84,7 +84,7 @@ export class MainComponent implements OnInit {
   async ngOnInit() {
     let params:any=await getParams(this.routes)
     this.visual=params.url || ""
-    setTimeout(()=>{this.autoscale()},200)
+    setTimeout(()=>{this.autoscale()},500)
   }
 
   async refresh_collection(){
@@ -118,8 +118,19 @@ export class MainComponent implements OnInit {
         this.visual=result.url
       }
 
+      let metadata_tags=""
+      if(this.properties.length>0){
+        let obj:any={}
+        for(let prop of this.properties){
+          obj[prop.name]=prop.value
+        }
+        let metadata=await this.imageUploader.upload(this.imageUploader.string_to_file(JSON.stringify(obj),"infos.json"),0)
+        $$("metadata ",metadata)
+        metadata_tags="metadata:"+metadata.Hash+"/infos.json;tags:"+this.tags.replace(" ",",").replace(";",",")
+      }
+
       try{
-        let rc=await makeNFT(col.collection,this.name,this.visual,this.user,this.quantity,this.royalties,this.uris)
+        let rc=await makeNFT(col.collection,this.name,this.visual,this.user,this.quantity,this.royalties,this.uris,metadata_tags)
         if(rc.returnMessage=="ok"){
           showMessage(this,"NFT builded",0,()=>this.view_on_gallery(),"View On Wallet")
           this.reset_image()
@@ -158,11 +169,11 @@ export class MainComponent implements OnInit {
   message: string=""
   image:WebcamImage | undefined
 
-
   protected readonly level = level;
   self_storage: boolean = false;
   uris:string[]=[]
   metadata: Object={}
+  tags=""
 
   logout() {
     this.collections=[]
@@ -208,7 +219,7 @@ export class MainComponent implements OnInit {
   }
 
   async add_property() {
-    let new_prop={name:"New Property",value:""}
+    let new_prop={name:"Field"+(this.properties.length+1),value:"0"}
     this.properties.push(new_prop)
     await this.update_prop(new_prop,"name")
     await this.update_prop(new_prop,"value")
@@ -224,8 +235,8 @@ export class MainComponent implements OnInit {
   getImageDimensions(): boolean {
     if(this.img){
       const img = this.img.nativeElement as HTMLImageElement;
-      this.w = img.naturalWidth;
-      this.h = img.naturalHeight;
+      this.w = img.naturalWidth
+      this.h = img.naturalHeight
       return true
     }
     return false
@@ -234,7 +245,7 @@ export class MainComponent implements OnInit {
 
   autoscale() {
     if(this.getImageDimensions()){
-      this.zoom=300/this.w
+      this.zoom=334/Math.min(this.w,this.h)
       this.x=0
       this.y=0
     }

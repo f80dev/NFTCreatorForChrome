@@ -50,30 +50,34 @@
       <mat-expansion-panel>
         <mat-expansion-panel-header>Metadata & Ressources</mat-expansion-panel-header>
 
+        <app-input label="Tags" [value]="tags"
+                   value_type="text" (valueChange)="tags=$event"></app-input>
+        <br>
+
         <button mat-raised-button (click)="add_property()">
           <mat-icon>add</mat-icon>Metadata
         </button>
 
-        <table style="width: 100%;max-width: 800px;display: inline-block;">
-          <tr *ngFor="let prop of properties" style="width: 100%;">
-            <td (click)="update_prop(prop,'name')" style="width: 45%;text-align: left;">{{prop.name}}</td>
-            <td (click)="update_prop(prop,'value')" style="width: 45%;text-align: right;">{{prop.value}}</td>
-            <td style="width: 10%;text-align: right;">
-              <mat-icon (click)="delete_prop(prop)">cancel</mat-icon>
+        <table style="width: 100%;">
+          <tr *ngFor="let prop of properties" >
+            <td (click)="update_prop(prop,'name')" style="width: 47%;text-align: left;">{{prop.name}}</td>
+            <td (click)="update_prop(prop,'value')" style="width: 47%;text-align: right;">{{prop.value}}</td>
+            <td style="width:6%;min-width:30px;text-align: right;">
+              <mat-icon style="margin-bottom: -6px;" (click)="delete_prop(prop)">cancel</mat-icon>
             </td>
           </tr>
         </table>
+        <br>
 
         <json-editor [data]="metadata" *ngIf="level(3)"
                      style="min-width: 350px;max-width: 800px;width: 100%;"></json-editor>
 
         <br>
-        <hr>
         <button mat-raised-button (click)="add_uri()">
           <mat-icon>add</mat-icon>Ressource
         </button>
         <br>
-        <table style="width: 100%;max-width: 800px;display: inline-block;">
+        <table style="width: 100%;">
           <tr *ngFor="let uri of uris" style="width: 100%;">
             <td style="width: 80%;text-align: left;">{{uri}}</td>
             <td style="width: 10%;text-align: right;">
@@ -82,6 +86,7 @@
             </td>
           </tr>
         </table>
+        <br>
 
       </mat-expansion-panel>
 
@@ -94,7 +99,11 @@
 
     <app-upload-file filter="pem" title="Upload a PEM file" style="display: inline-block;width:150px;"
                      (uploaded)="upload_pem($event)">Your PEM file</app-upload-file>
-    <button mat-raised-button (click)="login()" style="margin-top: -2px;">login</button>
+    <button mat-raised-button (click)="login()"
+            style="margin-top: -2px;">
+      Wallet login
+    </button>
+
   </div>
   <div *ngIf="visual.length>0">
 
@@ -117,8 +126,8 @@
 
           {{user.address.substring(0,10)+"..."+user.address.substring(user.address.length-10)}}
           &nbsp;
-        <button mat-icon-button class="icon-button" (click)="logout()" title="logout"><mat-icon>logout</mat-icon></button>
         <button mat-icon-button class="icon-button" (click)="view_account_on_gallery()" title="View all NFTs"><mat-icon>visibility</mat-icon></button>
+        <button mat-icon-button class="icon-button" (click)="logout()" title="logout"><mat-icon>logout</mat-icon></button>
       </div>
       <br>
 
