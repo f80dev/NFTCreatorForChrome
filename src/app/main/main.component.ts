@@ -24,6 +24,8 @@ import {ImageProcessorService} from "../image-processor.service";
 import {UploaderService} from "../uploader.service";
 import {Subject} from "rxjs";
 import {MatCard} from "@angular/material/card";
+import {IntroComponent} from "../intro/intro.component";
+import {SourceComponent} from "../source/source.component";
 
 @Component({
   selector: 'app-main',
@@ -42,7 +44,7 @@ import {MatCard} from "@angular/material/card";
     HourglassComponent,
     MatIconButton,
     MatExpansionPanel, MatExpansionPanelHeader,
-    JsonEditorComponent, MatAccordion, MatCard
+    JsonEditorComponent, MatAccordion, MatCard, IntroComponent, SourceComponent
   ],
   standalone:true,
   templateUrl: './main.component.html',
@@ -66,27 +68,23 @@ export class MainComponent implements OnInit {
 
   collections: {label:string,value:any}[]=[]
   sel_collection:{label:string,value:any} | undefined
-  generators=[
-    {label:"Stable Diffusion",value:"https://gen.akash.network/"},
-    {label:"Pixabay",value:"https://pixabay.com/"}
-  ]
-  sel_generator=this.generators[0]
-  show_scanner: boolean = false;
+
   zoom: number=1
   x: number=0
   y: number=0
   w: number=0
   h:number=0
-  handle: any
   start_x=0
   start_y=0
+
+  properties:{name:string,value:string}[]=[]
+
 
 
   async ngOnInit() {
     let params:any=await getParams(this.routes)
     this.visual=params.url || ""
     setTimeout(()=>{this.autoscale()},200)
-    this.login()
   }
 
   async refresh_collection(){
@@ -145,10 +143,6 @@ export class MainComponent implements OnInit {
   }
 
 
-  open_generator(generator:any) {
-    open(generator.value,"Images")
-  }
-
   reset_image() {
     this.uris=[]
     this.visual=""
@@ -160,29 +154,10 @@ export class MainComponent implements OnInit {
     this.location.replaceState("/")
   }
 
-  open_photo() {
-    this.show_scanner=true
-    this.handle=setInterval(()=>{this.trigger.next()},200)
-  }
 
   message: string=""
   image:WebcamImage | undefined
 
-  trigger = new Subject<void>();
-
-  capture_image(img: WebcamImage) {
-    this.image=img
-  }
-
-  take_photo() {
-    clearInterval(this.handle)
-    if(this.image){
-      this.visual=this.image?.imageAsDataUrl
-      this.self_storage=true
-      setTimeout(()=>{this.autoscale()},200)
-    }
-    this.show_scanner=false
-  }
 
   protected readonly level = level;
   self_storage: boolean = false;
@@ -195,13 +170,11 @@ export class MainComponent implements OnInit {
     this.user.logout(true)
   }
 
-
-  async paste() {
-    let content=await this.clipboard.paste()
-    if(content.startsWith("http"))this.visual=content
+  update_visual(src:string){
+    this.visual=src
+    this.self_storage=(!src.startsWith("http"))
     setTimeout(()=>{this.autoscale()},1000)
   }
-
 
   async update_uri(uri: string) {
     let idx=this.uris.indexOf(uri)
@@ -214,9 +187,31 @@ export class MainComponent implements OnInit {
     this.uris.splice(idx,1)
   }
 
+  async update_prop(prop: any,field : "value" | "name" ="value") {
+    let idx=this.properties.indexOf(prop)
+    let r=await _prompt(this,"New Propertie "+field,
+      field=="value" ? prop.value : prop.name,"","text","Ok","Cancel",false)
+    if(r){
+      if(field=="value")this.properties[idx].value=r
+      if(field=="name")this.properties[idx].name=r
+    }
+  }
+
+  delete_prop(uri: any) {
+    let idx=this.properties.indexOf(uri)
+    this.properties.splice(idx,1)
+  }
+
   add_uri() {
     this.uris.push('https://')
     this.update_uri('https://')
+  }
+
+  async add_property() {
+    let new_prop={name:"New Property",value:""}
+    this.properties.push(new_prop)
+    await this.update_prop(new_prop,"name")
+    await this.update_prop(new_prop,"value")
   }
 
   update_zoom($event: any) {
@@ -265,11 +260,7 @@ export class MainComponent implements OnInit {
     this.y=this.y-(300-$event.offsetY)
   }
 
-  from_device($event: any) {
-    this.visual=$event.file
-    this.self_storage=false
-    setTimeout(()=>{this.autoscale()},400)
-  }
+
 
 
   async build_collection() {

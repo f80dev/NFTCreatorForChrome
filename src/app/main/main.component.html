@@ -1,37 +1,13 @@
 <app-hourglass [message]="message"></app-hourglass>
+<app-intro></app-intro>
 
 <div class="mainform" *ngIf="message==''">
 
   <br>
-  <div *ngIf="!show_scanner && visual==''">
 
-    <h3>Find a picture</h3>
+  <app-source *ngIf="visual==''" (update_visual)="update_visual($event)">
 
-    <button mat-raised-button *ngIf="level(2)" (click)="open_photo()">Photo</button>
-    <button mat-raised-button *ngIf="level(1)" (click)="paste()">From clipboard</button>
-    <br><br>
-    <app-upload-file (uploaded)="from_device($event)">From your phone</app-upload-file>
-
-    <br>
-    <h4 style="margin-top: 60px;">Gallery and AI Generators</h4>
-    <div style="width: 95%;display: inline-block;">
-      <button *ngFor="let generator of generators"
-              mat-raised-button (click)="open_generator(generator)">
-        {{generator.label}}
-      </button>
-    </div>
-
-
-  </div>
-
-  <webcam [width]="300" [height]="300" *ngIf="show_scanner"
-          style="margin: 20px;"
-          [captureImageData]="true"
-          imageType="image/jpeg"
-          [imageQuality]="0.90"
-          [trigger]="trigger"
-          (click)="take_photo()"
-          (imageCapture)="capture_image($event)"></webcam>
+  </app-source>
 
 
   <div *ngIf="visual!=''">
@@ -73,12 +49,28 @@
       <br>
       <mat-expansion-panel>
         <mat-expansion-panel-header>Metadata & Ressources</mat-expansion-panel-header>
-        <json-editor [data]="metadata" style="min-width: 350px;max-width: 800px;width: 100%;"></json-editor>
+
+        <button mat-raised-button (click)="add_property()">
+          <mat-icon>add</mat-icon>Metadata
+        </button>
+
+        <table style="width: 100%;max-width: 800px;display: inline-block;">
+          <tr *ngFor="let prop of properties" style="width: 100%;">
+            <td (click)="update_prop(prop,'name')" style="width: 45%;text-align: left;">{{prop.name}}</td>
+            <td (click)="update_prop(prop,'value')" style="width: 45%;text-align: right;">{{prop.value}}</td>
+            <td style="width: 10%;text-align: right;">
+              <mat-icon (click)="delete_prop(prop)">cancel</mat-icon>
+            </td>
+          </tr>
+        </table>
+
+        <json-editor [data]="metadata" *ngIf="level(3)"
+                     style="min-width: 350px;max-width: 800px;width: 100%;"></json-editor>
 
         <br>
         <hr>
         <button mat-raised-button (click)="add_uri()">
-          <mat-icon>add</mat-icon>Add URI
+          <mat-icon>add</mat-icon>Ressource
         </button>
         <br>
         <table style="width: 100%;max-width: 800px;display: inline-block;">
@@ -89,19 +81,16 @@
               <mat-icon (click)="delete_uri(uri)">cancel</mat-icon>
             </td>
           </tr>
-
         </table>
 
       </mat-expansion-panel>
-
-
 
     </mat-accordion>
 
   </div>
 
   <br>
-  <div *ngIf="!user.isConnected()" style="display: inline-flex;width: 100%;align-content: center;justify-content: center;">
+  <div *ngIf="!user.isConnected() && visual!=''" style="display: inline-flex;width: 100%;align-content: center;justify-content: center;">
 
     <app-upload-file filter="pem" title="Upload a PEM file" style="display: inline-block;width:150px;"
                      (uploaded)="upload_pem($event)">Your PEM file</app-upload-file>
@@ -124,9 +113,10 @@
 
     <br>
     <mat-card style="text-align: center;max-width: 1200px;display:inline-block;padding: 15px;">
-      <div style="display: inline-flex;align-items: center;justify-content: center;">
-        {{user.address.substring(0,10)+"..."+user.address.substring(user.address.length-10)}}
-        &nbsp;
+      <div style="display: inline-flex;align-items: center;justify-content: center;" *ngIf="user.isConnected(false)">
+
+          {{user.address.substring(0,10)+"..."+user.address.substring(user.address.length-10)}}
+          &nbsp;
         <button mat-icon-button class="icon-button" (click)="logout()" title="logout"><mat-icon>logout</mat-icon></button>
         <button mat-icon-button class="icon-button" (click)="view_account_on_gallery()" title="View all NFTs"><mat-icon>visibility</mat-icon></button>
       </div>
@@ -138,12 +128,9 @@
 
       <div *ngIf="collections.length==0">You need a collection before mint a NFT<br><br></div>
 
-
         <button mat-raised-button (click)="build_collection()">Create Collection</button>
         <button mat-icon-button class="icon-button"*ngIf="sel_collection" (click)="set_roles_to_collection()"><mat-icon>build</mat-icon></button>
         <button mat-icon-button class="icon-button" *ngIf="sel_collection" (click)="view_on_gallery()"><mat-icon>visibility</mat-icon></button>
-
-
 
     </mat-card>
   </div>

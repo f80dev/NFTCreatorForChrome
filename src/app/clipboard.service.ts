@@ -19,29 +19,28 @@ export class ClipboardService {
     });
   }
 
-  paste(s=""): Promise<any> {
-    return new Promise(async (resolve, reject) => {
-      debugger
+  async paste(s="") {
       try {
-        resolve(await navigator.clipboard.readText());
+        return await navigator.clipboard.readText();
       }catch (e){
         $$("On fait la lecture d'une image")
       }
+
       if(s=="" || s.indexOf("image")>-1){
+        debugger
         try {
           const clipboardContents = await navigator.clipboard.read();
           for (const item of clipboardContents) {
             if (!item.types.includes("image/png")) {
-              reject(Error("Clipboard does not contain PNG image data."))
+              return Error("Clipboard does not contain PNG image data.")
             }
             const blob = await item.getType("image/png");
-            resolve(URL.createObjectURL(blob))
+            return URL.createObjectURL(blob)
           }
         } catch (err) {
-          reject(err)
+          return false
         }
       }
-    })
-
+      return false
   }
 }

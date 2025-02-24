@@ -10,6 +10,7 @@ import {GoogleLoginProvider, SocialAuthServiceConfig, SocialLoginModule} from "@
 import {provideHttpClient} from "@angular/common/http";
 import {provideServiceWorker} from "@angular/service-worker";
 import {TestComponent} from "./test/test.component";
+import {IntroComponent} from "./intro/intro.component";
 
 const GOOGLE_CLIENT_ID="794055474370-nj8dfh004epum0h6ne1chq903dr4rofe.apps.googleusercontent.com"
 
@@ -17,6 +18,7 @@ export const routes: Routes = [
   { path: 'main', component: MainComponent },
   { path: 'test', component: TestComponent },
   { path: '**', component: MainComponent },
+
 ];
 
 const config: SocketIoConfig = { url: environment.server, options: {} };

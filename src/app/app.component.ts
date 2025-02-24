@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {RouterOutlet} from "@angular/router";
+import {settings} from "../environments/settings";
 
 @Component({
   selector: 'app-root',
@@ -9,6 +10,6 @@ import {RouterOutlet} from "@angular/router";
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
-  title = 'NFTCreatorForChrome';
+export class AppComponent  {
+
 }

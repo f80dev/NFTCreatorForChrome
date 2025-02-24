@@ -1,0 +1,32 @@
+<h3>To make an NFT, you must start from a picture</h3>
+<div *ngIf="!show_scanner">
+  <br><br>
+
+  <button mat-raised-button *ngIf="level(2)" (click)="open_photo()">Photo</button>
+  <button mat-raised-button *ngIf="level(1)" (click)="paste()">From clipboard</button>
+  <br><br>
+  <app-upload-file (uploaded)="from_device($event)">From your phone</app-upload-file>
+
+  <br>
+  <h4 style="margin-top: 60px;">Gallery and AI Generators</h4>
+  <div style="width: 95%;display: inline-block;">
+    <button *ngFor="let generator of generators"
+            mat-raised-button (click)="open_generator(generator)">
+      {{generator.label}}
+    </button>
+  </div>
+</div>
+
+
+<div *ngIf="show_scanner">
+  <webcam [width]="300" [height]="300" *ngIf="show_scanner"
+          style="margin: 20px;"
+          [captureImageData]="true"
+          imageType="image/jpeg"
+          [imageQuality]="0.90"
+          [trigger]="trigger"
+          (click)="take_photo()"
+          (imageCapture)="capture_image($event)"></webcam>
+</div>
+
+
