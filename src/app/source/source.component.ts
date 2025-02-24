@@ -53,6 +53,9 @@ export class SourceComponent {
     open(generator.value,"Images")
   }
 
+
+
+
   take_photo() {
     clearInterval(this.handle)
     if(this.image){

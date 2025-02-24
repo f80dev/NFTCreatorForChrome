@@ -24,7 +24,7 @@ export class IntroComponent implements OnInit {
 
   async ngOnInit() {
     let occ=Number(localStorage.getItem(settings.appname) || "0")
-    if(occ<5) {
+    if(occ<1) {
       localStorage.setItem(settings.appname, (occ + 1).toString())
       this.showIntro = true
     }else{
