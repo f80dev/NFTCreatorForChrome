@@ -158,6 +158,7 @@ export class MainComponent implements OnInit {
 
   reset_image() {
     this.uris=[]
+    localStorage.removeItem("image")
     this.visual=""
     this.visual=""
     this.zoom=1
@@ -297,8 +298,14 @@ export class MainComponent implements OnInit {
 
   async convert_to_base64() {
     if(this.visual.startsWith("http")){
-      let result=await this.imageProcessor.getBase64FromUrl(this.visual)
-      this.visual=result as string
+      wait_message(this,"Creating a local copy of your image")
+      try{
+        let result=await this.imageProcessor.getBase64FromUrl(this.visual)
+        this.visual=result as string
+      }catch(e:any){
+        showMessage(this,"Technical problem ! Retry to make the copy")
+      }
+      wait_message(this)
     }
   }
 

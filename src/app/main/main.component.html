@@ -6,7 +6,6 @@
   <br>
 
   <app-source *ngIf="visual==''" (update_visual)="update_visual($event)">
-
   </app-source>
 
 
@@ -33,9 +32,11 @@
 
         </div>
         <br>
-        <button mat-raised-button (click)="reset_image()">Change</button>
-        <button mat-raised-button (click)="autoscale()">Autozoom</button>
-        <button mat-raised-button *ngIf="visual.startsWith('http')" (click)="convert_to_base64()"><div class="bloc-button">Transfer<br>to IPFS</div></button>
+        <button mat-raised-button title="Start a new NFT" (click)="reset_image()">Reset</button>
+        <button mat-raised-button title="Show the entire image" (click)="autoscale()">Autozoom</button>
+        <button mat-raised-button *ngIf="visual.startsWith('http')" (click)="convert_to_base64()">
+          <div class="bloc-button">Create<br>a copy</div>
+        </button>
 
 
       </mat-expansion-panel>

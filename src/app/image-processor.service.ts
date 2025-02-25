@@ -25,6 +25,8 @@ export class ImageProcessorService {
     });
   }
 
+
+
   async getBase64FromUrl(url: string): Promise<string> {
     let url_temp="https://api.allorigins.win/get?url="+encodeURIComponent(url)
     const rc:any = await firstValueFrom(this.http.get(url_temp,{responseType:'json'}))
