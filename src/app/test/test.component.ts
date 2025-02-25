@@ -31,4 +31,5 @@ export class TestComponent implements OnInit {
   }
 
 
+  protected readonly encodeURIComponent = encodeURIComponent;
 }

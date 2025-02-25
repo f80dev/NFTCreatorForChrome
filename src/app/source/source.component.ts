@@ -7,6 +7,7 @@ import {WebcamImage, WebcamModule} from "ngx-webcam";
 import {ClipboardService} from "../clipboard.service";
 import {Subject} from "rxjs";
 import {environment} from "../../environments/environment";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-source',
@@ -34,6 +35,8 @@ export class SourceComponent {
 
   trigger = new Subject<void>();
   private image: WebcamImage | undefined;
+  router=inject(Router)
+
 
   capture_image(img: WebcamImage) {
     this.image=img
@@ -73,4 +76,7 @@ export class SourceComponent {
     this.handle=setInterval(()=>{this.trigger.next()},200)
   }
 
+  go_editor() {
+    this.router.navigate(['editor'])
+  }
 }

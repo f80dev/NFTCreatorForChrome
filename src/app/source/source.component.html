@@ -2,11 +2,12 @@
 <div *ngIf="!show_scanner">
   <br><br>
 
-  <button mat-raised-button *ngIf="level(2)" title="Open the camera of your device to take a photo" (click)="open_photo()">Photo</button>
+  <button mat-raised-button *ngIf="level(2)" title="Open the camera of your device to take a photo" (click)="open_photo()">From camera</button>
   <button mat-raised-button *ngIf="level(1)" title="Get the content clipboard" (click)="paste()">From clipboard</button>
+  <button mat-raised-button *ngIf="level(1)" title="Image editor" (click)="go_editor()">From editor</button>
   <br><br>
   <app-upload-file (uploaded)="from_device($event)" title="Load a content from your device"
-                   style="display: inline-block;">From your phone</app-upload-file>
+                   style="display: inline-block;">From your device</app-upload-file>
 
   <br>
   <h4 style="margin-top: 100px;">Gallery and AI Generators</h4>

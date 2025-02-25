@@ -84,7 +84,7 @@ export class MainComponent implements OnInit {
 
   async ngOnInit() {
     let params:any=await getParams(this.routes)
-    this.visual=params.url || ""
+    this.visual=params.url || localStorage.getItem("image") || ""
     setTimeout(()=>{this.autoscale()},1000)
   }
 
