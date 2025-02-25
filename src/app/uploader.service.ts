@@ -5,6 +5,7 @@ import {$$} from "../tools";
 import {base32} from "multiformats/bases/base32";
 import {sha256} from "multiformats/hashes/sha2";
 import {CID} from "multiformats";
+import {firstValueFrom} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -74,6 +75,11 @@ export class UploaderService {
     return await this.query("ls","arg="+hash)
   }
 
+  async getBase64FromUrl(url: string): Promise<string> {
+    let url_temp="https://api.allorigins.win/get?url="+encodeURIComponent(url)
+    const rc:any = await firstValueFrom(this.http.get(url_temp,{responseType:'json'}))
+    return rc.contents
+  }
 
   async cat(path="") {
     //https://docs.ipfs.tech/reference/kubo/rpc/#api-v0-cat
