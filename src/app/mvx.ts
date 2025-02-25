@@ -415,18 +415,33 @@ async function signTransaction(t:Transaction,user:UserService) : Promise<Transac
   }
 }
 
-export async function set_roles_to_collection(collection_id:string, user:UserService) {
+export async function set_roles_to_collection(collection_id:string, user:UserService,type_collection:string="SFT") {
   let factory = new TokenManagementTransactionsFactory({config: new TransactionsFactoryConfig({ chainID: "D" })});
-  let setRoleTransaction=factory.createTransactionForSettingSpecialRoleOnSemiFungibleToken({
+
+  let setRoleTransaction=factory.createTransactionForSettingSpecialRoleOnNonFungibleToken({
     sender: Address.fromBech32(user.address),
+    addRoleNFTAddURI: false,
+    addRoleNFTUpdateAttributes: false,
     user: Address.fromBech32(user.address),
     tokenIdentifier: collection_id,
     addRoleESDTTransferRole: false,
-    addRoleNFTAddQuantity: false,
     addRoleNFTBurn: false,
     addRoleNFTCreate: true,
     addRoleESDTModifyCreator:false
   })
+  if(type_collection=="SFT"){
+    setRoleTransaction=factory.createTransactionForSettingSpecialRoleOnSemiFungibleToken({
+      sender: Address.fromBech32(user.address),
+      user: Address.fromBech32(user.address),
+      tokenIdentifier: collection_id,
+      addRoleESDTTransferRole: false,
+      addRoleNFTAddQuantity: false,
+      addRoleNFTBurn: false,
+      addRoleNFTCreate: true,
+      addRoleESDTModifyCreator:false
+    })
+  }
+
   user.refresh()
   setRoleTransaction.nonce=BigInt(user.account!.nonce)
   let sign_setRoleTransaction=await signTransaction(setRoleTransaction,user)
@@ -435,7 +450,7 @@ export async function set_roles_to_collection(collection_id:string, user:UserSer
 }
 
 
-export async function create_collection(name:string,user:UserService,vm:any=null) {
+export async function create_collection(name:string,user:UserService,vm:any=null,collection_type="SFT") {
   //exemple : issueSemiFungible@546f6b656d6f6e@544f4b454d4f4e
   //puis appel de setSpecialRole@544f4b454d4f4e2d346561303466@15432c1a00ea0f72466e099db66e6059d4becc9bb9eed17f3db817f29a0fc26b@45534454526f6c654e4654437265617465@45534454526f6c654e46544164645175616e74697479
 
@@ -446,10 +461,7 @@ export async function create_collection(name:string,user:UserService,vm:any=null
     name: name,
     sender: Address.fromBech32(user.address),
     tokenName:name,
-    tokenTicker:name.replace(" ","").toUpperCase().substring(0,10)
-  }
-
-  let transaction=factory.createTransactionForIssuingSemiFungible({
+    tokenTicker:name.replace(" ","").toUpperCase().substring(0,10),
     canAddSpecialRoles: true,
     canChangeOwner: false,
     canFreeze: false,
@@ -457,8 +469,16 @@ export async function create_collection(name:string,user:UserService,vm:any=null
     canTransferNFTCreateRole: false,
     canUpgrade: false,
     canWipe: false,
+  }
+
+  let transaction=factory.createTransactionForIssuingNonFungible({
     ...option
   })
+  if(collection_type=="SFT"){
+    transaction=factory.createTransactionForIssuingSemiFungible({
+      ...option
+    })
+  }
 
   user.refresh()
   transaction.nonce=BigInt(user.account!.nonce)

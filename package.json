@@ -38,6 +38,7 @@
     "ang-jsoneditor": "^4.0.1",
     "angularx-qrcode": "^19.0.0",
     "base32-encode": "^2.0.0",
+    "ethers": "^6.13.5",
     "image-js": "^0.30.3",
     "ipfs-http-client": "^60.0.1",
     "jsoneditor": "^10.1.3",

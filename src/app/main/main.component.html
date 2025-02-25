@@ -14,7 +14,14 @@
 
     <mat-accordion>
       <mat-expansion-panel [expanded]="true">
-        <mat-expansion-panel-header>Visual</mat-expansion-panel-header>
+        <mat-expansion-panel-header>Main</mat-expansion-panel-header>
+
+        <app-input label="NFT Name" [value]="name" value_type="text" (valueChange)="name=$event"></app-input>
+        <app-input label="Quantity" [value]="quantity"
+                   *ngIf="!sel_collection || sel_collection.value.subType=='SemiFungibleESDT'"
+                   value_type="number" (valueChange)="quantity=$event"></app-input>
+        <br>
+
         <div class="vignette"  (dblclick)="center_image($event)"
              (dragstart)="start_translate($event)"
              (dragend)="update_position($event)" (mousewheel)="update_zoom($event)">
@@ -35,10 +42,13 @@
 
       <mat-expansion-panel >
         <mat-expansion-panel-header>Properties</mat-expansion-panel-header>
-        <app-input label="Name" [value]="name" value_type="text" (valueChange)="name=$event"></app-input>
-        <app-input label="Quantity" [value]="quantity" value_type="number" (valueChange)="quantity=$event"></app-input>
+
+        <app-input label="Description" [value]="description" style="width: 80%;max-width: 700px;"
+                   value_type="text" (valueChange)="description=$event"></app-input>
+
         <br>
         <app-input label="Royalties" [value]="royalties" [min]="0" [max]="100" unity="%"
+                   style="width: 80%;max-width: 700px;"
                    value_type="slider" (valueChange)="royalties=$event"></app-input>
 
       </mat-expansion-panel>
@@ -130,7 +140,7 @@
 
       <app-input label="Collection" value_type="list" style="display: inline-block;"
                  [value]="sel_collection" *ngIf="collections.length>0"
-                 [options]="collections" (valueChange)="sel_collection=$event"></app-input>
+                 [options]="collections" (valueChange)="update_sel_collection($event)"></app-input>
 
       <div *ngIf="collections.length==0">You need a collection before mint a NFT<br><br></div>
 

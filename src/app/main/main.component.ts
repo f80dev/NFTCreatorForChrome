@@ -54,6 +54,7 @@ import {HttpClient} from "@angular/common/http";
 export class MainComponent implements OnInit {
   @ViewChild('img', { static: false }) img!: ElementRef;
   name= "MyNFT"
+  description=""
   visual= ""
   quantity= 1
   royalties=5
@@ -81,12 +82,10 @@ export class MainComponent implements OnInit {
 
   properties:{name:string,value:string}[]=[]
 
-
-
   async ngOnInit() {
     let params:any=await getParams(this.routes)
     this.visual=params.url || ""
-    setTimeout(()=>{this.autoscale()},500)
+    setTimeout(()=>{this.autoscale()},1000)
   }
 
   async refresh_collection(){
@@ -95,7 +94,7 @@ export class MainComponent implements OnInit {
       this.collections.push({label:col.name,value:col})
     }
     if(this.collections.length>0){
-      this.sel_collection=this.collections[0]
+      this.update_sel_collection(this.collections[0])
     }
   }
 
@@ -121,6 +120,7 @@ export class MainComponent implements OnInit {
       }
 
       let metadata_tags=""
+      if(this.description.length>0)this.properties.push({name:"description",value:this.description})
       if(this.properties.length>0){
         let obj:any={}
         for(let prop of this.properties){
@@ -279,11 +279,14 @@ export class MainComponent implements OnInit {
   async build_collection() {
     let r=await _prompt(this,"Collection name","","must be inferieur to 20 characters","text","Create","Cancel",false)
     if(r){
+      let collection_type=await _prompt(this,"Collection for NFT or SFT","","","list","Ok","Cancel",false,
+        [{label:"NFT",value:"NFT"},{label:"SFT",value:"SFT"}])
+
       await this.user.login(this,"You need a strong authentification to create a collection","",true)
       try{
-        let rc=await create_collection(r,this.user,this)
+        let rc=await create_collection(r,this.user,this,collection_type)
         await this.refresh_collection()
-        this.sel_collection=this.collections[this.collections.length-1]     //On positionne sur la dernière collection
+        this.update_sel_collection(this.collections[this.collections.length-1])
       }catch (e:any){
         showMessage(this,"Collection not created")
         wait_message(this)
@@ -294,9 +297,7 @@ export class MainComponent implements OnInit {
 
   async convert_to_base64() {
     if(this.visual.startsWith("http")){
-      let url="https://api.allorigins.win/get?url="+encodeURIComponent(this.visual)
-      let extension=this.visual.substring(this.visual.lastIndexOf("."))
-      let result=await this.imageProcessor.getBase64FromUrl(url,extension.replace("jpg","jpeg"))
+      let result=await this.imageProcessor.getBase64FromUrl(this.visual)
       this.visual=result as string
     }
   }
@@ -307,11 +308,8 @@ export class MainComponent implements OnInit {
       wait_message(this,"Setting roles to the collection")
       try{
         await set_roles_to_collection(this.sel_collection.value.collection,this.user)
-      }catch (e:any){
-
-      }
+      }catch (e:any){}
       wait_message(this)
-
     }
 
   }
@@ -328,5 +326,9 @@ export class MainComponent implements OnInit {
     let url="https://devnet.xspotlight.com/"+this.user.address
     if(!this.user.isDevnet())url=url.replace("devnet.","")
     open(url,"Gallery")
+  }
+
+  update_sel_collection($event: any) {
+    this.sel_collection=$event
   }
 }
