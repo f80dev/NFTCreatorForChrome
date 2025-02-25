@@ -1,7 +1,13 @@
 <app-hourglass [message]="message"></app-hourglass>
 <app-intro message="Create your NFT in one minute"></app-intro>
 
+
 <div class="mainform" *ngIf="message==''">
+
+  <div *ngIf="visual && !user.isConnected(false)">
+    You need to login your wallet to built a NFT
+  </div>
+
 
   <br>
 
@@ -82,8 +88,14 @@
 
         <br>
         <button mat-raised-button (click)="add_uri()">
-          <mat-icon>add</mat-icon>Ressource
+          <mat-icon>add</mat-icon>Ressources
         </button>
+        <div style="display: inline-block;width:100px;height:30px;margin-bottom: -30px;" *ngIf="level(2)">
+          <app-upload-file (uploaded)="add_files($event)">
+            <mat-icon>add</mat-icon>Files
+          </app-upload-file>
+        </div>
+
         <br>
         <table style="width: 100%;">
           <tr *ngFor="let uri of uris" style="width: 100%;">
@@ -106,6 +118,7 @@
   <div *ngIf="!user.isConnected() && visual!=''" style="display: inline-flex;width: 100%;align-content: center;justify-content: center;">
 
     <app-upload-file filter="pem" title="Upload a PEM file" style="display: inline-block;width:150px;"
+                     *ngIf="level(2)"
                      (uploaded)="upload_pem($event)">Your PEM file</app-upload-file>
     <button mat-raised-button (click)="login()"
             style="margin-top: -2px;">
@@ -129,8 +142,8 @@
     </button>
 
     <br>
-    <mat-card style="text-align: center;max-width: 1200px;display:inline-block;padding: 15px;">
-      <div style="display: inline-flex;align-items: center;justify-content: center;" *ngIf="user.isConnected(false)">
+    <mat-card style="text-align: center;max-width: 1200px;display:inline-block;padding: 15px;" *ngIf="user.isConnected(false)">
+      <div style="display: inline-flex;align-items: center;justify-content: center;" >
 
           {{user.address.substring(0,10)+"..."+user.address.substring(user.address.length-10)}}
           &nbsp;

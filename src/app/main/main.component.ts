@@ -182,6 +182,7 @@ export class MainComponent implements OnInit {
     this.collections=[]
     this.sel_collection=undefined
     this.user.logout(true)
+    showMessage(this,"You are disconnected")
   }
 
   update_visual(src:string){
@@ -337,5 +338,10 @@ export class MainComponent implements OnInit {
 
   update_sel_collection($event: any) {
     this.sel_collection=$event
+  }
+
+  async add_files($event:any) {
+    let result=await this.imageUploader.upload(this.imageUploader.b64_to_file($event.file,$event.filename,$event.type))
+    this.uris.push(result.url)
   }
 }
