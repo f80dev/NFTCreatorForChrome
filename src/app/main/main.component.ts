@@ -26,6 +26,7 @@ import {Subject} from "rxjs";
 import {MatCard} from "@angular/material/card";
 import {IntroComponent} from "../intro/intro.component";
 import {SourceComponent} from "../source/source.component";
+import {HttpClient} from "@angular/common/http";
 
 @Component({
   selector: 'app-main',
@@ -65,6 +66,7 @@ export class MainComponent implements OnInit {
   dialog=inject(MatDialog)
   toast=inject(MatSnackBar)
   clipboard=inject(ClipboardService)
+  http=inject(HttpClient)
 
   collections: {label:string,value:any}[]=[]
   sel_collection:{label:string,value:any} | undefined
@@ -111,7 +113,7 @@ export class MainComponent implements OnInit {
       let col:any=this.sel_collection.value
       wait_message(this,"NFT building ...")
 
-      if(this.self_storage){
+      if(this.visual.startsWith("data:")){
         let img=await this.imageProcessor.createImageFromBase64(this.visual)
         let s=await img.toDataURL("image/jpeg")
         let result=await this.imageUploader.upload(this.imageUploader.b64_to_file(s,"image.jpg"))
@@ -290,8 +292,13 @@ export class MainComponent implements OnInit {
     }
   }
 
-  update_self_storage() {
-    if(!this.self_storage)this.autoscale()
+  async convert_to_base64() {
+    if(this.visual.startsWith("http")){
+      let url="https://api.allorigins.win/get?url="+encodeURIComponent(this.visual)
+      let extension=this.visual.substring(this.visual.lastIndexOf("."))
+      let result=await this.imageProcessor.getBase64FromUrl(url,extension.replace("jpg","jpeg"))
+      this.visual=result as string
+    }
   }
 
   async set_roles_to_collection() {

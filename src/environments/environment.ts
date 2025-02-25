@@ -75,5 +75,12 @@ export const environment = {
   gaz_by_nft: 10000000n,
   max_gaz:    600000000n,
   geoloc_interval: 10000,
-  accuracy_limit: 50
+  accuracy_limit: 50,
+  generators: [
+    {label: "Emojis", value: "https://emojipedia.com/apple/"},
+    {label: "Stable Diffusion", value: "https://gen.akash.network/"},
+    {label: "Pixabay", value: "https://pixabay.com/"},
+    {label: "Google Image", value: "https://images.google.com/"},
+    {label: "Icons", value: "https://fonts.google.com/icons"},
+  ]
 }

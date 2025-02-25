@@ -6,6 +6,7 @@ import {NgForOf, NgIf} from "@angular/common";
 import {WebcamImage, WebcamModule} from "ngx-webcam";
 import {ClipboardService} from "../clipboard.service";
 import {Subject} from "rxjs";
+import {environment} from "../../environments/environment";
 
 @Component({
   selector: 'app-source',
@@ -28,10 +29,7 @@ export class SourceComponent {
   clipboard=inject(ClipboardService)
   show_scanner: boolean = false;
   handle:any
-  generators=[
-    {label:"Stable Diffusion",value:"https://gen.akash.network/"},
-    {label:"Pixabay",value:"https://pixabay.com/"}
-  ]
+  generators=environment.generators
 
 
   trigger = new Subject<void>();

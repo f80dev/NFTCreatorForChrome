@@ -1,6 +1,6 @@
 import {inject, Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {Observable} from "rxjs";
+import {firstValueFrom, Observable} from "rxjs";
 import {Image} from "image-js"
 import {fromArrayLike} from "rxjs/internal/observable/innerFrom";
 
@@ -25,9 +25,10 @@ export class ImageProcessorService {
     });
   }
 
-  async getBase64FromUrl(url: string): Promise<string> {
-    const blob = await this.fetchImageAsBlob(url).toPromise();
-    return this.convertBlobToBase64(blob!);
+  async getBase64FromUrl(url: string,format:string): Promise<string> {
+    const blob = await firstValueFrom(this.http.get(url,{responseType:'blob'}))
+    let rc= await this.convertBlobToBase64(blob!);
+    return rc.replace("application/json","image/"+format.replace(".",""))
   }
 
 

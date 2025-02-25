@@ -19,7 +19,7 @@
 
 
 <div *ngIf="show_scanner">
-  <webcam [width]="300" [height]="300" *ngIf="show_scanner"
+  <webcam [width]="350" [height]="350" *ngIf="show_scanner"
           style="margin: 20px;"
           [captureImageData]="true"
           imageType="image/jpeg"
@@ -27,6 +27,12 @@
           [trigger]="trigger"
           (click)="take_photo()"
           (imageCapture)="capture_image($event)"></webcam>
+
+  <br>
+  <br>
+  <button mat-raised-button (click)="take_photo()">Photo</button>
+  <button mat-raised-button (click)="show_scanner=false">Cancel</button>
+
 </div>
 
 

@@ -28,12 +28,9 @@
         <br>
         <button mat-raised-button (click)="reset_image()">Change</button>
         <button mat-raised-button (click)="autoscale()">Autozoom</button>
+        <button mat-raised-button *ngIf="visual.startsWith('http')" (click)="convert_to_base64()"><div class="bloc-button">Transfer<br>to IPFS</div></button>
 
-        <mat-slide-toggle *ngIf="visual && visual.startsWith('http')"
-                          (toggleChange)="update_self_storage()"
-                          [checked]="self_storage" style="width:250px;">
-          <div class="bloc-button">Self<br>storage</div>
-        </mat-slide-toggle>
+
       </mat-expansion-panel>
 
       <mat-expansion-panel >
