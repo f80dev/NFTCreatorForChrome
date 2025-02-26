@@ -27,6 +27,7 @@ import {MatCard} from "@angular/material/card";
 import {IntroComponent} from "../intro/intro.component";
 import {SourceComponent} from "../source/source.component";
 import {HttpClient} from "@angular/common/http";
+import {CropperComponent} from "../cropper/cropper.component";
 
 @Component({
   selector: 'app-main',
@@ -45,7 +46,7 @@ import {HttpClient} from "@angular/common/http";
     HourglassComponent,
     MatIconButton,
     MatExpansionPanel, MatExpansionPanelHeader,
-    JsonEditorComponent, MatAccordion, MatCard, IntroComponent, SourceComponent
+    JsonEditorComponent, MatAccordion, MatCard, IntroComponent, SourceComponent, CropperComponent
   ],
   standalone:true,
   templateUrl: './main.component.html',
@@ -81,11 +82,11 @@ export class MainComponent implements OnInit {
   start_y=0
 
   properties:{name:string,value:string}[]=[]
+  showCrop: boolean=false
 
   async ngOnInit() {
     let params:any=await getParams(this.routes)
     this.visual=params.url || localStorage.getItem("image") || ""
-    setTimeout(()=>{this.autoscale()},1000)
   }
 
   async refresh_collection(){
@@ -128,14 +129,21 @@ export class MainComponent implements OnInit {
         }
         let metadata=await this.imageUploader.upload(this.imageUploader.string_to_file(JSON.stringify(obj),"infos.json"),0)
         $$("metadata ",metadata)
-        metadata_tags="metadata:"+metadata.Hash+"/infos.json;tags:"+this.tags.replace(" ",",").replace(";",",")
+        metadata_tags="metadata:"+metadata.url+"/infos.json;tags:"+this.tags.replace(" ",",").replace(";",",")
       }
 
       try{
         let rc=await makeNFT(col.collection,this.name,this.visual,this.user,this.quantity,this.royalties,this.uris,metadata_tags)
         if(rc.returnMessage=="ok"){
-          showMessage(this,"NFT builded",2000,()=>this.view_on_gallery(),"View On Wallet")
-          setTimeout(()=>{this.reset_image()},2000)
+          try{
+            let r=await _prompt(this,"Mint terminated. See your NFT in your wallet ?","","","yesno","See my NFT","New NFT",true)
+            if(r=="yes"){
+              this.view_on_gallery()
+            }
+          }catch (e:any){
+
+          }
+          this.reset_image()
         }else{
           showMessage(this,rc.returnMessage)
         }
@@ -144,7 +152,6 @@ export class MainComponent implements OnInit {
         showError(this,e)
       }
       wait_message(this)
-
     }
   }
 
@@ -188,7 +195,6 @@ export class MainComponent implements OnInit {
   update_visual(src:string){
     this.visual=src
     this.self_storage=(!src.startsWith("http"))
-    setTimeout(()=>{this.autoscale()},1000)
   }
 
   async update_uri(uri: string) {
@@ -236,25 +242,7 @@ export class MainComponent implements OnInit {
   }
 
 
-  getImageDimensions(): boolean {
-    if(this.img){
-      const img = this.img.nativeElement as HTMLImageElement;
-      this.w = img.naturalWidth
-      this.h = img.naturalHeight
-      return true
-    }
-    return false
-  }
 
-
-  autoscale() {
-    if(this.getImageDimensions()){
-      this.zoom=334/Math.min(this.w,this.h)
-      this.x=0
-      this.y=0
-    }
-
-  }
 
 
 
@@ -343,5 +331,21 @@ export class MainComponent implements OnInit {
   async add_files($event:any) {
     let result=await this.imageUploader.upload(this.imageUploader.b64_to_file($event.file,$event.filename,$event.type))
     this.uris.push(result.url)
+  }
+
+  edit_image($event: MouseEvent) {
+
+  }
+
+  async open_crop() {
+    if(this.visual.startsWith("http")){
+      await this.convert_to_base64()
+    }
+    this.showCrop=true
+  }
+
+  crop($event: any) {
+    this.visual=$event
+    this.showCrop=false
   }
 }

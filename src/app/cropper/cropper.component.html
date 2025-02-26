@@ -1,0 +1,14 @@
+<div class="mainform">
+  <div style="position: relative;width:100vw;height: 80vh;display: inline-block;"
+       (mousedown)="start_crop($event)" (mousemove)="end_crop($event)">
+
+    <img [src]="visual" style="object-fit:contain;width:100%;height:100%;">
+
+    <div style="pointer-events: none;position:absolute;opacity: 0.4;background-color: #050d0e;z-index: 100;display: block;"
+         [style.width]="w+'px'" [style.height]="h+'px'" [style.left]="x+'px'" [style.top]="y+'px'"></div>
+  </div>
+
+  <br><br>
+  <button mat-raised-button (click)="crop()">Crop !</button>
+</div>
+

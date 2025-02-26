@@ -126,6 +126,7 @@ export class UploaderService {
 
     //https://docs.ipfs.tech/reference/kubo/rpc/#api-v0-add
     let r=await this.query("add","pin=true&cid-version="+version,formData)
+    r.hash=r.Hash
     if(version==1){
       r.url="https://"+r.Hash+".ipfs.dweb.link?filename="+file.name
     }else{

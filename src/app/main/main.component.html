@@ -1,22 +1,21 @@
 
 <app-intro message="Create your NFT in one minute"></app-intro>
+<app-hourglass [message]="message"></app-hourglass>
+
+<div class="mainform" [style.pointer-events]="message=='' ? 'all' : 'none'" [style.opacity]="message=='' ? 1 : 0.3">
 
 
-<div class="mainform" [style.pointer-events]="message=='' ? 'all' : 'none'" [style.opacity]="message=='' ? 1 : 0.8">
-  <app-hourglass [message]="message"></app-hourglass>
-
-  <div *ngIf="visual && !user.isConnected(false)" >
+  <div *ngIf="!showCrop && visual && !user.isConnected(false)" >
     You need to login your wallet to built a NFT
   </div>
-
-
   <br>
 
   <app-source *ngIf="visual==''" (update_visual)="update_visual($event)">
   </app-source>
 
+  <app-cropper *ngIf="showCrop" [visual]="visual" (update_visual)="crop($event)"></app-cropper>
 
-  <div *ngIf="visual!=''">
+  <div *ngIf="visual!='' && !showCrop">
 
     <mat-accordion>
       <mat-expansion-panel [expanded]="true">
@@ -28,24 +27,20 @@
                    value_type="number" (valueChange)="quantity=$event"></app-input>
         <br>
 
-        <div class="vignette"  (dblclick)="center_image($event)"
-             (dragstart)="start_translate($event)"
-             (dragend)="update_position($event)" (mousewheel)="update_zoom($event)">
-          <img [src]="visual" style="position: absolute;display: block;"
-               #img
-               (load)="getImageDimensions()"
-               [style.height]="(h*zoom)+'px'" [style.width]="(w*zoom)+'px'"
-               [style.left]="x+'px'" [style.top]="y+'px'" [title]="visual+'(zoom:'+zoom+')'">
+        <div class="vignette" (dblclick)="edit_image($event)">
+          <img [src]="visual" class="centered-image" #img
+               [title]="visual+'(zoom:'+zoom+')'">
+
+<!--          [style.height]="(h*zoom)+'px'" [style.width]="(w*zoom)+'px'"-->
+<!--          [style.left]="x+'px'" [style.top]="y+'px'"-->
 
         </div>
         <br>
         <button mat-raised-button title="Start a new NFT" (click)="reset_image()">Reset</button>
-        <button mat-raised-button title="Show the entire image" (click)="autoscale()">Autozoom</button>
+        <button mat-raised-button title="Crop the picture" (click)="open_crop()">Crop</button>
         <button mat-raised-button *ngIf="visual.startsWith('http')" (click)="convert_to_base64()">
           <div class="bloc-button">Create<br>a copy</div>
         </button>
-
-
       </mat-expansion-panel>
 
       <mat-expansion-panel >
@@ -119,7 +114,7 @@
   </div>
 
   <br>
-  <div *ngIf="!user.isConnected() && visual!=''" style="display: inline-flex;width: 100%;align-content: center;justify-content: center;">
+  <div *ngIf="!user.isConnected() && visual!='' && !showCrop" style="display: inline-flex;width: 100%;align-content: center;justify-content: center;">
 
     <app-upload-file filter="pem" title="Upload a PEM file" style="display: inline-block;width:150px;"
                      *ngIf="level(2)"
@@ -130,7 +125,7 @@
     </button>
 
   </div>
-  <div *ngIf="visual.length>0">
+  <div *ngIf="visual.length>0 && showCrop">
 
     <button *ngIf="sel_collection && visual!=''" mat-raised-button
             style="width:200px;height:70px;margin-top:-10px;margin-bottom: 15px;"
