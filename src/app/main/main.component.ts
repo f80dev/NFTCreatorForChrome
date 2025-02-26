@@ -135,8 +135,7 @@ export class MainComponent implements OnInit {
         let rc=await makeNFT(col.collection,this.name,this.visual,this.user,this.quantity,this.royalties,this.uris,metadata_tags)
         if(rc.returnMessage=="ok"){
           showMessage(this,"NFT builded",2000,()=>this.view_on_gallery(),"View On Wallet")
-         setTimeout(()=>{this.reset_image()},2000)
-
+          setTimeout(()=>{this.reset_image()},2000)
         }else{
           showMessage(this,rc.returnMessage)
         }

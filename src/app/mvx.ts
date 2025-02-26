@@ -16,6 +16,7 @@ import {numberToPaddedHex, utf8ToHex} from '@multiversx/sdk-core/out/utils.codec
 import {gatherAllEvents} from '@multiversx/sdk-core/out/transactionsOutcomeParsers/resources';
 import {abi, settings} from '../environments/settings';
 import {PlainSignedTransaction} from "@multiversx/sdk-web-wallet-provider/out/plainSignedTransaction";
+import {environment} from "../environments/environment";
 
 export const DEVNET="https://devnet-api.multiversx.com"
 export const MAINNET="https://api.multiversx.com"
@@ -529,9 +530,9 @@ export async function makeNFT(identifier:string,name:string,visual:string,user:U
     royalties: Math.round(royalties*100),
     sender: Address.fromBech32(user.address),
     tokenIdentifier: identifier,
-    uris: uris
+    uris: uris,
   })
-
+  transaction.gasLimit=environment.max_gaz
   user.refresh()
   transaction.nonce=BigInt(user.account!.nonce)
 
