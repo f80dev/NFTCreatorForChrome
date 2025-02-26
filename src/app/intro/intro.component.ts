@@ -7,12 +7,12 @@ import {MatDialog} from '@angular/material/dialog';
 import {ApiService} from '../api.service';
 import {MatIcon} from '@angular/material/icon';
 import {settings} from '../../environments/settings';
-import {NgIf} from "@angular/common";
+import {NgIf, NgOptimizedImage} from "@angular/common";
 
 @Component({
   selector: 'app-intro',
   imports: [
-    MatButton, MatIcon, NgIf
+    MatButton, MatIcon, NgIf, NgOptimizedImage
   ],
   standalone:true,
   templateUrl: './intro.component.html',
