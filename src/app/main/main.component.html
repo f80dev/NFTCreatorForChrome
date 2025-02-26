@@ -1,10 +1,11 @@
-<app-hourglass [message]="message"></app-hourglass>
+
 <app-intro message="Create your NFT in one minute"></app-intro>
 
 
-<div class="mainform" *ngIf="message==''">
+<div class="mainform" [style.pointer-events]="message=='' ? 'all' : 'none'" [style.opacity]="message=='' ? 1 : 0.8">
+  <app-hourglass [message]="message"></app-hourglass>
 
-  <div *ngIf="visual && !user.isConnected(false)">
+  <div *ngIf="visual && !user.isConnected(false)" >
     You need to login your wallet to built a NFT
   </div>
 
