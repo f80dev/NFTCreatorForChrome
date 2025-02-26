@@ -87,14 +87,17 @@
                      style="min-width: 350px;max-width: 800px;width: 100%;"></json-editor>
 
         <br>
-        <button mat-raised-button (click)="add_uri()">
-          <mat-icon>add</mat-icon>Ressources
-        </button>
-        <div style="display: inline-block;width:100px;height:30px;margin-bottom: -30px;" *ngIf="level(2)">
-          <app-upload-file (uploaded)="add_files($event)">
-            <mat-icon>add</mat-icon>Files
-          </app-upload-file>
+        <div style="display: flex;align-items: center;justify-content: center;width:100%;">
+          <button mat-raised-button (click)="add_uri()">
+            <mat-icon>add</mat-icon>Ressources
+          </button>
+          <div style="display: block;width:100px;height:20px;margin-top:-13px;" *ngIf="level(2)">
+            <app-upload-file (uploaded)="add_files($event)">
+              <mat-icon style="margin-bottom: -5px;margin-left: -10px;">add</mat-icon>Files
+            </app-upload-file>
+          </div>
         </div>
+
 
         <br>
         <table style="width: 100%;">

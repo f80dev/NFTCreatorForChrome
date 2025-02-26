@@ -1,6 +1,6 @@
 export const settings={
   contract_addr:"",
-  ihm_level:2,
+  ihm_level:1,
   appname: "Instant NFT (devnet)",
   appli:"https://devnet.nft.f80.fr",
   network: "elrond-devnet",

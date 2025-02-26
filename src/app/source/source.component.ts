@@ -8,6 +8,8 @@ import {ClipboardService} from "../clipboard.service";
 import {Subject} from "rxjs";
 import {environment} from "../../environments/environment";
 import {Router} from "@angular/router";
+import {showMessage} from "../../tools";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-source',
@@ -25,6 +27,7 @@ import {Router} from "@angular/router";
 export class SourceComponent {
 
   protected readonly level = level;
+  toast=inject(MatSnackBar)
   @Input() visual=""
   @Output() update_visual=new EventEmitter();
   clipboard=inject(ClipboardService)
@@ -46,7 +49,11 @@ export class SourceComponent {
 
   async paste() {
     let content=await this.clipboard.paste()
-    if(content && content.toString().startsWith("http"))this.update_visual.emit(content)
+    if(content && content.toString().startsWith("http")){
+      this.update_visual.emit(content)
+    }else{
+      showMessage(this,"Nothing in the clipboard")
+    }
   }
 
 

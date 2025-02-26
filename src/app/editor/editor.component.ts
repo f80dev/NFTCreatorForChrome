@@ -33,4 +33,7 @@ export class EditorComponent {
 
   }
 
+  _cancel() {
+    this.router.navigate(["main"])
+  }
 }
