@@ -345,7 +345,9 @@ export class MainComponent implements OnInit {
   }
 
   crop($event: any) {
-    this.visual=$event
+    if($event){
+      this.visual=$event
+    }
     this.showCrop=false
   }
 }

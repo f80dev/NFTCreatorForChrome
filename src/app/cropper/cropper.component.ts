@@ -64,4 +64,8 @@ export class CropperComponent {
   crop() {
     this.update_visual.emit(this.cropImage(this.visual,this.w_zoom))
   }
+
+  cancel() {
+    this.update_visual.emit(null)
+  }
 }

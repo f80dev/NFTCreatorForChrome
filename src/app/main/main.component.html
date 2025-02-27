@@ -2,10 +2,12 @@
 <app-intro message="Create your NFT in one minute"></app-intro>
 <app-hourglass [message]="message"></app-hourglass>
 
-<div class="mainform" [style.pointer-events]="message=='' ? 'all' : 'none'" [style.opacity]="message=='' ? 1 : 0.3">
+<app-cropper *ngIf="showCrop" [visual]="visual" (update_visual)="crop($event)"></app-cropper>
+
+<div class="mainform" [style.pointer-events]="message=='' ? 'all' : 'none'" [style.opacity]="message=='' ? 1 : 0.3" *ngIf="!showCrop">
 
 
-  <div *ngIf="!showCrop && visual && !user.isConnected(false)" >
+  <div *ngIf="visual && !user.isConnected(false)" >
     You need to login your wallet to built a NFT
   </div>
   <br>
@@ -13,9 +15,9 @@
   <app-source *ngIf="visual==''" (update_visual)="update_visual($event)">
   </app-source>
 
-  <app-cropper *ngIf="showCrop" [visual]="visual" (update_visual)="crop($event)"></app-cropper>
 
-  <div *ngIf="visual!='' && !showCrop">
+
+  <div *ngIf="visual!=''">
 
     <mat-accordion>
       <mat-expansion-panel [expanded]="true">
@@ -114,7 +116,7 @@
   </div>
 
   <br>
-  <div *ngIf="!user.isConnected() && visual!='' && !showCrop" style="display: inline-flex;width: 100%;align-content: center;justify-content: center;">
+  <div *ngIf="!user.isConnected() && visual!=''" style="display: inline-flex;width: 100%;align-content: center;justify-content: center;">
 
     <app-upload-file filter="pem" title="Upload a PEM file" style="display: inline-block;width:150px;"
                      *ngIf="level(2)"
@@ -125,7 +127,7 @@
     </button>
 
   </div>
-  <div *ngIf="visual.length>0 && showCrop">
+  <div *ngIf="visual.length>0">
 
     <button *ngIf="sel_collection && visual!=''" mat-raised-button
             style="width:200px;height:70px;margin-top:-10px;margin-bottom: 15px;"
