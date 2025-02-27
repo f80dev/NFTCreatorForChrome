@@ -1,6 +1,8 @@
 <div class="mainform">
+  <h4>Define the crop zone on the picture</h4>
   <div style="position: relative;width:100vw;height: 80vh;display: inline-block;"
-       (mousedown)="start_crop($event)" (mousemove)="update_crop_zone($event)" (mouseup)="define_zone=false">
+       (mousedown)="start_crop($event)" (mousemove)="update_crop_zone($event)" (mouseup)="define_zone=false"
+       (touchstart)="start_crop($event)" (touchmove)="update_crop_zone($event)" (touchend)="define_zone=false">
 
     <img draggable="false"  [src]="visual" style="object-fit:contain;width:100%;height:100%;">
 
@@ -9,7 +11,7 @@
   </div>
 
   <br><br>
-  <button mat-raised-button (click)="crop()">Crop !</button>
+  <button mat-raised-button *ngIf="w>0 && h>0" (click)="crop()">Crop !</button>
   <button mat-raised-button (click)="cancel()">Cancel</button>
 </div>
 

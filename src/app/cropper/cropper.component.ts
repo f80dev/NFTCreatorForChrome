@@ -1,11 +1,13 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {MatButton} from "@angular/material/button";
 import {$$} from "../../tools";
+import {NgIf} from "@angular/common";
 
 @Component({
   selector: 'app-cropper',
   imports: [
-    MatButton
+    MatButton,
+    NgIf
   ],
   templateUrl: './cropper.component.html',
   standalone: true,
@@ -42,26 +44,30 @@ export class CropperComponent {
       0, 0, canvas.width,canvas.height
     );
 
-    // Get the cropped image as base64
     return canvas.toDataURL();
+
   }
 
-  start_crop($event: MouseEvent) {
+  start_crop($event: any) {
     this.define_zone=!this.define_zone
     if(this.define_zone){
       const rect = ($event.target as HTMLDivElement).getBoundingClientRect();
-      this.x = $event.clientX - rect.left;
-      this.y = $event.clientY - rect.top;
+      let x=$event.type=="mousedown" ?  $event.clientX : $event.touches[0].clientX
+      let y=$event.type=="mousedown" ?  $event.clientY : $event.touches[0].clientY
+      this.x = x- rect.left;
+      this.y = y- rect.top;
     }
   }
 
-  update_crop_zone($event: MouseEvent) {
+  update_crop_zone($event: any) {
     if(this.define_zone){
       const rect = ($event.target as HTMLDivElement).getBoundingClientRect();
       this.w_zoom=rect.width
       this.h_zoom=rect.height
-      this.w=$event.clientX-rect.left-this.x
-      this.h=$event.offsetY-rect.top-this.y
+      let x=$event.type=="mousemove" ?  $event.clientX : $event.touches[0].clientX
+      let y=$event.type=="mousemove" ?  $event.clientY : $event.touches[0].clientY
+      this.w=x-rect.left-this.x
+      this.h=y-rect.top-this.y
     }
   }
 
