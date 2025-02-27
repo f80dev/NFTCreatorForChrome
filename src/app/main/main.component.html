@@ -29,7 +29,7 @@
                    value_type="number" (valueChange)="quantity=$event"></app-input>
         <br>
 
-        <div class="vignette" (dblclick)="edit_image($event)">
+        <div class="vignette">
           <img [src]="visual" class="centered-image" #img
                [title]="visual+'(zoom:'+zoom+')'">
 
@@ -40,6 +40,7 @@
         <br>
         <button mat-raised-button title="Start a new NFT" (click)="reset_image()">Reset</button>
         <button mat-raised-button title="Crop the picture" (click)="open_crop()">Crop</button>
+        <button mat-raised-button title="Return to the original image" *ngIf="uncrop!=''" (click)="undo_crop()">Undo crop</button>
         <button mat-raised-button *ngIf="visual.startsWith('http')" (click)="convert_to_base64()">
           <div class="bloc-button">Create<br>a copy</div>
         </button>

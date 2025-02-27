@@ -22,7 +22,6 @@ import {MatAccordion, MatExpansionPanel, MatExpansionPanelHeader} from "@angular
 import {JsonEditorComponent} from "ang-jsoneditor";
 import {ImageProcessorService} from "../image-processor.service";
 import {UploaderService} from "../uploader.service";
-import {Subject} from "rxjs";
 import {MatCard} from "@angular/material/card";
 import {IntroComponent} from "../intro/intro.component";
 import {SourceComponent} from "../source/source.component";
@@ -78,11 +77,11 @@ export class MainComponent implements OnInit {
   y: number=0
   w: number=0
   h:number=0
-  start_x=0
-  start_y=0
 
   properties:{name:string,value:string}[]=[]
   showCrop: boolean=false
+  uncrop: string=""
+
 
   async ngOnInit() {
     let params:any=await getParams(this.routes)
@@ -235,36 +234,6 @@ export class MainComponent implements OnInit {
     await this.update_prop(new_prop,"value")
   }
 
-  update_zoom($event: any) {
-    this.zoom=this.zoom+($event.wheelDelta>0 ? 0.01 : -0.01);
-    if(this.zoom<=0)this.zoom=0.1;
-    this.self_storage=true
-  }
-
-
-
-
-
-
-  update_position($event: MouseEvent) {
-    this.x=this.x+(this.start_x-$event.clientX)
-    this.y=this.y+(this.start_y-$event.clientY)
-    this.self_storage=true
-  }
-
-
-  start_translate($event: MouseEvent) {
-    this.start_x=$event.offsetX
-    this.start_y=$event.offsetY
-  }
-
-  center_image($event: MouseEvent) {
-    this.x=this.x-(300-$event.offsetX)
-    this.y=this.y-(300-$event.offsetY)
-  }
-
-
-
 
   async build_collection() {
     let r=await _prompt(this,"Collection name","","must be inferieur to 20 characters","text","Create","Cancel",false)
@@ -285,6 +254,7 @@ export class MainComponent implements OnInit {
     }
   }
 
+
   async convert_to_base64() {
     if(this.visual.startsWith("http")){
       wait_message(this,"Creating a local copy of your image")
@@ -298,6 +268,7 @@ export class MainComponent implements OnInit {
     }
   }
 
+
   async set_roles_to_collection() {
     if(this.sel_collection){
       await this.user.login(this,"","",true)
@@ -307,8 +278,8 @@ export class MainComponent implements OnInit {
       }catch (e:any){}
       wait_message(this)
     }
-
   }
+
 
   view_on_gallery() {
     if(this.sel_collection){
@@ -318,30 +289,31 @@ export class MainComponent implements OnInit {
     }
   }
 
+
   view_account_on_gallery() {
     let url="https://devnet.xspotlight.com/"+this.user.address
     if(!this.user.isDevnet())url=url.replace("devnet.","")
     open(url,"Gallery")
   }
 
+
   update_sel_collection($event: any) {
     this.sel_collection=$event
   }
+
 
   async add_files($event:any) {
     let result=await this.imageUploader.upload(this.imageUploader.b64_to_file($event.file,$event.filename,$event.type))
     this.uris.push(result.url)
   }
 
-  edit_image($event: MouseEvent) {
-
-  }
 
   async open_crop() {
     if(this.visual.startsWith("http")){
       await this.convert_to_base64()
     }
     this.showCrop=true
+    this.uncrop=this.visual
   }
 
   crop($event: any) {
@@ -349,5 +321,10 @@ export class MainComponent implements OnInit {
       this.visual=$event
     }
     this.showCrop=false
+  }
+
+  undo_crop() {
+    this.visual=this.uncrop
+    this.uncrop=""
   }
 }
