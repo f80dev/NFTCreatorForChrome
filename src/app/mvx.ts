@@ -515,8 +515,10 @@ async function executeTransaction(sign_transaction:Transaction,user:UserService)
 
 
 //buildNFT
-export async function makeNFT(identifier:string,name:string,visual:string,user:UserService,quantity=1,royalties=0,uris:string[]=[],metadata="")  {
+export async function makeNFT(identifier:string,name:string,visual:string,user:UserService,
+                              quantity=1,royalties=0,uris:string[]=[],metadata="",metadata_url="")  {
   //Voir https://docs.multiversx.com/tokens/nft-tokens/#creation-of-an-nft
+  if(metadata_url.length>0)uris.unshift(metadata_url)
   uris.unshift(visual)
 
   let factory = new TokenManagementTransactionsFactory({

@@ -107,6 +107,7 @@ export class MainComponent implements OnInit {
   imageProcessor=inject(ImageProcessorService)
   imageUploader=inject(UploaderService)
   async Create_NFT() {
+    //voir https://docs.multiversx.com/tokens/nft-tokens/#creation-of-an-nft
     if(this.sel_collection){
       await this.user.login(this,"",localStorage.getItem("pem") || "",true)
       let col:any=this.sel_collection.value
@@ -120,19 +121,23 @@ export class MainComponent implements OnInit {
       }
 
       let metadata_tags=""
-      if(this.description.length>0)this.properties.push({name:"description",value:this.description})
-      if(this.properties.length>0){
-        let obj:any={}
+      let metadata_url=""
+      if(this.properties.length>0 || this.description.length>0){
+        let obj:any={description:this.description,attributes:[],collection:""}
         for(let prop of this.properties){
-          obj[prop.name]=prop.value
+          obj.attributes.push({trait_type:prop.name,value:prop.value})
         }
         let metadata=await this.imageUploader.upload(this.imageUploader.string_to_file(JSON.stringify(obj),"infos.json"),0)
         $$("metadata ",metadata)
-        metadata_tags="metadata:"+metadata.url+"/infos.json;tags:"+this.tags.replace(" ",",").replace(";",",")
+        for(let i=0;i<10;i++){
+          this.tags=this.tags.replace(" ",",").replace(";",",")
+        }
+        metadata_tags="metadata:ipfs"+metadata.Hash+"/filename.json;tags:"+this.tags
+        metadata_url=metadata.url
       }
 
       try{
-        let rc=await makeNFT(col.collection,this.name,this.visual,this.user,this.quantity,this.royalties,this.uris,metadata_tags)
+        let rc=await makeNFT(col.collection,this.name,this.visual,this.user,this.quantity,this.royalties,this.uris,metadata_tags,metadata_url)
         if(rc.returnMessage=="ok"){
           try{
             let r=await _prompt(this,"Mint terminated. See your NFT in your wallet ?","","","yesno","See my NFT","New NFT",true)
@@ -166,7 +171,9 @@ export class MainComponent implements OnInit {
     this.uris=[]
     localStorage.removeItem("image")
     this.visual=""
-    this.visual=""
+    this.description=""
+    this.properties=[]
+    this.royalties=5
     this.zoom=1
     this.x=0
     this.y=0
