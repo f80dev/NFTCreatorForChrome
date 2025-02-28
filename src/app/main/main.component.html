@@ -5,8 +5,6 @@
 <app-cropper *ngIf="showCrop" [visual]="visual" (update_visual)="crop($event)"></app-cropper>
 
 <div class="mainform" [style.pointer-events]="message=='' ? 'all' : 'none'" [style.opacity]="message=='' ? 1 : 0.3" *ngIf="!showCrop">
-
-
   <div *ngIf="visual && !user.isConnected(false)" >
     You need to login your wallet to built a NFT
   </div>
@@ -22,7 +20,7 @@
       <mat-expansion-panel [expanded]="true">
         <mat-expansion-panel-header>Main</mat-expansion-panel-header>
 
-        <app-input label="NFT Name" [value]="name" value_type="text" (valueChange)="name=$event"></app-input>
+        <app-input label="NFT Name" [value]="name" style="width: 180px;" value_type="text" (valueChange)="name=$event"></app-input>
         <app-input label="Quantity" [value]="quantity" style="width: 144px;"
                    *ngIf="!sel_collection || sel_collection.value.subType=='SemiFungibleESDT'"
                    value_type="number" (valueChange)="quantity=$event"></app-input>
@@ -37,11 +35,11 @@
 
         </div>
         <br>
-        <button mat-raised-button title="Start a new NFT" (click)="reset_image()">Reset</button>
-        <button mat-raised-button title="Crop the picture" (click)="open_crop()">Crop</button>
-        <button mat-raised-button title="Return to the original image" *ngIf="uncrop!=''" (click)="undo_crop()">Undo crop</button>
-        <button mat-raised-button *ngIf="visual.startsWith('http')" (click)="convert_to_base64()">
-          <div class="bloc-button">Create<br>a copy</div>
+        <button mat-raised-button title="Start a new NFT" (click)="reset_image()"><mat-icon>cancel</mat-icon>Reset</button>
+        <button mat-raised-button title="Crop the picture" (click)="open_crop()"><mat-icon>crop</mat-icon>Crop</button>
+        <button mat-raised-button title="Return to the original image" *ngIf="uncrop!=''" (click)="undo_crop()"><mat-icon>undo</mat-icon>Undo crop</button>
+        <button mat-raised-button title="Create a copy and IPFS" *ngIf="visual.startsWith('http')" (click)="convert_to_base64()">
+          <mat-icon>download</mat-icon>Copy
         </button>
       </mat-expansion-panel>
 

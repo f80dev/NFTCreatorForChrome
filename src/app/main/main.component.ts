@@ -172,6 +172,7 @@ export class MainComponent implements OnInit {
     this.uris=[]
     localStorage.removeItem("image")
     this.visual=""
+    this.uncrop=""
     this.description=""
     this.properties=[]
     this.royalties=5
