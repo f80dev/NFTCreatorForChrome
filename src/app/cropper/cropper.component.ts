@@ -38,8 +38,8 @@ export class CropperComponent implements OnChanges {
         this.zoom=zoom_w>zoom_h ? zoom_h : zoom_w
       },200)
     }
-
   }
+
 
   cropImage() {
     const canvas = document.createElement("canvas");
@@ -47,16 +47,14 @@ export class CropperComponent implements OnChanges {
     canvas.width =  Math.round(this.w*this.zoom)
     canvas.height =  Math.round(this.h*this.zoom)
     const ctx = canvas.getContext("2d");
-
     ctx!.drawImage(
       this.img,
       Math.round(this.x*this.zoom), Math.round((this.y-90)*this.zoom), canvas.width, canvas.height, // Source rectangle
       0, 0, canvas.width,canvas.height
     );
-
     return canvas.toDataURL();
-
   }
+
 
   start_crop($event: any) {
     this.define_zone=!this.define_zone
@@ -69,6 +67,7 @@ export class CropperComponent implements OnChanges {
     }
   }
 
+
   update_crop_zone($event: any) {
     if(this.define_zone){
       const rect = this.image_zone?.nativeElement.getBoundingClientRect();
@@ -78,6 +77,7 @@ export class CropperComponent implements OnChanges {
       this.h=y-rect.top-this.y
     }
   }
+
 
   crop() {
     this.update_visual.emit(this.cropImage())
