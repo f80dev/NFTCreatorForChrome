@@ -1,6 +1,6 @@
 
 <app-intro message="Create your NFT in one minute"></app-intro>
-<app-hourglass [message]="message"></app-hourglass>
+<app-hourglass style="color:white" [message]="message"></app-hourglass>
 
 <app-cropper *ngIf="showCrop" [visual]="visual" (update_visual)="crop($event)"></app-cropper>
 
