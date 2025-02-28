@@ -1,17 +1,14 @@
-<div class="mainform">
-  <h4>Define the crop zone on the picture</h4>
-  <div style="position: relative;width:100vw;height: 80vh;display: inline-block;"
-       (mousedown)="start_crop($event)" (mousemove)="update_crop_zone($event)" (mouseup)="define_zone=false"
-       (touchstart)="start_crop($event)" (touchmove)="update_crop_zone($event)" (touchend)="define_zone=false">
+<h4>Define the crop zone on the picture</h4>
+<button mat-raised-button *ngIf="w>0 && h>0" (click)="crop()">Crop !</button>
+<button mat-raised-button (click)="cancel()">Cancel</button>
+<br>
+<div #imageZone style="position: fixed;width:100vw;height: 80vh;display:block;left:5px;top:50px;"
+     (mousedown)="start_crop($event)" (mousemove)="update_crop_zone($event)" (mouseup)="define_zone=false"
+     (touchstart)="start_crop($event)" (touchmove)="update_crop_zone($event)" (touchend)="define_zone=false">
 
-    <img draggable="false"  [src]="visual" style="object-fit:contain;width:100%;height:100%;">
+  <img draggable="false"  [src]="visual" style="object-fit:contain;width:100%;height:100%;">
 
-    <div style="pointer-events: none;position:absolute;opacity: 0.4;background-color: #050d0e;z-index: 100;display: block;"
-         [style.width]="w+'px'" [style.height]="h+'px'" [style.left]="x+'px'" [style.top]="y+'px'"></div>
-  </div>
-
-  <br><br>
-  <button mat-raised-button *ngIf="w>0 && h>0" (click)="crop()">Crop !</button>
-  <button mat-raised-button (click)="cancel()">Cancel</button>
+  <div style="pointer-events: none;position:absolute;opacity: 0.4;background-color: #050d0e;z-index: 100;display: block;"
+       [style.width]="w+'px'" [style.height]="h+'px'" [style.left]="x+'px'" [style.top]="y+'px'"></div>
 </div>
 

@@ -83,6 +83,7 @@ export class MainComponent implements OnInit {
   uncrop: string=""
 
 
+
   async ngOnInit() {
     let params:any=await getParams(this.routes)
     this.visual=params.url || localStorage.getItem("image") || ""
