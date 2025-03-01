@@ -10,6 +10,7 @@ import {environment} from "../../environments/environment";
 import {Router} from "@angular/router";
 import {showMessage} from "../../tools";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {ImageProcessorService} from "../image-processor.service";
 
 @Component({
   selector: 'app-source',
@@ -31,6 +32,7 @@ export class SourceComponent {
   @Input() visual=""
   @Output() update_visual=new EventEmitter();
   clipboard=inject(ClipboardService)
+  imageProc=inject(ImageProcessorService)
   show_scanner: boolean = false;
   handle:any
   generators=environment.generators
@@ -64,17 +66,18 @@ export class SourceComponent {
 
 
 
-  take_photo() {
+  async take_photo() {
     clearInterval(this.handle)
     if(this.image){
-      this.update_visual.emit(this.image?.imageAsDataUrl)
+      this.update_visual.emit((await this.imageProc.createImageFromBase64(this.image.imageAsBase64)).toDataURL("image/webp"))
     }
     this.show_scanner=false
   }
 
 
-  from_device($event: any) {
+  async from_device($event: any) {
     this.visual=$event.file
+    this.visual=(await this.imageProc.createImageFromBase64(this.visual)).toDataURL("image/webp")
     this.update_visual.emit(this.visual)
   }
 

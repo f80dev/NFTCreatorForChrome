@@ -18,7 +18,6 @@ export class UploaderService {
   http=inject(HttpClient)
   endpoint="https://ipfs.f80.fr:5001/api/v0/"
 
-
   query(service:string,params="",body={}) : Promise<any> {
     return new Promise(async (resolve, reject)  => {
       let headers=new HttpHeaders()
