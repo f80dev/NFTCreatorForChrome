@@ -41,7 +41,7 @@ export class ImageProcessorService {
     if(lx>0 && ly>0){
       return rc.crop({x:x,y:y,width:lx,height:ly})
     }else{
-      return rc;
+      return rc
     }
   }
 

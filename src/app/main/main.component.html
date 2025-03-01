@@ -30,8 +30,8 @@
           <img [src]="visual" class="centered-image" #img
                [title]="visual+'(zoom:'+zoom+')'">
 
-<!--          [style.height]="(h*zoom)+'px'" [style.width]="(w*zoom)+'px'"-->
-<!--          [style.left]="x+'px'" [style.top]="y+'px'"-->
+          <!--          [style.height]="(h*zoom)+'px'" [style.width]="(w*zoom)+'px'"-->
+          <!--          [style.left]="x+'px'" [style.top]="y+'px'"-->
 
         </div>
         <br>
@@ -145,23 +145,22 @@
     <mat-expansion-panel *ngIf="user.isConnected(false)" [expanded]="true">
       <mat-expansion-panel-header>Your Wallet</mat-expansion-panel-header>
       <div style="display: inline-flex;align-items: center;justify-content: center;" >
-
-          {{user.address.substring(0,10)+"..."+user.address.substring(user.address.length-10)}}
-          &nbsp;
+        {{user.address.substring(0,10)+"..."+user.address.substring(user.address.length-10)}}
+        &nbsp;
         <button mat-icon-button class="icon-button" (click)="view_account_on_gallery()" title="View all NFTs"><mat-icon>visibility</mat-icon></button>
         <button mat-icon-button class="icon-button" (click)="logout()" title="logout"><mat-icon>logout</mat-icon></button>
       </div>
       <br>
 
-      <app-input label="Collection" value_type="list" style="display: inline-block;"
+      <app-input label="Collection" value_type="list" style="display: inline-block;width:150px;max-height: 60px;"
                  [value]="sel_collection" *ngIf="collections.length>0"
                  [options]="collections" (valueChange)="update_sel_collection($event)"></app-input>
 
       <div *ngIf="collections.length==0">You need a collection before mint a NFT<br><br></div>
 
-        <button mat-raised-button (click)="build_collection()">Create Collection</button>
-        <button mat-icon-button class="icon-button"*ngIf="sel_collection" (click)="set_roles_to_collection()"><mat-icon>build</mat-icon></button>
-        <button mat-icon-button class="icon-button" *ngIf="sel_collection" (click)="view_on_gallery()"><mat-icon>visibility</mat-icon></button>
+      <button mat-raised-button (click)="build_collection()"><div class="bloc-button">Create<br>Collection</div></button>
+      <button mat-icon-button class="icon-button"*ngIf="sel_collection" (click)="set_roles_to_collection()"><mat-icon>build</mat-icon></button>
+      <button mat-icon-button class="icon-button" *ngIf="sel_collection" (click)="view_on_gallery()"><mat-icon>visibility</mat-icon></button>
 
     </mat-expansion-panel>
   </div>

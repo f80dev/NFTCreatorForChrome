@@ -1,6 +1,6 @@
 import {Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild} from '@angular/core';
 import {MatButton, MatIconButton} from "@angular/material/button";
-import {$$} from "../../tools";
+import {$$, rotate} from "../../tools";
 import {NgIf} from "@angular/common";
 import {MatIcon} from "@angular/material/icon";
 
@@ -31,6 +31,7 @@ export class CropperComponent implements OnChanges {
   define_zone: boolean=false
   zoom: number=0
   img = new Image();
+  showSave: boolean = false
 
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -58,7 +59,7 @@ export class CropperComponent implements OnChanges {
       Math.round(this.x_zone/this.zoom), Math.round(this.y_zone/this.zoom), canvas.width, canvas.height, // Source rectangle
       0, 0, canvas.width,canvas.height
     );
-    return canvas.toDataURL();
+    return canvas.toDataURL("image/webp",90);
   }
 
 
@@ -91,5 +92,9 @@ export class CropperComponent implements OnChanges {
 
   cancel() {
     this.update_visual.emit(null)
+  }
+
+  async _rotate() {
+    this.update_visual.emit(await rotate(this.visual,-90))
   }
 }

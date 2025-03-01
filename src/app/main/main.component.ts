@@ -66,7 +66,6 @@ export class MainComponent implements OnInit {
   router=inject(Router)
   dialog=inject(MatDialog)
   toast=inject(MatSnackBar)
-  clipboard=inject(ClipboardService)
   http=inject(HttpClient)
 
   collections: {label:string,value:any}[]=[]
@@ -116,8 +115,8 @@ export class MainComponent implements OnInit {
 
       if(this.visual.startsWith("data:")){
         let img=await this.imageProcessor.createImageFromBase64(this.visual)
-        let s=await img.toDataURL("image/jpeg")
-        let result=await this.imageUploader.upload(this.imageUploader.b64_to_file(s,"image.jpg"))
+        let s=await img.toDataURL("image/webp")
+        let result=await this.imageUploader.upload(this.imageUploader.b64_to_file(s,"image.webp"))
         this.visual=result.url
       }
 
@@ -141,7 +140,7 @@ export class MainComponent implements OnInit {
         let rc=await makeNFT(col.collection,this.name,this.visual,this.user,this.quantity,this.royalties,this.uris,metadata_tags,metadata_url)
         if(rc.returnMessage=="ok"){
           try{
-            let r=await _prompt(this,"Mint terminated. See your NFT in your wallet ?","","","yesno","See my NFT","New NFT",true)
+            let r=await _prompt(this,"Mint terminated.","","See your NFT in your wallet ?","yesno","See my NFT","New NFT",true)
             if(r=="yes"){
               this.view_on_gallery()
             }
@@ -264,11 +263,12 @@ export class MainComponent implements OnInit {
   }
 
 
-  async convert_to_base64() {
+  async convert_to_base64(format="image/webp") {
     if(this.visual.startsWith("http")){
       wait_message(this,"Creating a local copy of your image")
       try{
         let result=await this.imageProcessor.getBase64FromUrl(this.visual)
+        result=(await this.imageProcessor.createImageFromBase64(result)).toDataURL(format)
         this.visual=result as string
       }catch(e:any){
         showMessage(this,"Technical problem ! Retry to make the copy")

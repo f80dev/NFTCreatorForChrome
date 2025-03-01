@@ -309,7 +309,7 @@ export function rotate(src: string, angle: number, quality: number=1) : Promise<
         canvas.width = img.height;
         canvas.height = img.width;
         drawRotated(canvas, this, angle);
-        var rc = canvas.toDataURL("image/jpeg", quality);
+        var rc = canvas.toDataURL("image/webp", quality);
         resolve(rc);
       };
       img.src = src;
