@@ -36,7 +36,7 @@ export class UploaderService {
     })
   }
 
-  b64_to_blob(content:string,contentType="image/jpeg") : Blob {
+  b64_to_blob(content:string,contentType="image/webp") : Blob {
     if(content.indexOf("base64,")>-1){
       contentType=content.split("base64")[0].replace("data:","")
       content=content.split("base64,")[1]
