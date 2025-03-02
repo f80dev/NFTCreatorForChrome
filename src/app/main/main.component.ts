@@ -82,11 +82,14 @@ export class MainComponent implements OnInit {
   uncrop: string=""
 
 
-
   async ngOnInit() {
     let params:any=await getParams(this.routes)
+    $$("Lecture des paramètres ",params)
+    this.user.action_after_mint=params.action || params.action_after_mint || ""
     this.visual=params.url || localStorage.getItem("image") || ""
   }
+
+
 
   async refresh_collection(){
     this.collections=[]
@@ -116,7 +119,7 @@ export class MainComponent implements OnInit {
       if(this.visual.startsWith("data:")){
         let img=await this.imageProcessor.createImageFromBase64(this.visual)
         let s=await img.toDataURL("image/webp")
-        let result=await this.imageUploader.upload(this.imageUploader.b64_to_file(s,"image.webp"))
+        let result=await this.imageUploader.upload(this.imageUploader.b64_to_file(s,"image.webp","image/webp"))
         this.visual=result.url
       }
 
@@ -140,6 +143,10 @@ export class MainComponent implements OnInit {
         let rc=await makeNFT(col.collection,this.name,this.visual,this.user,this.quantity,this.royalties,this.uris,metadata_tags,metadata_url)
         if(rc.returnMessage=="ok"){
           try{
+            if(this.user.action_after_mint.startsWith("redirect"))open(this.user.action_after_mint.replace("redirect:",""))
+            if(this.user.action_after_mint=="close")window.close()
+            if(this.user.action_after_mint=="wallet")this.view_on_gallery(true)
+
             let r=await _prompt(this,"Mint terminated.","","See your NFT in your wallet ?","yesno","See my NFT","New NFT",true)
             if(r=="yes"){
               this.view_on_gallery()
@@ -290,11 +297,16 @@ export class MainComponent implements OnInit {
   }
 
 
-  view_on_gallery() {
+  view_on_gallery(self_window=false) {
     if(this.sel_collection){
       let url="https://devnet.xspotlight.com/collections/"+this.sel_collection.value.collection;
       if(!this.user.isDevnet())url=url.replace("devnet.","")
-      open(url,"Gallery")
+      if(self_window){
+        open(url)
+      }else{
+        open(url,"Gallery")
+      }
+
     }
   }
 

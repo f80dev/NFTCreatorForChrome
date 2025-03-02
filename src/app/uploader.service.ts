@@ -53,7 +53,7 @@ export class UploaderService {
     return blob
   }
 
-  b64_to_file(content:string,filename:string="",contentType="image/jpeg") : File {
+  b64_to_file(content:string,filename:string="",contentType="image/webp") : File {
     let blob=this.b64_to_blob(content,contentType);
     return new File([blob], filename, { type: contentType})
   }

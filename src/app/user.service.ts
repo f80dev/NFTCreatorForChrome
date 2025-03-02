@@ -54,6 +54,7 @@ export class UserService {
   }
   preview: boolean = false;
   balance: number=0
+  action_after_mint: string = "";
 
   constructor() { }
 

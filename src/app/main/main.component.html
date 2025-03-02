@@ -5,8 +5,17 @@
 <app-cropper *ngIf="showCrop" [visual]="visual" (update_visual)="crop($event)"></app-cropper>
 
 <div class="mainform" [style.pointer-events]="message=='' ? 'all' : 'none'" [style.opacity]="message=='' ? 1 : 0.3" *ngIf="!showCrop">
-  <div *ngIf="visual && !user.isConnected(false)" >
-    You need to login your wallet to built a NFT
+  <div *ngIf="visual && !user.isConnected(false)" style="margin-top:10px;display: inline-flex;align-content:center;justify-content: center;width: 100%;">
+    <div>
+      You need login with your wallet to built a NFT :&nbsp;
+
+    </div>
+
+    <button mat-raised-button (click)="login()"
+            style="margin-top: -10px;">
+      Wallet login
+    </button>
+
   </div>
   <br>
 
@@ -20,7 +29,7 @@
       <mat-expansion-panel [expanded]="true">
         <mat-expansion-panel-header>Main</mat-expansion-panel-header>
 
-        <app-input label="NFT Name" [value]="name" style="width: 180px;" value_type="text" (valueChange)="name=$event"></app-input>
+        <app-input label="NFT Name" [value]="name" style="width: 160px;" value_type="text" (valueChange)="name=$event"></app-input>
         <app-input label="Quantity" [value]="quantity" style="width: 144px;"
                    *ngIf="!sel_collection || sel_collection.value.subType=='SemiFungibleESDT'"
                    value_type="number" (valueChange)="quantity=$event"></app-input>
@@ -29,10 +38,6 @@
         <div class="vignette">
           <img [src]="visual" class="centered-image" #img
                [title]="eval_size(visual)">
-
-          <!--          [style.height]="(h*zoom)+'px'" [style.width]="(w*zoom)+'px'"-->
-          <!--          [style.left]="x+'px'" [style.top]="y+'px'"-->
-
         </div>
         <br>
         <button mat-raised-button title="Start a new NFT" (click)="reset_image()"><mat-icon>cancel</mat-icon>Reset</button>
@@ -120,11 +125,6 @@
     <app-upload-file filter="pem" title="Upload a PEM file" style="display: inline-block;width:150px;"
                      *ngIf="level(2)"
                      (uploaded)="upload_pem($event)">Your PEM file</app-upload-file>
-    <button mat-raised-button (click)="login()"
-            style="margin-top: -2px;">
-      Wallet login
-    </button>
-
   </div>
   <div *ngIf="visual.length>0">
 

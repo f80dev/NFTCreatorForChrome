@@ -1,6 +1,6 @@
 
 <div style="display: block;position: fixed;right:0;top:0;height:50px;width:150px;text-align: right;z-index: 1000;background: none;">
-  <button mat-icon-button *ngIf="h>0 && w>0" (click)="crop()"><mat-icon>crop</mat-icon></button>
+  <button mat-icon-button *ngIf="h_zone>0 && w_zone>0" (click)="crop()"><mat-icon>crop</mat-icon></button>
   <button mat-icon-button (click)="_rotate()"><mat-icon>turn_left</mat-icon></button>
   <button mat-icon-button (click)="cancel()"><mat-icon>cancel</mat-icon></button>
 </div>
