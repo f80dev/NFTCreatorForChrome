@@ -28,7 +28,7 @@
 
         <div class="vignette">
           <img [src]="visual" class="centered-image" #img
-               [title]="visual+'(zoom:'+zoom+')'">
+               [title]="eval_size(visual)">
 
           <!--          [style.height]="(h*zoom)+'px'" [style.width]="(w*zoom)+'px'"-->
           <!--          [style.left]="x+'px'" [style.top]="y+'px'"-->

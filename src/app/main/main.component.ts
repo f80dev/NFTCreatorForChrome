@@ -336,4 +336,9 @@ export class MainComponent implements OnInit {
     this.visual=this.uncrop
     this.uncrop=""
   }
+
+  eval_size(visual: string) {
+    if(visual.startsWith("http"))return visual
+    return Math.round(visual.length/1000) + " Ko"
+  }
 }
