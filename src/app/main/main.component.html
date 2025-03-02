@@ -29,7 +29,9 @@
       <mat-expansion-panel [expanded]="true">
         <mat-expansion-panel-header>Main</mat-expansion-panel-header>
 
-        <app-input label="NFT Name" [value]="name" style="width: 160px;" value_type="text" (valueChange)="name=$event"></app-input>
+        <app-input label="NFT Name" [value]="name" style="width: 160px;"
+                   maxlength="50"
+                   value_type="text" (valueChange)="name=$event"></app-input>
         <app-input label="Quantity" [value]="quantity" style="width: 144px;"
                    *ngIf="!sel_collection || sel_collection.value.subType=='SemiFungibleESDT'"
                    value_type="number" (valueChange)="quantity=$event"></app-input>

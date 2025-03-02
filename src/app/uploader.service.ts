@@ -36,6 +36,8 @@ export class UploaderService {
     })
   }
 
+
+
   b64_to_blob(content:string,contentType="image/webp") : Blob {
     if(content.indexOf("base64,")>-1){
       contentType=content.split("base64")[0].replace("data:","")
@@ -125,11 +127,14 @@ export class UploaderService {
 
     //https://docs.ipfs.tech/reference/kubo/rpc/#api-v0-add
     let r=await this.query("add","pin=true&cid-version="+version,formData)
+    $$("Result from add ",r)
     r.hash=r.Hash
     if(version==1){
+      r.old="https://ipfs.io/ipfs/"+r.Hash+"?filename="+file.name
       r.url="https://"+r.Hash+".ipfs.dweb.link?filename="+file.name
     }else{
       r.url="https://ipfs.io/ipfs/"+r.Hash+"?filename="+file.name
+      r.old=r.url
     }
     return r
   }

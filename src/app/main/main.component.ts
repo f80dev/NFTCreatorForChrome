@@ -87,6 +87,8 @@ export class MainComponent implements OnInit {
     $$("Lecture des paramètres ",params)
     this.user.action_after_mint=params.action || params.action_after_mint || ""
     this.visual=params.url || localStorage.getItem("image") || ""
+    await this.user.login(this,"","",false,0.003,"",true)
+    await this.refresh_collection()
   }
 
 
@@ -111,6 +113,11 @@ export class MainComponent implements OnInit {
   imageUploader=inject(UploaderService)
   async Create_NFT() {
     //voir https://docs.multiversx.com/tokens/nft-tokens/#creation-of-an-nft
+    if(this.name.length<3 || this.name.length>50){
+      showMessage(this,"Name must be between 3 and 50 characters")
+      return
+    }
+
     if(this.sel_collection){
       await this.user.login(this,"",localStorage.getItem("pem") || "",true)
       let col:any=this.sel_collection.value
@@ -120,7 +127,7 @@ export class MainComponent implements OnInit {
         let img=await this.imageProcessor.createImageFromBase64(this.visual)
         let s=await img.toDataURL("image/webp")
         let result=await this.imageUploader.upload(this.imageUploader.b64_to_file(s,"image.webp","image/webp"))
-        this.visual=result.url
+        this.visual=result.old
       }
 
       let metadata_tags=""
@@ -136,7 +143,7 @@ export class MainComponent implements OnInit {
           this.tags=this.tags.replace(" ",",").replace(";",",")
         }
         metadata_tags="metadata:ipfs"+metadata.Hash+"/filename.json;tags:"+this.tags
-        metadata_url=metadata.url
+        metadata_url=metadata.old
       }
 
       try{
