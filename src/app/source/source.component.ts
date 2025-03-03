@@ -12,6 +12,9 @@ import {showMessage} from "../../tools";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {ImageProcessorService} from "../image-processor.service";
 import {HourglassComponent, wait_message} from "../hourglass/hourglass.component";
+import {MatAccordion, MatExpansionPanel, MatExpansionPanelHeader} from "@angular/material/expansion";
+import {WalletComponent} from "../wallet/wallet.component";
+import {UserService} from "../user.service";
 
 @Component({
   selector: 'app-source',
@@ -21,7 +24,9 @@ import {HourglassComponent, wait_message} from "../hourglass/hourglass.component
     NgForOf,
     NgIf,
     WebcamModule,
-    HourglassComponent
+    HourglassComponent,
+    MatExpansionPanel, MatExpansionPanelHeader,
+    WalletComponent, MatAccordion
   ],
   templateUrl: './source.component.html',
   standalone: true,
@@ -44,6 +49,7 @@ export class SourceComponent {
   private image: WebcamImage | undefined;
   router=inject(Router)
   message: string=""
+  user=inject(UserService)
 
 
 

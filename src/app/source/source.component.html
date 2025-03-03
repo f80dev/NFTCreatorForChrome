@@ -1,40 +1,53 @@
 <app-hourglass [message]="message"></app-hourglass>
-<h3>To make a NFT,<br>you must start from a picture</h3>
-<div *ngIf="!show_scanner && message==''">
-  <br><br>
+<div class="mainform">
+  <mat-accordion style="margin: 10px;">
+    <mat-expansion-panel *ngIf="!show_scanner && message==''" [expanded]="true">
+      <mat-expansion-panel-header>Sources</mat-expansion-panel-header>
+      <h3>To make a NFT,<br>you must start from a picture</h3>
+      <br><br>
 
-  <button mat-raised-button *ngIf="level(2)" title="Open the camera of your device to take a photo" (click)="open_photo()">From camera</button>
-  <button mat-raised-button *ngIf="level(1)" title="Get the content clipboard" (click)="paste()">From clipboard</button>
-  <button mat-raised-button *ngIf="level(1)" title="Image editor" (click)="go_editor()">From editor</button>
-  <br><br>
-  <app-upload-file (uploaded)="from_device($event)" title="Load a content from your device"
-                   style="display: inline-block;">From your device</app-upload-file>
+      <button mat-raised-button *ngIf="level(2)" title="Open the camera of your device to take a photo" (click)="open_photo()">From camera</button>
+      <button mat-raised-button *ngIf="level(1)" title="Get the content clipboard" (click)="paste()">From clipboard</button>
+      <button mat-raised-button *ngIf="level(1)" title="Image editor" (click)="go_editor()">From editor</button>
+      <br><br>
+      <app-upload-file (uploaded)="from_device($event)" title="Load a content from your device"
+                       style="display: inline-block;">From your device</app-upload-file>
 
-  <br>
-  <h4 style="margin-top: 100px;">Gallery and AI Generators</h4>
-  <div style="width: 95%;display: inline-block;">
-    <button *ngFor="let generator of generators"
-            mat-raised-button (click)="open_generator(generator)">
-      {{generator.label}}
-    </button>
+      <br>
+
+    </mat-expansion-panel>
+
+    <mat-expansion-panel *ngIf="!show_scanner && message==''">
+      <mat-expansion-panel-header>Gallery and AI Generators</mat-expansion-panel-header>
+      <button *ngFor="let generator of generators"
+              mat-raised-button (click)="open_generator(generator)">
+        {{generator.label}}
+      </button>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel *ngIf="user.isConnected(false)">
+      <mat-expansion-panel-header>Wallet</mat-expansion-panel-header>
+      <app-wallet [address]="user.address" show="coin,nft" height="75px" width="75px"></app-wallet>
+    </mat-expansion-panel>
+
+  </mat-accordion>
+
+  <div *ngIf="show_scanner">
+    <webcam [width]="350" [height]="350" *ngIf="show_scanner"
+            style="margin: 20px;"
+            [captureImageData]="true"
+            imageType="image/jpeg"
+            [imageQuality]="0.90"
+            [trigger]="trigger"
+            (click)="take_photo()"
+            (imageCapture)="capture_image($event)"></webcam>
+
+    <br>
+    <br>
+    <button mat-raised-button (click)="take_photo()">Photo</button>
+    <button mat-raised-button (click)="show_scanner=false">Cancel</button>
+
   </div>
-</div>
-
-
-<div *ngIf="show_scanner">
-  <webcam [width]="350" [height]="350" *ngIf="show_scanner"
-          style="margin: 20px;"
-          [captureImageData]="true"
-          imageType="image/jpeg"
-          [imageQuality]="0.90"
-          [trigger]="trigger"
-          (click)="take_photo()"
-          (imageCapture)="capture_image($event)"></webcam>
-
-  <br>
-  <br>
-  <button mat-raised-button (click)="take_photo()">Photo</button>
-  <button mat-raised-button (click)="show_scanner=false">Cancel</button>
 
 </div>
 

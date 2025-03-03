@@ -54,14 +54,6 @@ button {
 }
 
 
-mat-expansion-panel {
-  width:90%;
-  text-align: center;
-  background-color: black;
-  max-width: 1000px;
-  min-width: 350px;
-  display: inline-block;
-}
 
 hr {
   width: 70%;

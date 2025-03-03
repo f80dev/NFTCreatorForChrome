@@ -128,10 +128,10 @@
                      *ngIf="level(2)"
                      (uploaded)="upload_pem($event)">Your PEM file</app-upload-file>
   </div>
-  <div *ngIf="visual.length>0">
 
+  <div *ngIf="visual.length>0">
     <button *ngIf="sel_collection && visual!=''" mat-raised-button
-            style="width:200px;height:70px;margin-top:-10px;margin-bottom: 15px;"
+            style="width:200px;height:70px;margin-top:-5px;margin-bottom: 15px;"
             (click)="Create_NFT()">
       <div style="font-size: medium;margin-bottom: -10px;">
         Build this NFT

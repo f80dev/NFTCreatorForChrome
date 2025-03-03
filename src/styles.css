@@ -7,12 +7,12 @@ html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 .mainform {
-  width:100vw;
+  width:99vw;
+  margin:0;
+  padding:5px;
   height: 100vh;
   color: white;
   background-color: #0a191b;
-  padding:5px;
-  margin:0;
   text-align: center;
   overflow: scroll;
   scrollbar-width: none;
@@ -23,3 +23,20 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   font-size: small;
   text-align: center;
 }
+
+mat-expansion-panel-header {
+  font-weight: bold !important;
+  font-size: large !important;
+}
+
+
+mat-expansion-panel {
+  width:96%;
+  text-align: center;
+  background-color: black;
+  max-width: 1000px;
+  min-width: 350px;
+  display: inline-block;
+}
+
+
