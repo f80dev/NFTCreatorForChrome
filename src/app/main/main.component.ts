@@ -49,7 +49,7 @@ import {CropperComponent} from "../cropper/cropper.component";
   ],
   standalone:true,
   templateUrl: './main.component.html',
-  styleUrl: './main.component.css'
+  styleUrl: './main.component.scss'
 })
 export class MainComponent implements OnInit {
   @ViewChild('img', { static: false }) img!: ElementRef;

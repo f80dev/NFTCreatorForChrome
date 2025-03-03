@@ -1,3 +1,5 @@
+@import "../../styles.scss";
+
 .vignette {
   position: relative;
   display:inline-flex;
@@ -11,6 +13,11 @@
   overflow: hidden;
   border: solid 1px grey;
   background-color: #011010;
+}
+
+
+mat-expansion-panel {
+  @include expansion-panel;
 }
 
 .centered-image {
@@ -52,8 +59,6 @@ button {
 .icon-button {
   width:45px;
 }
-
-
 
 hr {
   width: 70%;

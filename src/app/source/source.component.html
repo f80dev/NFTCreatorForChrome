@@ -1,16 +1,16 @@
-<app-hourglass [message]="message"></app-hourglass>
-<div class="mainform">
-  <mat-accordion style="margin: 10px;">
+<div class="mainform" >
+  <app-hourglass [message]="message"></app-hourglass>
+  <mat-accordion style="margin: 10px;" [style.pointer-events]="message=='' ? 'all' : 'none'" [style.opacity]="message=='' ? 1 : 0.3">
     <mat-expansion-panel *ngIf="!show_scanner && message==''" [expanded]="true">
       <mat-expansion-panel-header>Sources</mat-expansion-panel-header>
       <h3>To make a NFT,<br>you must start from a picture</h3>
-      <br><br>
-
+      <br>
       <button mat-raised-button *ngIf="level(2)" title="Open the camera of your device to take a photo" (click)="open_photo()">From camera</button>
       <button mat-raised-button *ngIf="level(1)" title="Get the content clipboard" (click)="paste()">From clipboard</button>
       <button mat-raised-button *ngIf="level(1)" title="Image editor" (click)="go_editor()">From editor</button>
       <br><br>
       <app-upload-file (uploaded)="from_device($event)" title="Load a content from your device"
+
                        style="display: inline-block;">From your device</app-upload-file>
 
       <br>
@@ -27,7 +27,8 @@
 
     <mat-expansion-panel *ngIf="user.isConnected(false)">
       <mat-expansion-panel-header>Wallet</mat-expansion-panel-header>
-      <app-wallet [address]="user.address" show="coin,nft" height="75px" width="75px"></app-wallet>
+      <app-wallet [address]="user.address" show="coin"></app-wallet>
+      <app-wallet [address]="user.address" show="nft" height="75px" width="75px"></app-wallet>
     </mat-expansion-panel>
 
   </mat-accordion>

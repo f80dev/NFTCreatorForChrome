@@ -1,0 +1,12 @@
+@import "../../styles.scss";
+
+button {
+  width: 150px;
+  margin: 10px;
+  line-height: 85%;
+}
+
+
+mat-expansion-panel {
+  @include expansion-panel;
+}

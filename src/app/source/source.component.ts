@@ -30,7 +30,7 @@ import {UserService} from "../user.service";
   ],
   templateUrl: './source.component.html',
   standalone: true,
-  styleUrl: './source.component.css'
+  styleUrl: './source.component.scss'
 })
 export class SourceComponent {
 
