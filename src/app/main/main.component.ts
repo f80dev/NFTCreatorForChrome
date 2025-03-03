@@ -88,7 +88,7 @@ export class MainComponent implements OnInit {
     this.user.action_after_mint=params.action || params.action_after_mint || ""
     this.visual=params.url || localStorage.getItem("image") || ""
     await this.user.login(this,"","",false,0.003,"",true)
-    await this.refresh_collection()
+    if(this.user.address)await this.refresh_collection()
     if(params.hasOwnProperty("uri"))this.uris.push(params.uri)
     if(params.hasOwnProperty("description"))this.description=params.description
     if(params.hasOwnProperty("source"))this.properties.push({name:"Sources",value:params.source})

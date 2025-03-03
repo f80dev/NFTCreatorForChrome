@@ -106,9 +106,10 @@ export class UserService {
       if(!this.address)this.address=localStorage.getItem("address") || ""
 
       if(this.isConnected(strong) || silence_mode){
-        await this.init_balance(vm.api)
-
-        if(required_balance>0 && this.balance<required_balance)vm.router.navigate(["faucet"],{queryParams:{message:message_balance}})
+        if(this.address){
+          await this.init_balance(vm.api)
+          if(required_balance>0 && this.balance<required_balance)vm.router.navigate(["faucet"],{queryParams:{message:message_balance}})
+        }
         if(this.device.isMobile())this.connexion.extension_wallet=false
         resolve(true)
       }else{
