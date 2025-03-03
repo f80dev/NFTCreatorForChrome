@@ -91,6 +91,7 @@ export class MainComponent implements OnInit {
     await this.refresh_collection()
     if(params.hasOwnProperty("uri"))this.uris.push(params.uri)
     if(params.hasOwnProperty("description"))this.description=params.description
+    if(params.hasOwnProperty("source"))this.properties.push({name:"Sources",value:params.source})
     if(params.hasOwnProperty("name"))this.name=params.name
     if(this.visual.length>0 && params.self_storage)await this.convert_to_base64("image/webp")
   }
