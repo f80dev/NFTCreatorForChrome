@@ -11,6 +11,7 @@ import {Router} from "@angular/router";
 import {showMessage} from "../../tools";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {ImageProcessorService} from "../image-processor.service";
+import {HourglassComponent, wait_message} from "../hourglass/hourglass.component";
 
 @Component({
   selector: 'app-source',
@@ -19,7 +20,8 @@ import {ImageProcessorService} from "../image-processor.service";
     MatButton,
     NgForOf,
     NgIf,
-    WebcamModule
+    WebcamModule,
+    HourglassComponent
   ],
   templateUrl: './source.component.html',
   standalone: true,
@@ -41,6 +43,8 @@ export class SourceComponent {
   trigger = new Subject<void>();
   private image: WebcamImage | undefined;
   router=inject(Router)
+  message: string=""
+
 
 
   capture_image(img: WebcamImage) {
@@ -69,16 +73,20 @@ export class SourceComponent {
   async take_photo() {
     clearInterval(this.handle)
     if(this.image){
+      wait_message(this,"Photo loading ...")
       this.update_visual.emit((await this.imageProc.createImageFromBase64(this.image.imageAsBase64)).toDataURL("image/webp"))
+      wait_message(this)
     }
     this.show_scanner=false
   }
 
 
   async from_device($event: any) {
+    wait_message(this,"File loading ...")
     this.visual=$event.file
     this.visual=(await this.imageProc.createImageFromBase64(this.visual)).toDataURL("image/webp")
     this.update_visual.emit(this.visual)
+    wait_message(this)
   }
 
   open_photo() {

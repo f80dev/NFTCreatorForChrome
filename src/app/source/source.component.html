@@ -1,5 +1,6 @@
+<app-hourglass [message]="message"></app-hourglass>
 <h3>To make a NFT,<br>you must start from a picture</h3>
-<div *ngIf="!show_scanner">
+<div *ngIf="!show_scanner && message==''">
   <br><br>
 
   <button mat-raised-button *ngIf="level(2)" title="Open the camera of your device to take a photo" (click)="open_photo()">From camera</button>

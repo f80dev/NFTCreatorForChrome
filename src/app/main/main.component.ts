@@ -80,6 +80,7 @@ export class MainComponent implements OnInit {
   properties:{name:string,value:string}[]=[]
   showCrop: boolean=false
   uncrop: string=""
+  filename: string="image.webp"
 
 
   async ngOnInit() {
@@ -93,6 +94,7 @@ export class MainComponent implements OnInit {
     if(params.hasOwnProperty("description"))this.description=params.description
     if(params.hasOwnProperty("source"))this.properties.push({name:"Sources",value:params.source})
     if(params.hasOwnProperty("name"))this.name=params.name.split(".")[0]
+    this.filename=params.filename || "image.webp"
     if(this.visual.length>0 && params.self_storage)await this.convert_to_base64("image/webp")
   }
 
@@ -131,7 +133,7 @@ export class MainComponent implements OnInit {
       if(this.visual.startsWith("data:")){
         let img=await this.imageProcessor.createImageFromBase64(this.visual)
         let s=await img.toDataURL("image/webp")
-        let result=await this.imageUploader.upload(this.imageUploader.b64_to_file(s,"image.webp","image/webp"))
+        let result=await this.imageUploader.upload(this.imageUploader.b64_to_blob(s,"image/webp"),this.filename)
         this.visual=result.old
       }
 
@@ -142,7 +144,7 @@ export class MainComponent implements OnInit {
         for(let prop of this.properties){
           obj.attributes.push({trait_type:prop.name,value:prop.value})
         }
-        let metadata=await this.imageUploader.upload(this.imageUploader.string_to_file(JSON.stringify(obj),"infos.json"),0)
+        let metadata=await this.imageUploader.upload(this.imageUploader.string_to_file(JSON.stringify(obj),"infos.json"),"infos.json",0)
         $$("metadata ",metadata)
         for(let i=0;i<10;i++){
           this.tags=this.tags.replace(" ",",").replace(";",",")
@@ -336,7 +338,7 @@ export class MainComponent implements OnInit {
 
 
   async add_files($event:any) {
-    let result=await this.imageUploader.upload(this.imageUploader.b64_to_file($event.file,$event.filename,$event.type))
+    let result=await this.imageUploader.upload(this.imageUploader.b64_to_blob($event.file,$event.type),$event.filename,1)
     this.uris.push(result.url)
   }
 
