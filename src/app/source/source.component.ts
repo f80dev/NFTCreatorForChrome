@@ -1,5 +1,5 @@
 import {Component, EventEmitter, inject, Input, Output} from '@angular/core';
-import {level} from "../mvx";
+import {level, view_nft} from "../mvx";
 import {UploadFileComponent} from "../upload-file/upload-file.component";
 import {MatButton} from "@angular/material/button";
 import {NgForOf, NgIf} from "@angular/common";
@@ -102,5 +102,11 @@ export class SourceComponent {
 
   go_editor() {
     this.router.navigate(['editor'])
+  }
+
+  protected readonly view_nft = view_nft;
+
+  on_view_nft($event: any) {
+    view_nft(this.user,$event.identifier)
   }
 }

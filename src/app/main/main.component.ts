@@ -9,7 +9,7 @@ import {MatDialog} from "@angular/material/dialog";
 import {MatList, MatListItem} from "@angular/material/list";
 import {UploadFileComponent} from "../upload-file/upload-file.component";
 import {$$, getParams, showError, showMessage} from "../../tools";
-import {create_collection, get_collections, level, makeNFT, set_roles_to_collection} from "../mvx";
+import {create_collection, get_collections, level, makeNFT, set_roles_to_collection, view_nft} from "../mvx";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
 import {MatIcon} from "@angular/material/icon";
 import {ScannerComponent} from "../scanner/scanner.component";
@@ -142,7 +142,7 @@ export class MainComponent implements OnInit {
       let metadata_tags=""
       let metadata_url=""
       if(this.properties.length>0 || this.description.length>0){
-        let obj:any={description:this.description,attributes:[],collection:""}
+        let obj:any={description:this.description,attributes:[],collection:this.sel_collection.value.name}
         for(let prop of this.properties){
           obj.attributes.push({trait_type:prop.name,value:prop.value})
         }
@@ -151,7 +151,7 @@ export class MainComponent implements OnInit {
         for(let i=0;i<10;i++){
           this.tags=this.tags.replace(" ",",").replace(";",",")
         }
-        metadata_tags="metadata:ipfs"+metadata.Hash+"/filename.json;tags:"+this.tags
+        metadata_tags="metadata:"+metadata.Hash+";tags:"+this.tags
         metadata_url=metadata.old
       }
 
@@ -163,10 +163,10 @@ export class MainComponent implements OnInit {
             if(this.user.action_after_mint=="close")window.close()
             if(this.user.action_after_mint=="wallet")this.view_on_gallery(true)
 
-            let r=await _prompt(this,"Mint terminated.","","See your NFT in your wallet ?","yesno","See my NFT","New NFT",true)
-            if(r=="yes"){
-              this.view_on_gallery()
-            }
+            let identifier=col.collection+"-"+(rc.values[0][0]-1).toString(16)
+            let r=await _prompt(this,"Mint terminated of "+identifier,"","See your NFT in your wallet ?","yesno","See my NFT","New NFT",true)
+            if(r=="yes")view_nft(this.user,identifier)
+
           }catch (e:any){
 
           }
@@ -313,9 +313,9 @@ export class MainComponent implements OnInit {
   }
 
 
-  view_on_gallery(self_window=false) {
+  view_on_gallery(self_window=false,explorer="xoxno.com/collection/%collection%?listingType=All") {
     if(this.sel_collection){
-      let url="https://devnet.xspotlight.com/collections/"+this.sel_collection.value.collection;
+      let url="https://"+(this.user.isDevnet() ? "devnet." : "")+explorer.replace("%collection%",this.sel_collection.value.collection)
       if(!this.user.isDevnet())url=url.replace("devnet.","")
       if(self_window){
         open(url)
@@ -327,8 +327,8 @@ export class MainComponent implements OnInit {
   }
 
 
-  view_account_on_gallery() {
-    let url="https://devnet.xspotlight.com/"+this.user.address
+  view_account_on_gallery(explorer="https://devnet.xoxno.com/profile/%address%") {
+    let url=explorer.replace("%address%",this.user.address)
     if(!this.user.isDevnet())url=url.replace("devnet.","")
     open(url,"Gallery")
   }
@@ -369,4 +369,5 @@ export class MainComponent implements OnInit {
     if(visual.startsWith("http"))return visual
     return Math.round(visual.length/1000) + " Ko"
   }
+
 }

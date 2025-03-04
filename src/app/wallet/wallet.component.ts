@@ -48,15 +48,19 @@ export class WalletComponent implements OnChanges {
   async refresh(){
     this.nfts=[]
     if(this.show.indexOf("nft")>-1){
-      for (let nft of await this.api._service("accounts/"+this.address+"/nfts","","https://devnet-api.multiversx.com/")) {
-        let prop = nft.attributes.toString("utf-8")
-        let tags=prop.split(";metadata:")[0].replace("tags:" ,"")
+      let nfts=await this.api._service(
+        "accounts/"+this.address+"/nfts","",
+        "https://"+(this.user.isDevnet() ? "devnet-" : "")+"api.multiversx.com/")
 
+      for (let nft of nfts) {
+        if(!nft.metadata){
+          let prop = atob(nft.attributes)
+          let tags=prop.split(";metadata:")[0].replace("tags:" ,"")
+          let cid=prop.split("metadata:")[1]
+          if(!nft.hasOwnProperty("metadata")){nft.metadata=await this.api._service("ipfs/"+cid,"","https://ipfs.io/",false)}
+          nft.tags=tags
+        }
         nft.visual=nft.hasOwnProperty("media") ? nft.media[0].hasOwnProperty("thumbnailUrl") ? nft.media[0].thumbnailUrl : nft.media[0].originalUrl : ""
-
-        let cid=prop.split("metadata:")[1]
-        if(!nft.hasOwnProperty("metadata")){nft.metadata=await this.api._service("ipfs/"+cid,"","https://ipfs.io/",false)}
-        nft.tags=tags
         this.nfts.push(nft)
       }
       this.listChanged.emit(this.nfts)

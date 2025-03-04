@@ -30,6 +30,7 @@ import {XALIAS_PROVIDER_DEVNET, XALIAS_PROVIDER_MAINNET} from "@multiversx/sdk-w
 import {eval_direct_url_xportal} from "../../crypto";
 import {QRCodeComponent} from 'angularx-qrcode';
 import {settings} from '../../environments/settings';
+import {HourglassComponent, wait_message} from "../hourglass/hourglass.component";
 
 //Installation de @multiversx/sdk-wallet-connect-provider via yarn add @multiversx/sdk-wallet-connect-provider
 
@@ -53,20 +54,21 @@ interface IExtensionAccount {
   templateUrl: './authent.component.html',
   standalone: true,
   imports: [
-      MatExpansionPanel,
-      MatExpansionPanelHeader,
-      MatCardTitle,
-      MatAccordion,
-      QRCodeComponent,
-      MatCard,
-      ScannerComponent,
-      CdkCopyToClipboard,
-      InputComponent,
-      GoogleSigninButtonModule,
-      MatIcon,
-      UploadFileComponent,
-      NgIf,
-      MatButton,
+    MatExpansionPanel,
+    MatExpansionPanelHeader,
+    MatCardTitle,
+    MatAccordion,
+    QRCodeComponent,
+    MatCard,
+    ScannerComponent,
+    CdkCopyToClipboard,
+    InputComponent,
+    GoogleSigninButtonModule,
+    MatIcon,
+    UploadFileComponent,
+    NgIf,
+    MatButton,
+    HourglassComponent,
   ],
   providers: [],
   styleUrls: ['./authent.component.css']
@@ -147,6 +149,7 @@ export class AuthentComponent implements OnInit,OnChanges {
   qrcode_enabled: boolean = true;
   url_xportal_direct_connect: string="";
   @Input() walletconnect_open=true;
+  message: string=""
 
   constructor(
       public api:NetworkService,
@@ -546,9 +549,11 @@ export class AuthentComponent implements OnInit,OnChanges {
     this.provider = new WalletConnectV2Provider(callbacks, this.get_chain_id(), this.relayUrl, this.walletConnect_ProjectId);
 
     try{
+      wait_message(this,"Connexion")
       await this.provider.init()
       const { uri, approval } = await this.provider.connect();
       this.qrcode=uri
+      wait_message(this)
       //this.qrcode=this.api.server_nfluent+"/api/qrcode/"+encodeURIComponent(uri);
 
       this.url_xportal_direct_connect=eval_direct_url_xportal(uri)

@@ -514,6 +514,13 @@ async function executeTransaction(sign_transaction:Transaction,user:UserService)
 }
 
 
+export function view_nft(user:UserService,identifier:string,explorer="https://devnet.xoxno.com/nft/%identifier%") {
+  let url=explorer.replace("%identifier%",identifier)
+  if(!user.isDevnet())url=url.replace("devnet.","")
+  open(url,"Gallery")
+}
+
+
 //buildNFT
 export async function makeNFT(identifier:string,name:string,visual:string,user:UserService,
                               quantity=1,royalties=0,uris:string[]=[],metadata="",metadata_url="")  {

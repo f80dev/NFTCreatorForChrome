@@ -28,7 +28,8 @@
     <mat-expansion-panel *ngIf="user.isConnected(false)">
       <mat-expansion-panel-header>Wallet</mat-expansion-panel-header>
       <app-wallet [address]="user.address" show="coin"></app-wallet>
-      <app-wallet [address]="user.address" show="nft" height="75px" width="75px"></app-wallet>
+      <app-wallet [address]="user.address"
+                  show="nft" height="75px" width="75px" (selectChanged)="on_view_nft($event)"></app-wallet>
     </mat-expansion-panel>
 
   </mat-accordion>
