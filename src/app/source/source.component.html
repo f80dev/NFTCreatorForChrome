@@ -1,22 +1,39 @@
-<div class="mainform" >
+<div class="mainform">
   <app-hourglass [message]="message"></app-hourglass>
   <mat-accordion style="margin: 10px;" [style.pointer-events]="message=='' ? 'all' : 'none'" [style.opacity]="message=='' ? 1 : 0.3">
-    <mat-expansion-panel *ngIf="!show_scanner && message==''" [expanded]="true">
+    <mat-expansion-panel [expanded]="true">
       <mat-expansion-panel-header>Sources</mat-expansion-panel-header>
       <h3>To make a NFT,<br>you must start from a picture</h3>
       <br>
-      <button mat-raised-button *ngIf="level(2)" title="Open the camera of your device to take a photo" (click)="open_photo()">From camera</button>
-      <button mat-raised-button *ngIf="level(1)" title="Get the content clipboard" (click)="paste()">From clipboard</button>
-      <button mat-raised-button *ngIf="level(1)" title="Image editor" (click)="go_editor()">From editor</button>
-      <br><br>
-      <app-upload-file (uploaded)="from_device($event)" title="Load a content from your device"
+      <div *ngIf="!show_scanner">
+        <button mat-raised-button *ngIf="level(2)" title="Open the camera of your device to take a photo" (click)="open_photo()">From camera</button>
+        <button mat-raised-button *ngIf="level(1)" title="Get the content clipboard" (click)="paste()">From clipboard</button>
+        <button mat-raised-button *ngIf="level(1)" title="Image editor" (click)="go_editor()">From editor</button>
+        <br><br>
+        <app-upload-file (uploaded)="from_device($event)" title="Load a content from your device" style="display: inline-block;">From your device</app-upload-file>
+      </div>
 
-                       style="display: inline-block;">From your device</app-upload-file>
+      <div *ngIf="show_scanner">
+        <webcam [width]="350" [height]="350" *ngIf="show_scanner"
+                style="margin: 20px;"
+                [captureImageData]="true"
+                imageType="image/jpeg"
+                [imageQuality]="0.90"
+                [trigger]="trigger"
+                (click)="take_photo()"
+                (imageCapture)="capture_image($event)"></webcam>
 
-      <br>
+        <br>
+        <br>
+        <button mat-raised-button (click)="take_photo()">Photo</button>
+        <button mat-raised-button (click)="show_scanner=false">Cancel</button>
+
+      </div>
+
 
     </mat-expansion-panel>
 
+    <br>
     <mat-expansion-panel *ngIf="!show_scanner && message==''">
       <mat-expansion-panel-header>Gallery and AI Generators</mat-expansion-panel-header>
       <button *ngFor="let generator of generators"
@@ -24,32 +41,23 @@
         {{generator.label}}
       </button>
     </mat-expansion-panel>
+    <br>
 
-    <mat-expansion-panel *ngIf="user.isConnected(false)">
+    <mat-expansion-panel >
       <mat-expansion-panel-header>Wallet</mat-expansion-panel-header>
-      <app-wallet [address]="user.address" show="coin"></app-wallet>
-      <app-wallet [address]="user.address"
-                  show="nft" height="75px" width="75px" (selectChanged)="on_view_nft($event)"></app-wallet>
+      <button mat-raised-button *ngIf="user.isConnected(false)" (click)="user.logout(true)">Log out</button>
+      <button mat-raised-button *ngIf="!user.isConnected(false)" (click)="login()">Log in</button>
+      <br>
+      <div *ngIf="user.isConnected(false)">
+        <app-wallet [address]="user.address" show="coin"></app-wallet>
+        <app-wallet [address]="user.address"
+                    show="nft" height="75px" width="75px" (selectChanged)="on_view_nft($event)"></app-wallet>
+      </div>
+
     </mat-expansion-panel>
 
   </mat-accordion>
 
-  <div *ngIf="show_scanner">
-    <webcam [width]="350" [height]="350" *ngIf="show_scanner"
-            style="margin: 20px;"
-            [captureImageData]="true"
-            imageType="image/jpeg"
-            [imageQuality]="0.90"
-            [trigger]="trigger"
-            (click)="take_photo()"
-            (imageCapture)="capture_image($event)"></webcam>
-
-    <br>
-    <br>
-    <button mat-raised-button (click)="take_photo()">Photo</button>
-    <button mat-raised-button (click)="show_scanner=false">Cancel</button>
-
-  </div>
 
 </div>
 

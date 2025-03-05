@@ -416,30 +416,30 @@ async function signTransaction(t:Transaction,user:UserService) : Promise<Transac
   }
 }
 
-export async function set_roles_to_collection(collection_id:string, user:UserService,type_collection:string="SFT") {
+export async function set_roles_to_collection(collection_id:string, user:UserService,type_collection:string="SFT",burn=false,update=false) {
   let factory = new TokenManagementTransactionsFactory({config: new TransactionsFactoryConfig({ chainID: "D" })});
-
+  $$("Affectation des roles sur la collection "+collection_id+" de type "+type_collection)
   let setRoleTransaction=factory.createTransactionForSettingSpecialRoleOnNonFungibleToken({
     sender: Address.fromBech32(user.address),
-    addRoleNFTAddURI: false,
-    addRoleNFTUpdateAttributes: false,
+    addRoleNFTAddURI: update,
+    addRoleNFTUpdateAttributes: update,
     user: Address.fromBech32(user.address),
     tokenIdentifier: collection_id,
     addRoleESDTTransferRole: false,
-    addRoleNFTBurn: false,
+    addRoleNFTBurn: burn,
     addRoleNFTCreate: true,
-    addRoleESDTModifyCreator:false
+    addRoleESDTModifyCreator:update
   })
   if(type_collection=="SFT"){
     setRoleTransaction=factory.createTransactionForSettingSpecialRoleOnSemiFungibleToken({
       sender: Address.fromBech32(user.address),
       user: Address.fromBech32(user.address),
       tokenIdentifier: collection_id,
-      addRoleESDTTransferRole: false,
-      addRoleNFTAddQuantity: false,
-      addRoleNFTBurn: false,
+      addRoleESDTTransferRole: update,
+      addRoleNFTAddQuantity: update,
+      addRoleNFTBurn: burn,
       addRoleNFTCreate: true,
-      addRoleESDTModifyCreator:false
+      addRoleESDTModifyCreator:update
     })
   }
 
@@ -467,26 +467,21 @@ export async function create_collection(name:string,user:UserService,vm:any=null
     canChangeOwner: false,
     canFreeze: false,
     canPause: false,
-    canTransferNFTCreateRole: false,
+    canTransferNFTCreateRole: true,
     canUpgrade: false,
     canWipe: false,
   }
 
-  let transaction=factory.createTransactionForIssuingNonFungible({
-    ...option
-  })
+  let transaction=factory.createTransactionForIssuingNonFungible({...option})
   if(collection_type=="SFT"){
-    transaction=factory.createTransactionForIssuingSemiFungible({
-      ...option
-    })
+    transaction=factory.createTransactionForIssuingSemiFungible({...option})
   }
 
-  user.refresh()
+  await user.refresh()
   transaction.nonce=BigInt(user.account!.nonce)
   let sign_transaction=await signTransaction(transaction,user)
   let result:any=await executeTransaction(sign_transaction,user)
 
-  //Attribution des droits
   let collection_id=new TextDecoder("utf-8").decode(result.values[0])
 
   return {result:result,collection_id:collection_id}
@@ -525,6 +520,8 @@ export function view_nft(user:UserService,identifier:string,explorer="https://de
 export async function makeNFT(identifier:string,name:string,visual:string,user:UserService,
                               quantity=1,royalties=0,uris:string[]=[],metadata="",metadata_url="")  {
   //Voir https://docs.multiversx.com/tokens/nft-tokens/#creation-of-an-nft
+  $$("Construction de "+name+" sur la collection "+identifier+" en quantite "+quantity)
+
   if(metadata_url.length>0)uris.unshift(metadata_url)
   uris.unshift(visual)
 

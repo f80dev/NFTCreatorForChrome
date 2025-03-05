@@ -3,15 +3,14 @@
 @import "jsoneditor/dist/jsoneditor.min.css";
 
 
-html, body { height: 100%; }
+html, body { height: 100vh; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 .mainform {
-  width:100%;
+  width:100vw;
   margin:0;
-  padding:5px;
-  display: block;
-  position: relative;
+  padding: 2px;
+  display: inline-block;
   height: 100vh;
   color: #e8e8e8;
   background-color: #050e0e;
@@ -33,12 +32,13 @@ mat-expansion-panel-header {
 
 
 @mixin expansion-panel {
-  width:98%;
+  width:96%;
+  display: inline-block;
+  position: relative;
   text-align: center;
   background-color: black;
   max-width: 1000px;
   min-width: 350px;
-  display: inline-block;
 }
 
 

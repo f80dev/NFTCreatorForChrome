@@ -52,6 +52,8 @@ export class WalletComponent implements OnChanges {
         "accounts/"+this.address+"/nfts","",
         "https://"+(this.user.isDevnet() ? "devnet-" : "")+"api.multiversx.com/")
 
+      nfts.reverse()
+
       for (let nft of nfts) {
         if(!nft.metadata){
           let prop = atob(nft.attributes)

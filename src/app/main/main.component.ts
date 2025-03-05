@@ -89,7 +89,13 @@ export class MainComponent implements OnInit {
     this.user.action_after_mint=params.action || params.action_after_mint || ""
     this.visual=params.url || localStorage.getItem("image") || ""
     await this.user.login(this,"","",false,0.003,"",true)
-    if(this.user.address)await this.refresh_collection()
+    if(this.user.address){
+      await this.refresh_collection()
+      if(this.collections.length>0){
+        this.sel_collection=this.collections[0]
+        $$("Selection de la collection ",this.sel_collection)
+      }
+    }
     if(params.hasOwnProperty("uri"))this.uris.push(params.uri)
     if(params.hasOwnProperty("description"))this.description=params.description
     if(params.hasOwnProperty("name"))this.name=params.name.split(".")[0]
@@ -146,7 +152,8 @@ export class MainComponent implements OnInit {
         for(let prop of this.properties){
           obj.attributes.push({trait_type:prop.name,value:prop.value})
         }
-        let metadata=await this.imageUploader.upload(this.imageUploader.string_to_file(JSON.stringify(obj),"infos.json"),"infos.json",0)
+        const blob = new Blob([JSON.stringify(obj)], { type: 'application/json'})
+        let metadata=await this.imageUploader.upload(blob,"infos.json",0)
         $$("metadata ",metadata)
         for(let i=0;i<10;i++){
           this.tags=this.tags.replace(" ",",").replace(";",",")
@@ -163,7 +170,9 @@ export class MainComponent implements OnInit {
             if(this.user.action_after_mint=="close")window.close()
             if(this.user.action_after_mint=="wallet")this.view_on_gallery(true)
 
-            let identifier=col.collection+"-"+(rc.values[0][0]-1).toString(16)
+            let nonce=(rc.values[0][0]).toString(16).toLowerCase()
+            if(nonce.length==1)nonce="0"+nonce
+            let identifier=col.collection+"-"+nonce
             let r=await _prompt(this,"Mint terminated of "+identifier,"","See your NFT in your wallet ?","yesno","See my NFT","New NFT",true)
             if(r=="yes")view_nft(this.user,identifier)
 
@@ -265,23 +274,36 @@ export class MainComponent implements OnInit {
     await this.update_prop(new_prop,"value")
   }
 
+  async open_collection(collection_id:string){
+    await this.refresh_collection()
+    for(let col of this.collections){
+      if(col.value.collection==collection_id)this.sel_collection=col;
+    }
+    let url="https://devnet-explorer.multiversx.com/collections/%collection%/roles".replace("%collection%",collection_id)
+    if(!this.user.isDevnet())url=url.replace("devnet-","")
+    open(url,"collection")
+  }
+
 
   async build_collection() {
     let r=await _prompt(this,"Collection name","","must be inferieur to 20 characters","text","Create","Cancel",false)
     if(r){
-      let collection_type=await _prompt(this,"Collection for NFT or SFT","","","list","Ok","Cancel",false,
+      let collection_type: any=await _prompt(this,"Collection for NFT or SFT","","","list","Ok","Cancel",false,
         [{label:"NFT",value:"NFT"},{label:"SFT",value:"SFT"}])
-
       await this.user.login(this,"You need a strong authentification to create a collection","",true)
       try{
-        let rc=await create_collection(r,this.user,this,collection_type)
-        await this.refresh_collection()
-        this.update_sel_collection(this.collections[this.collections.length-1])
-      }catch (e:any){
+        wait_message(this,"Collection building")
+        let rc=await create_collection(r,this.user,this,collection_type.value)
+        setTimeout(async ()=>{
+          await this.set_roles_to_collection(rc.collection_id)
+          this.open_collection(rc.collection_id)
+        },2500)
+      }catch (e:any
+        ){
         showMessage(this,"Collection not created")
         wait_message(this)
       }
-      setTimeout(()=>{this.set_roles_to_collection()},2500)
+
     }
   }
 
@@ -301,15 +323,15 @@ export class MainComponent implements OnInit {
   }
 
 
-  async set_roles_to_collection() {
-    if(this.sel_collection){
+  async set_roles_to_collection(collection_id:string) {
       await this.user.login(this,"","",true)
       wait_message(this,"Setting roles to the collection")
       try{
-        await set_roles_to_collection(this.sel_collection.value.collection,this.user)
-      }catch (e:any){}
+        await set_roles_to_collection(collection_id,this.user)
+      }catch (e:any){
+        showMessage(this,"Problem to setting the collection, retry")
+      }
       wait_message(this)
-    }
   }
 
 

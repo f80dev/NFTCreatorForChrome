@@ -1,7 +1,5 @@
-
 <app-intro message="Create your NFT in one minute"></app-intro>
-<app-hourglass style="color:white" [message]="message"></app-hourglass>
-
+<app-hourglass style="color:white" marginTop="20px" [message]="message"></app-hourglass>
 <app-cropper *ngIf="showCrop" [visual]="visual" (update_visual)="crop($event)"></app-cropper>
 
 <div class="mainform" [style.pointer-events]="message=='' ? 'all' : 'none'" [style.opacity]="message=='' ? 1 : 0.3" *ngIf="!showCrop">
@@ -134,7 +132,9 @@
             style="width:200px;height:70px;margin-top:-5px;margin-bottom: 15px;"
             (click)="Create_NFT()">
       <div style="font-size: medium;margin-bottom: -10px;">
-        Build this NFT
+        Build this
+        <span *ngIf="sel_collection!.value.subType=='SemiFungibleESDT'">SFT</span>
+        <span *ngIf="sel_collection!.value.subType=='NonFungibleESDT'">NFT</span>
         <br>
         <mat-icon>arrow_downward</mat-icon>
 
@@ -161,7 +161,7 @@
       <div *ngIf="collections.length==0">You need a collection before mint a NFT<br><br></div>
 
       <button mat-raised-button (click)="build_collection()"><div class="bloc-button">Create<br>Collection</div></button>
-      <button mat-icon-button class="icon-button"*ngIf="sel_collection" (click)="set_roles_to_collection()"><mat-icon>build</mat-icon></button>
+      <button mat-icon-button class="icon-button"*ngIf="sel_collection" (click)="set_roles_to_collection(sel_collection.value.collection)"><mat-icon>build</mat-icon></button>
       <button mat-icon-button class="icon-button" *ngIf="sel_collection" (click)="view_on_gallery()"><mat-icon>visibility</mat-icon></button>
 
     </mat-expansion-panel>

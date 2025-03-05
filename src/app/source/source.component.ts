@@ -15,6 +15,7 @@ import {HourglassComponent, wait_message} from "../hourglass/hourglass.component
 import {MatAccordion, MatExpansionPanel, MatExpansionPanelHeader} from "@angular/material/expansion";
 import {WalletComponent} from "../wallet/wallet.component";
 import {UserService} from "../user.service";
+import {MatDialog} from "@angular/material/dialog";
 
 @Component({
   selector: 'app-source',
@@ -50,6 +51,7 @@ export class SourceComponent {
   router=inject(Router)
   message: string=""
   user=inject(UserService)
+  dialog=inject(MatDialog)
 
 
 
@@ -108,5 +110,9 @@ export class SourceComponent {
 
   on_view_nft($event: any) {
     view_nft(this.user,$event.identifier)
+  }
+
+  async login() {
+    await this.user.login(this,"","",true,0.01)
   }
 }

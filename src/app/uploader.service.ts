@@ -135,11 +135,11 @@ export class UploaderService {
     return r
   }
 
-  async upload(file:Blob,filename="image.webp",version=1) : Promise<any>{
+  async upload(blob:Blob,filename="image.webp",version=1) : Promise<any>{
     const formData = new FormData()
-    formData.append("file", file,filename)
+    formData.append("file", blob,filename)
     $$("upload du fichier ",formData)
-    $$("taille du fichier "+file.size)
+    $$("taille du fichier "+blob.size)
 
     return this.upload_file(formData,version)
     //https://docs.ipfs.tech/reference/kubo/rpc/#api-v0-add
