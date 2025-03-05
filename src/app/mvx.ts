@@ -177,6 +177,25 @@ export function get_transactions(api:ApiService,smartcontract_addr:string,abi=nu
   })
 }
 
+export function getExplorer(addr = "", network = "elrond-devnet",service="accounts", tools = "xspotlight"): string {
+  let url = ""
+  let isMain: boolean = (network.indexOf("devnet") == -1)
+  if (network.indexOf("elrond") > -1) {
+    if (tools == "xspotlight") url = "https://" + (isMain ? "" : "devnet.") + "xspotlight.com/" + addr;
+    if (tools == "explorer") url = "https://" + (isMain ? "" : "devnet-") + "explorer.multiversx.com/"+service+"/" + addr;
+  }
+
+  if (network.indexOf("polygon") > -1) {
+    if (isMain) {
+      url = "https://polygonscan.com/accounts/" + addr;
+    } else {
+      url = "https://polygon.testnets-nftically.com/marketplace?search=" + addr + "&chain[]=80001"
+    }
+  }
+  return url
+}
+
+
 
 export function create_transaction(function_name:string,args:any[],
                                    user:UserService,tokens_to_transfer: TokenTransfer[],
@@ -518,8 +537,11 @@ export function view_nft(user:UserService,identifier:string,explorer="https://de
 
 //buildNFT
 export async function makeNFT(identifier:string,name:string,visual:string,user:UserService,
-                              quantity=1,royalties=0,uris:string[]=[],metadata="",metadata_url="")  {
+                              quantity=1,royalties=0,uris:string[]=[],metadata="",metadata_url="",hash="")  {
   //Voir https://docs.multiversx.com/tokens/nft-tokens/#creation-of-an-nft
+
+  //Creation depuis le wallet Mvx : ESDTNFTCreate@SFT-55f2b5@@Londres@2500@QmNq8Kb8J2Aq3fqWu8jRHEvUvyAEwrHt8DSrqAhAWStiDE@tags:;metadata:QmaoTy3G7Cpb72czvs384qFQUqWeWBdTs5grHk311AassH@https://ipfs.io/ipfs/QmNq8Kb8J2Aq3fqWu8jRHEvUvyAEwrHt8DSrqAhAWStiDE
+
   $$("Construction de "+name+" sur la collection "+identifier+" en quantite "+quantity)
 
   if(metadata_url.length>0)uris.unshift(metadata_url)
@@ -530,7 +552,7 @@ export async function makeNFT(identifier:string,name:string,visual:string,user:U
   });
   let transaction=factory.createTransactionForCreatingNFT({
     attributes: new TextEncoder().encode(metadata),
-    hash: "",
+    hash: hash,
     initialQuantity: BigInt(quantity),
     name: name,
     royalties: Math.round(royalties*100),

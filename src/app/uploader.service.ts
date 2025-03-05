@@ -121,27 +121,28 @@ export class UploaderService {
     return await this.query("cid/format","cid="+hash);
   }
 
-  protected async upload_file(data:FormData,version=1) {
+  protected async upload_file(data:FormData,version=1,filename="") {
     let r=await this.query("add","cid-version="+version,data)
     $$("Result from add ",r)
     r.hash=r.Hash
+    $$("IPFS scan : https://ipfs-scan.io/?cid="+r.hash)
     if(version==1){
-      r.old="https://ipfs.io/ipfs/"+r.Hash //+"?filename="+filename
-      r.url="https://"+r.Hash+".ipfs.dweb.link" //?filename="+filename
+      r.old="https://ipfs.io/ipfs/"+r.Hash+(filename=='' ? '' : "?filename="+filename)
+      r.url="https://"+r.Hash+".ipfs.dweb.link" +(filename=='' ? '' : "?filename="+filename)
     }else{
-      r.url="https://ipfs.io/ipfs/"+r.Hash
+      r.url="https://ipfs.io/ipfs/"+r.Hash+(filename=='' ? '' : "?filename="+filename)
       r.old=r.url
     }
     return r
   }
 
-  async upload(blob:Blob,filename="image.webp",version=1) : Promise<any>{
+  async upload(blob:Blob,filename="img.webp",version=1) : Promise<any>{
     const formData = new FormData()
     formData.append("file", blob,filename)
     $$("upload du fichier ",formData)
     $$("taille du fichier "+blob.size)
 
-    return this.upload_file(formData,version)
+    return this.upload_file(formData,version,filename)
     //https://docs.ipfs.tech/reference/kubo/rpc/#api-v0-add
   }
 

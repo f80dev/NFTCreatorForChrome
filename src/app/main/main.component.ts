@@ -9,7 +9,15 @@ import {MatDialog} from "@angular/material/dialog";
 import {MatList, MatListItem} from "@angular/material/list";
 import {UploadFileComponent} from "../upload-file/upload-file.component";
 import {$$, getParams, showError, showMessage} from "../../tools";
-import {create_collection, get_collections, level, makeNFT, set_roles_to_collection, view_nft} from "../mvx";
+import {
+  create_collection,
+  get_collections,
+  getExplorer,
+  level,
+  makeNFT,
+  set_roles_to_collection,
+  view_nft
+} from "../mvx";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
 import {MatIcon} from "@angular/material/icon";
 import {ScannerComponent} from "../scanner/scanner.component";
@@ -138,11 +146,14 @@ export class MainComponent implements OnInit {
       let col:any=this.sel_collection.value
       wait_message(this,"NFT building ...")
 
+      let hash=""
       if(this.visual.startsWith("data:")){
         let img=await this.imageProcessor.createImageFromBase64(this.visual)
         let s=await img.toDataURL("image/webp")
-        let result=await this.imageUploader.upload(this.imageUploader.b64_to_blob(s,"image/webp"),this.filename)
+        let result=await this.imageUploader.upload(this.imageUploader.b64_to_blob(s,"image/webp"))
         this.visual=result.old
+        hash=result.hash
+        $$("Consultation du visuel https://ipfs.io/ipfs/"+hash)
       }
 
       let metadata_tags=""
@@ -160,10 +171,11 @@ export class MainComponent implements OnInit {
         }
         metadata_tags="metadata:"+metadata.Hash+";tags:"+this.tags
         metadata_url=metadata.old
+        $$("Consultation des metadata https://ipfs.io/ipfs/"+metadata.hash)
       }
 
       try{
-        let rc=await makeNFT(col.collection,this.name,this.visual,this.user,this.quantity,this.royalties,this.uris,metadata_tags,metadata_url)
+        let rc=await makeNFT(col.collection,this.name,this.visual,this.user,this.quantity,this.royalties,this.uris,metadata_tags,metadata_url,hash)
         if(rc.returnMessage=="ok"){
           try{
             if(this.user.action_after_mint.startsWith("redirect"))open(this.user.action_after_mint.replace("redirect:",""))
@@ -173,6 +185,9 @@ export class MainComponent implements OnInit {
             let nonce=(rc.values[0][0]).toString(16).toLowerCase()
             if(nonce.length==1)nonce="0"+nonce
             let identifier=col.collection+"-"+nonce
+
+            $$("Visibilité du NFT sur "+getExplorer(identifier,this.user.network,"nfts"))
+
             let r=await _prompt(this,"Mint terminated of "+identifier,"","See your NFT in your wallet ?","yesno","See my NFT","New NFT",true)
             if(r=="yes")view_nft(this.user,identifier)
 
