@@ -35,6 +35,7 @@ import {IntroComponent} from "../intro/intro.component";
 import {SourceComponent} from "../source/source.component";
 import {HttpClient} from "@angular/common/http";
 import {CropperComponent} from "../cropper/cropper.component";
+import {PinataService} from "../pinata.service";
 
 @Component({
   selector: 'app-main',
@@ -67,6 +68,7 @@ export class MainComponent implements OnInit {
   quantity= 1
   royalties=5
 
+  pinata=inject(PinataService)
   location=inject(Location)
   user=inject(UserService)
   api=inject(ApiService)
@@ -148,10 +150,9 @@ export class MainComponent implements OnInit {
 
       let hash=""
       if(this.visual.startsWith("data:")){
-        let img=await this.imageProcessor.createImageFromBase64(this.visual)
-        let s=await img.toDataURL("image/webp")
-        let result=await this.imageUploader.upload(this.imageUploader.b64_to_blob(s,"image/webp"))
-        this.visual=result.old
+        let img=await this.imageUploader.b64_to_file(this.visual)
+        let result:any=await this.pinata.uploadFileToIPFS(img)
+        this.visual=result.url
         hash=result.hash
         $$("Consultation du visuel https://ipfs.io/ipfs/"+hash)
       }
@@ -163,14 +164,18 @@ export class MainComponent implements OnInit {
         for(let prop of this.properties){
           obj.attributes.push({trait_type:prop.name,value:prop.value})
         }
-        const blob = new Blob([JSON.stringify(obj)], { type: 'application/json'})
-        let metadata=await this.imageUploader.upload(blob,"infos.json",0)
+
+        //const blob = new Blob([JSON.stringify(obj)], { type: 'application/json'})
+        //let metadata=await this.imageUploader.upload(blob,"infos.json",0)
+
+        let metadata=await this.pinata.uploadJSONToIPFS({name:"metadata",content:obj})
+
         $$("metadata ",metadata)
         for(let i=0;i<10;i++){
           this.tags=this.tags.replace(" ",",").replace(";",",")
         }
-        metadata_tags="metadata:"+metadata.Hash+";tags:"+this.tags
-        metadata_url=metadata.old
+        metadata_tags="metadata:"+metadata.hash+";tags:"+this.tags
+        metadata_url=metadata.url
         $$("Consultation des metadata https://ipfs.io/ipfs/"+metadata.hash)
       }
 

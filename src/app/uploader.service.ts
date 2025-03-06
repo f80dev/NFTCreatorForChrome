@@ -1,4 +1,4 @@
-import {inject, Injectable} from '@angular/core';
+import {inject, Injectable, OnInit} from '@angular/core';
 
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {$$} from "../tools";
@@ -6,17 +6,20 @@ import {base32} from "multiformats/bases/base32";
 import {sha256} from "multiformats/hashes/sha2";
 import {CID} from "multiformats";
 import {firstValueFrom} from "rxjs";
+import {environment} from "../environments/environment";
 
 @Injectable({
   providedIn: 'root'
 })
 
 
-
 //IPFS_SERVER="/ip4/173.249.41.158/tcp/"+str(IPFS_PORT)+"/http"
-export class UploaderService {
+export class UploaderService implements OnInit {
   http=inject(HttpClient)
   endpoint="https://ipfs.f80.fr:5001/api/v0/"
+  service="pinata"
+  pinata:any
+
 
   query(service:string,params="",body={}) : Promise<any> {
     return new Promise(async (resolve, reject)  => {
@@ -55,7 +58,7 @@ export class UploaderService {
     return blob
   }
 
-  b64_to_file(content:string,filename:string="",contentType="image/webp") : File {
+  b64_to_file(content:string,filename:string="image.webp",contentType="image/webp") : File {
     let blob=this.b64_to_blob(content,contentType);
     return new File([blob], filename, { type: contentType})
   }
@@ -136,14 +139,41 @@ export class UploaderService {
     return r
   }
 
+
+
   async upload(blob:Blob,filename="img.webp",version=1) : Promise<any>{
     const formData = new FormData()
     formData.append("file", blob,filename)
     $$("upload du fichier ",formData)
     $$("taille du fichier "+blob.size)
 
-    return this.upload_file(formData,version,filename)
+    if(this.service=="pinata"){
+      return this.upload_b64_with_pinata(await blob.text())
+    }else{
+      return this.upload_file(formData,version,filename)
+    }
     //https://docs.ipfs.tech/reference/kubo/rpc/#api-v0-add
   }
 
+
+  ngOnInit(): void {
+    // this.pinata =new PinataSDK({
+    //   pinataJwt: environment.PINATA_JWT,
+    //   pinataGateway:environment.PINATA_GATEWAY_URL
+    // })
+  }
+
+  async list_files_with_pinata(){
+    return await this.pinata?.listFiles()
+  }
+
+
+
+  async upload_file_with_pinata(file: File) {
+    return await this.pinata?.upload.file(file)
+  }
+
+  async upload_b64_with_pinata(b64content: string) {
+    return await this.pinata?.upload.base64(b64content)
+  }
 }

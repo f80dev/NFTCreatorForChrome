@@ -82,5 +82,12 @@ export const environment = {
     {label: "Pixabay", value: "https://pixabay.com/"},
     {label: "Google Image", value: "https://images.google.com/"},
     {label: "Icons", value: "https://fonts.google.com/icons"},
-  ]
+  ],
+  PINATA_JWT:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI1ZTY2NTFkNy0yMGRlLTRhMjgtOTYxZC02Yzk5M2VjMjU3YmMiLCJlbWFpbCI6Imhob2FyZWF1QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaW5fcG9saWN5Ijp7InJlZ2lvbnMiOlt7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6IkZSQTEifV0sInZlcnNpb24iOjF9LCJtZmFfZW5hYmxlZCI6ZmFsc2UsInN0YXR1cyI6IkFDVElWRSJ9LCJhdXRoZW50aWNhdGlvblR5cGUiOiJzY29wZWRLZXkiLCJzY29wZWRLZXlLZXkiOiIzOWJiMWExNDJkMzhjZDYxMmMxZCIsInNjb3BlZEtleVNlY3JldCI6IjJjYzcyODMyNmIxMTQwOWZiYmNlM2IwMTE4OWEwOGJiNzg3MWE2MDBmMWE5OGUzNTBkNjBjOTJiODZhMjMxNmMiLCJleHAiOjE3NzI4MTU4Njl9.FBHAjuEWRzaArbwkgs5f_M02-wj-FTEd5v9ork8-FVw",
+  PINATA_API_KEY:"39bb1a142d38cd612c1d",
+  PINATA_GATEWAY_URL:"cyan-revolutionary-haddock-289.mypinata.cloud",
+  PINATA_API_SECRET:"2cc728326b11409fbbce3b01189a08bb7871a600f1a98e350d60c92b86a2316c",
+
+  NFT_STORAGE_KEY:"70e9232c.fd46ec266cc940dcbe27ab485cea2243",
+  PINATA_BASE_URL: "https://api.pinata.cloud/"
 }
