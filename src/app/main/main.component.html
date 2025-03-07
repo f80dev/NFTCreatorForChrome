@@ -133,8 +133,8 @@
             (click)="Create_NFT()">
       <div style="font-size: medium;margin-bottom: -10px;">
         Build this
-        <span *ngIf="sel_collection!.value.subType=='SemiFungibleESDT'">SFT</span>
-        <span *ngIf="sel_collection!.value.subType=='NonFungibleESDT'">NFT</span>
+        <span *ngIf="sel_collection.value.subType=='SemiFungibleESDT'">SFT</span>
+        <span *ngIf="sel_collection.value.subType!='SemiFungibleESDT'">NFT</span>
         <br>
         <mat-icon>arrow_downward</mat-icon>
 

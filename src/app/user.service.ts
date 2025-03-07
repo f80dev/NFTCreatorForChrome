@@ -11,6 +11,7 @@ import {settings} from "../environments/settings";
 import {environment} from "../environments/environment";
 import {Account, UserSigner} from "@multiversx/sdk-core/out";
 import {AccountOnNetwork} from "@multiversx/sdk-network-providers/out";
+import add = chrome.systemLog.add;
 
 (window as any).global = window;
 
@@ -65,12 +66,14 @@ export class UserService {
     encrypted: string;
     url_direct_xportal_connect: string
   }) {
+    let rc=(this.address.length>0 && this.address!=$event.address)   //True s'il y a changement d'adresse
     this.address = $event.address
     localStorage.setItem("address",this.address)
     this.account=await toAccount(this.address)
     this.provider = $event.provider
     this.strong=$event.strong
     this.addr_change.next(this.address)
+    return rc
   }
 
   isConnected(strong=false) : boolean {
@@ -121,23 +124,23 @@ export class UserService {
             encrypted:"",
             url_direct_xportal_connect:""
           }
-          await this.authent(r)
+          let address_change=await this.authent(r)
           await this.init_balance(vm.api)
 
           if(required_balance>0 && this.balance<required_balance)vm.router.navigate(["faucet"],{queryParams:{message:message_balance}})
 
-          resolve(r)
+          resolve(address_change)
           showMessage(vm,"Identification ok")
         } else {
           try{
             if(this.device.isMobile())this.connexion.extension_wallet=false
             let r:any=await _ask_for_authent(vm,"Authentification",subtitle,this.network,this.connexion)
-            await this.authent(r)
+            let address_change=await this.authent(r)
             await this.init_balance(vm.api)
 
             if(required_balance>0 && this.balance<required_balance)vm.router.navigate(["faucet"],{queryParams:{message:message_balance}})
 
-            resolve(r)
+            resolve(address_change)
           }catch (e){
             $$("Error ",e)
             reject(e)

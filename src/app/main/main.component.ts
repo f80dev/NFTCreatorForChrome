@@ -36,6 +36,7 @@ import {SourceComponent} from "../source/source.component";
 import {HttpClient} from "@angular/common/http";
 import {CropperComponent} from "../cropper/cropper.component";
 import {PinataService} from "../pinata.service";
+import {environment} from "../../environments/environment";
 
 @Component({
   selector: 'app-main',
@@ -99,13 +100,7 @@ export class MainComponent implements OnInit {
     this.user.action_after_mint=params.action || params.action_after_mint || ""
     this.visual=params.url || localStorage.getItem("image") || ""
     await this.user.login(this,"","",false,0.003,"",true)
-    if(this.user.address){
-      await this.refresh_collection()
-      if(this.collections.length>0){
-        this.sel_collection=this.collections[0]
-        $$("Selection de la collection ",this.sel_collection)
-      }
-    }
+    await this.refresh_collection()
     if(params.hasOwnProperty("uri"))this.uris.push(params.uri)
     if(params.hasOwnProperty("description"))this.description=params.description
     if(params.hasOwnProperty("name"))this.name=params.name.split(".")[0]
@@ -119,12 +114,12 @@ export class MainComponent implements OnInit {
 
 
   async refresh_collection(){
-    this.collections=[]
-    for(let col of await get_collections(this.user,this.api)) {
-      this.collections.push({label:col.name,value:col})
-    }
-    if(this.collections.length>0){
-      this.update_sel_collection(this.collections[0])
+    if(this.user.address){
+      this.collections=[]
+      for(let col of await get_collections(this.user,this.api)) {
+        this.collections.push({label:col.name,value:col})
+      }
+      if(this.collections.length>0)this.update_sel_collection(this.collections[0])
     }
   }
 
@@ -144,7 +139,13 @@ export class MainComponent implements OnInit {
     }
 
     if(this.sel_collection){
-      await this.user.login(this,"",localStorage.getItem("pem") || "",true)
+      let address_change=await this.user.login(this,"",localStorage.getItem("pem") || "",true)
+      if(address_change){
+        this.user.logout()
+        showMessage(this,"Reconnection required")
+        return
+      }
+
       let col:any=this.sel_collection.value
       wait_message(this,"NFT building ...")
 
@@ -355,9 +356,10 @@ export class MainComponent implements OnInit {
   }
 
 
-  view_on_gallery(self_window=false,explorer="xoxno.com/collection/%collection%?listingType=All") {
+  view_on_gallery(self_window=false,explorer=environment.collection_viewer) {
     if(this.sel_collection){
-      let url="https://"+(this.user.isDevnet() ? "devnet." : "")+explorer.replace("%collection%",this.sel_collection.value.collection)
+      if(!this.user.isDevnet())explorer=explorer.replace("devnet.","").replace("devnet-","")
+      let url=explorer.replace("%collection%",this.sel_collection.value.collection)
       if(!this.user.isDevnet())url=url.replace("devnet.","")
       if(self_window){
         open(url)
@@ -369,9 +371,9 @@ export class MainComponent implements OnInit {
   }
 
 
-  view_account_on_gallery(explorer="https://devnet.xoxno.com/profile/%address%") {
+  view_account_on_gallery(explorer=environment.account_viewer) {
     let url=explorer.replace("%address%",this.user.address)
-    if(!this.user.isDevnet())url=url.replace("devnet.","")
+    if(!this.user.isDevnet())url=url.replace("devnet.","").replace("devnet-","")
     open(url,"Gallery")
   }
 

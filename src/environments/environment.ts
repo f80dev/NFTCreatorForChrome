@@ -89,5 +89,16 @@ export const environment = {
   PINATA_API_SECRET:"2cc728326b11409fbbce3b01189a08bb7871a600f1a98e350d60c92b86a2316c",
 
   NFT_STORAGE_KEY:"70e9232c.fd46ec266cc940dcbe27ab485cea2243",
-  PINATA_BASE_URL: "https://api.pinata.cloud/"
+  PINATA_BASE_URL: "https://api.pinata.cloud/",
+
+  collection_viewer_old:"https://devnet.xoxno.com/collection/%collection%?listingType=All",
+  nft_viewer_old: "https://devnet.xoxno.com/nft/%identifier%",
+  account_viewer_old: "https://devnet.xoxno.com/profile/%address%",
+
+  collection_viewer:"https://devnet.xspotlight.com/collections/%collection%",
+  nft_viewer: "https://devnet.xspotlight.com/nfts/%identifier%",
+  account_viewer: "https://devnet.xspotlight.com/accounts/%address%"
+
+
+
 }

@@ -528,7 +528,7 @@ async function executeTransaction(sign_transaction:Transaction,user:UserService)
 }
 
 
-export function view_nft(user:UserService,identifier:string,explorer="https://devnet.xoxno.com/nft/%identifier%") {
+export function view_nft(user:UserService,identifier:string,explorer=environment.nft_viewer) {
   let url=explorer.replace("%identifier%",identifier)
   if(!user.isDevnet())url=url.replace("devnet.","")
   open(url,"Gallery")
