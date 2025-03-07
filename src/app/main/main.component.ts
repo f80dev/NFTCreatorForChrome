@@ -300,9 +300,9 @@ export class MainComponent implements OnInit {
     for(let col of this.collections){
       if(col.value.collection==collection_id)this.sel_collection=col;
     }
-    let url="https://devnet-explorer.multiversx.com/collections/%collection%/roles".replace("%collection%",collection_id)
-    if(!this.user.isDevnet())url=url.replace("devnet-","")
-    open(url,"collection")
+    // let url="https://devnet-explorer.multiversx.com/collections/%collection%/roles".replace("%collection%",collection_id)
+    // if(!this.user.isDevnet())url=url.replace("devnet-","")
+    // open(url,"collection")
   }
 
 
@@ -319,8 +319,7 @@ export class MainComponent implements OnInit {
           await this.set_roles_to_collection(rc.collection_id)
           this.open_collection(rc.collection_id)
         },2500)
-      }catch (e:any
-        ){
+      }catch (e:any){
         showMessage(this,"Collection not created")
         wait_message(this)
       }
@@ -331,7 +330,7 @@ export class MainComponent implements OnInit {
 
   async convert_to_base64(format="image/webp") {
     if(this.visual.startsWith("http")){
-      wait_message(this,"Creating a local copy of your image")
+      wait_message(this,"Creating a personal copy of this picture")
       try{
         let result=await this.imageProcessor.getBase64FromUrl(this.visual)
         result=(await this.imageProcessor.createImageFromBase64(result)).toDataURL(format)

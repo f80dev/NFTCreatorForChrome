@@ -92,12 +92,12 @@ export const environment = {
   PINATA_BASE_URL: "https://api.pinata.cloud/",
 
   collection_viewer_old:"https://devnet.xoxno.com/collection/%collection%?listingType=All",
-  nft_viewer_old: "https://devnet.xoxno.com/nft/%identifier%",
+  nft_viewer: "https://devnet.xoxno.com/nft/%identifier%",
   account_viewer_old: "https://devnet.xoxno.com/profile/%address%",
 
   collection_viewer:"https://devnet.xspotlight.com/collections/%collection%",
-  nft_viewer: "https://devnet.xspotlight.com/nfts/%identifier%",
-  account_viewer: "https://devnet.xspotlight.com/accounts/%address%"
+  nft_viewer_old: "https://devnet.xspotlight.com/nfts/%identifier%",
+  account_viewer: "https://devnet.xspotlight.com/%address%"
 
 
 

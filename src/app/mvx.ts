@@ -483,12 +483,12 @@ export async function create_collection(name:string,user:UserService,vm:any=null
     tokenName:name,
     tokenTicker:name.replace(" ","").toUpperCase().substring(0,10),
     canAddSpecialRoles: true,
-    canChangeOwner: false,
+    canChangeOwner: true,
     canFreeze: false,
     canPause: false,
     canTransferNFTCreateRole: true,
     canUpgrade: false,
-    canWipe: false,
+    canWipe: true,
   }
 
   let transaction=factory.createTransactionForIssuingNonFungible({...option})

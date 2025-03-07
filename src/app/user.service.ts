@@ -114,7 +114,7 @@ export class UserService {
           if(required_balance>0 && this.balance<required_balance)vm.router.navigate(["faucet"],{queryParams:{message:message_balance}})
         }
         if(this.device.isMobile())this.connexion.extension_wallet=false
-        resolve(true)
+        resolve(false)
       }else{
         if(pem_file.length>0){
           let r={
