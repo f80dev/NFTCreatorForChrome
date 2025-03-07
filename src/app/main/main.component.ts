@@ -15,7 +15,7 @@ import {
   getExplorer,
   level,
   makeNFT,
-  set_roles_to_collection,
+  set_roles_to_collection, view_account_on_gallery,
   view_nft
 } from "../mvx";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
@@ -37,6 +37,7 @@ import {HttpClient} from "@angular/common/http";
 import {CropperComponent} from "../cropper/cropper.component";
 import {PinataService} from "../pinata.service";
 import {environment} from "../../environments/environment";
+import {cat} from "@helia/unixfs/commands/cat";
 
 @Component({
   selector: 'app-main',
@@ -300,9 +301,6 @@ export class MainComponent implements OnInit {
     for(let col of this.collections){
       if(col.value.collection==collection_id)this.sel_collection=col;
     }
-    // let url="https://devnet-explorer.multiversx.com/collections/%collection%/roles".replace("%collection%",collection_id)
-    // if(!this.user.isDevnet())url=url.replace("devnet-","")
-    // open(url,"collection")
   }
 
 
@@ -370,11 +368,6 @@ export class MainComponent implements OnInit {
   }
 
 
-  view_account_on_gallery(explorer=environment.account_viewer) {
-    let url=explorer.replace("%address%",this.user.address)
-    if(!this.user.isDevnet())url=url.replace("devnet.","").replace("devnet-","")
-    open(url,"Gallery")
-  }
 
 
   update_sel_collection($event: any) {
@@ -383,8 +376,16 @@ export class MainComponent implements OnInit {
 
 
   async add_files($event:any) {
-    let result=await this.imageUploader.upload(this.imageUploader.b64_to_blob($event.file,$event.type),$event.filename,1)
-    this.uris.push(result.url)
+    wait_message(this,"Uploading")
+    try{
+      debugger
+      let result=await this.imageUploader.upload(this.imageUploader.b64_to_blob($event.file,$event.type),$event.filename,1)
+      this.uris.push(result.url)
+    }catch (e){
+      showMessage(this,"Upload canceled, retry")
+    }
+    wait_message(this)
+
   }
 
 
@@ -413,4 +414,5 @@ export class MainComponent implements OnInit {
     return Math.round(visual.length/1000) + " Ko"
   }
 
+  protected readonly view_account_on_gallery = view_account_on_gallery;
 }

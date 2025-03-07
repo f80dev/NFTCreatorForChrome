@@ -17,7 +17,7 @@ import {environment} from "../environments/environment";
 export class UploaderService implements OnInit {
   http=inject(HttpClient)
   endpoint="https://ipfs.f80.fr:5001/api/v0/"
-  service="pinata"
+  service="ipfs"
   pinata:any
 
 

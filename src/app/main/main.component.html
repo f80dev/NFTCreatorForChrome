@@ -70,7 +70,7 @@
                    value_type="text" (valueChange)="tags=$event"></app-input>
         <br>
 
-        <button mat-raised-button (click)="add_property()">
+        <button mat-raised-button (click)="add_property()" title="Add property to your NFT">
           <mat-icon>add</mat-icon>Metadata
         </button>
 
@@ -90,11 +90,11 @@
 
         <br>
         <div style="display: flex;align-items: center;justify-content: center;width:100%;">
-          <button mat-raised-button (click)="add_uri()">
+          <button mat-raised-button (click)="add_uri()" title="Link your NFT to some urls">
             <mat-icon>add</mat-icon>Ressources
           </button>
           <div style="display: block;width:100px;height:20px;margin-top:-13px;" *ngIf="level(2)">
-            <app-upload-file (uploaded)="add_files($event)">
+            <app-upload-file (uploaded)="add_files($event)" title="Uploading file to link to your NFT">
               <mat-icon style="margin-bottom: -5px;margin-left: -10px;">add</mat-icon>Files
             </app-upload-file>
           </div>
@@ -149,7 +149,7 @@
       <div style="display: inline-flex;align-items: center;justify-content: center;" >
         {{user.address.substring(0,10)+"..."+user.address.substring(user.address.length-10)}}
         &nbsp;
-        <button mat-icon-button class="icon-button" (click)="view_account_on_gallery()" title="View all NFTs"><mat-icon>visibility</mat-icon></button>
+        <button mat-icon-button class="icon-button" (click)="view_account_on_gallery(user)" title="View all NFTs"><mat-icon>visibility</mat-icon></button>
         <button mat-icon-button class="icon-button" (click)="logout()" title="logout"><mat-icon>logout</mat-icon></button>
       </div>
       <br>

@@ -507,6 +507,14 @@ export async function create_collection(name:string,user:UserService,vm:any=null
 }
 
 
+export function view_account_on_gallery(user:UserService,explorer=environment.account_viewer) {
+  let url=explorer.replace("%address%",user.address)
+  if(!user.isDevnet())url=url.replace("devnet.","").replace("devnet-","")
+  open(url,"Gallery")
+}
+
+
+
 export async function get_collections(user:UserService,api:ApiService) {
   //voir https://devnet-api.multiversx.com/#/accounts/AccountController_getAccountCollectionsWithRoles
   let domain=user.get_domain()

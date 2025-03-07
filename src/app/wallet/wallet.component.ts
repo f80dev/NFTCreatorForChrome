@@ -6,6 +6,7 @@ import {UserService} from '../user.service';
 import {environment} from '../../environments/environment';
 import {MatIcon} from '@angular/material/icon';
 import {settings} from '../../environments/settings';
+import {view_account_on_gallery} from "../mvx";
 
 @Component({
   selector: 'app-wallet',
@@ -106,4 +107,6 @@ export class WalletComponent implements OnChanges {
     if(this.user.network.indexOf("devnet")==-1)url=url.replace("devnet.","")
     open(url,"ESDT Creator")
   }
+
+  protected readonly view_account_on_gallery = view_account_on_gallery;
 }
