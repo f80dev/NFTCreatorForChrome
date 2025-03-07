@@ -552,8 +552,8 @@ export async function makeNFT(identifier:string,name:string,visual:string,user:U
 
   $$("Construction de "+name+" sur la collection "+identifier+" en quantite "+quantity)
 
-  if(metadata_url.length>0)uris.unshift(metadata_url)
-  uris.unshift(visual)
+  //if(metadata_url.length>0)uris.unshift(metadata_url)
+  if(uris.length==0 || uris[0]!=visual)uris.unshift(visual)
 
   let factory = new TokenManagementTransactionsFactory({
     config: new TransactionsFactoryConfig({ chainID: "D" })
