@@ -1,9 +1,9 @@
 export const settings={
   contract_addr:"",
-  ihm_level:2,
+  ihm_level:1,
   appname: "NFTNow",
   appli:"https://nftnow.af10.fr",
-  network: "elrond-devnet",
+  network: "elrond-mainnet",
   intro: "Create your NFT in one minute"
 }
 
