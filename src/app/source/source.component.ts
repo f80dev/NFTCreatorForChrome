@@ -80,12 +80,10 @@ export class SourceComponent {
 
   async take_photo() {
     clearInterval(this.handle)
-    if(this.image){
-      wait_message(this,"Photo loading ...")
-      this.update_visual.emit((await this.imageProc.createImageFromBase64(this.image.imageAsBase64)).toDataURL("image/webp"))
-      wait_message(this)
-    }
     this.show_scanner=false
+    if(this.image){
+      this.update_visual.emit((await this.imageProc.createImageFromBase64(this.image.imageAsBase64)).toDataURL("image/webp"))
+    }
   }
 
 
