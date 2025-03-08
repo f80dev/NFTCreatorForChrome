@@ -1,6 +1,6 @@
 {
   "name": "NFTNow Devnet",
-  "short_name": "NFTNow",
+  "short_name": "NFTNow Devnet",
   "theme_color": "#1976d2",
   "background_color": "#fafafa",
   "display": "standalone",
@@ -19,7 +19,6 @@
            "type": "image/png",
            "purpose": "maskable any"
      },
-
      {
        "src": "assets/nftnow_icon_512.png",
        "sizes": "512x512",
