@@ -81,6 +81,11 @@ export class UserService {
   }
 
 
+
+  get_chain_id(){
+    return this.network.indexOf("devnet") ? "D" : "1"
+  }
+
   logout(strong=false) {
     if(strong){
       localStorage.removeItem("address")

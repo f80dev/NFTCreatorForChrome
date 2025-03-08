@@ -201,7 +201,7 @@ export function create_transaction(function_name:string,args:any[],
                                    user:UserService,tokens_to_transfer: TokenTransfer[],
                                    gasLimit=50000000n, contract_addr="") : Promise<Transaction>  {
   return new Promise(async (resolve) => {
-    const factoryConfig = new TransactionsFactoryConfig({ chainID: "D" });
+    const factoryConfig = new TransactionsFactoryConfig({ chainID: user.get_chain_id() });
     let factory = new SmartContractTransactionsFactory({config: factoryConfig,abi:await create_abi(abi)});
     const apiNetworkProvider = new ApiNetworkProvider(user.network.indexOf("devnet")>-1 ? DEVNET : MAINNET);
     if(contract_addr=="")contract_addr=user.get_sc_address()
@@ -326,7 +326,7 @@ export async function send_transaction(user:UserService,function_name:string,
       user.address = user_signer.getAddress().bech32()
     }
 
-    const factoryConfig = new TransactionsFactoryConfig({chainID: "D"});
+    const factoryConfig = new TransactionsFactoryConfig({chainID: user.get_chain_id()});
     let factory = new SmartContractTransactionsFactory({
       config: factoryConfig,
       abi: await create_abi(_abi)
@@ -436,7 +436,7 @@ async function signTransaction(t:Transaction,user:UserService) : Promise<Transac
 }
 
 export async function set_roles_to_collection(collection_id:string, user:UserService,type_collection:string="SFT",burn=false,update=false) {
-  let factory = new TokenManagementTransactionsFactory({config: new TransactionsFactoryConfig({ chainID: "D" })});
+  let factory = new TokenManagementTransactionsFactory({config: new TransactionsFactoryConfig({ chainID: user.get_chain_id() })});
   $$("Affectation des roles sur la collection "+collection_id+" de type "+type_collection)
   let setRoleTransaction=factory.createTransactionForSettingSpecialRoleOnNonFungibleToken({
     sender: Address.fromBech32(user.address),
@@ -475,7 +475,7 @@ export async function create_collection(name:string,user:UserService,vm:any=null
   //puis appel de setSpecialRole@544f4b454d4f4e2d346561303466@15432c1a00ea0f72466e099db66e6059d4becc9bb9eed17f3db817f29a0fc26b@45534454526f6c654e4654437265617465@45534454526f6c654e46544164645175616e74697479
 
   if(vm)vm.message="Collection building phase"
-  let factory = new TokenManagementTransactionsFactory({config: new TransactionsFactoryConfig({ chainID: "D" })});
+  let factory = new TokenManagementTransactionsFactory({config: new TransactionsFactoryConfig({ chainID:user.get_chain_id() })});
 
   let option={
     name: name,
@@ -556,7 +556,7 @@ export async function makeNFT(identifier:string,name:string,visual:string,user:U
   if(uris.length==0 || uris[0]!=visual)uris.unshift(visual)
 
   let factory = new TokenManagementTransactionsFactory({
-    config: new TransactionsFactoryConfig({ chainID: "D" })
+    config: new TransactionsFactoryConfig({ chainID:user.get_chain_id() })
   });
   let transaction=factory.createTransactionForCreatingNFT({
     attributes: new TextEncoder().encode(metadata),
@@ -607,8 +607,8 @@ export async function query(function_name:string,args:any[],domain:string,sc_add
   })
 }
 
-export async  function deploy(owner:string,code:BytesValue) {
-  const factoryConfig = new TransactionsFactoryConfig({ chainID: "D" });
+export async  function deploy(user:UserService,code:BytesValue) {
+  const factoryConfig = new TransactionsFactoryConfig({ chainID:user.get_chain_id() });
   let factory = new SmartContractTransactionsFactory({
     config: factoryConfig,
     abi: await create_abi(abi)
@@ -616,7 +616,7 @@ export async  function deploy(owner:string,code:BytesValue) {
   let args = [10];
 
   const deployTransaction = factory.createTransactionForDeploy({
-    sender: Address.fromBech32(owner),
+    sender: Address.fromBech32(user.address),
     bytecode: code.valueOf(),
     gasLimit: 6000000n,
     arguments: args

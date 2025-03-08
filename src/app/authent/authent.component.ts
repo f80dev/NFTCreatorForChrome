@@ -453,7 +453,7 @@ export class AuthentComponent implements OnInit,OnChanges {
   }
 
   get_chain_id(){
-    return this.network.indexOf("devnet") ? "D" : "T"
+    return this.network.indexOf("devnet") ? "D" : "1"
   }
 
   private startBgrMsgChannel(operation: string, connectData: any): Promise<any> {
