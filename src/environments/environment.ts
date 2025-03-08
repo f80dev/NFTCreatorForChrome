@@ -61,8 +61,6 @@ export const environment = {
   scale_factor:100,
   translate_factor:1000000000,
 
-
-
   website: "https://af10.fr",
   company:"AF10",
   seuil_capture: 10,
