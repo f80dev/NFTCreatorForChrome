@@ -3,7 +3,7 @@ export const environment = {
   forum: "https://discord.gg/BfC2E2ent",
   mail: "contact@nfluent.io",
   telegram: "https://t.me/NFTNow_official",
-  version: "0.2",
+  version: "0.3",
 
   server: "http://localhost:5000",
   networks: [
