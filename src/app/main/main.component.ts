@@ -152,7 +152,7 @@ export class MainComponent implements OnInit {
 
       let hash=""
       if(this.visual.startsWith("data:")){
-        let img=await this.imageUploader.b64_to_file(this.visual)
+        let img=await this.imageUploader.b64_to_file(this.visual,"img_"+this.user.address+".webp")
         let result:any=await this.pinata.uploadFileToIPFS(img)
         this.visual=result.url
         hash=result.hash
@@ -170,7 +170,7 @@ export class MainComponent implements OnInit {
         //const blob = new Blob([JSON.stringify(obj)], { type: 'application/json'})
         //let metadata=await this.imageUploader.upload(blob,"infos.json",0)
 
-        let metadata=await this.pinata.uploadJSONToIPFS({name:"metadata",content:obj})
+        let metadata=await this.pinata.uploadJSONToIPFS({name:"metadata_"+this.user.address+".json",content:obj})
 
         $$("metadata ",metadata)
         for(let i=0;i<10;i++){

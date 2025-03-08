@@ -34,6 +34,7 @@ export class UploadFileComponent implements OnInit, OnChanges {
   @Input() can_drop: boolean = true;
   @Input("maxsize") maxsize: number = environment.max_file_size;
   @Input("show_cancel") show_cancel: boolean = false;
+  @Output("start") onstart: EventEmitter<any> = new EventEmitter();
   @Output("uploaded") onupload: EventEmitter<any> = new EventEmitter();
   @Output("canceled") oncancel: EventEmitter<any> = new EventEmitter();
   @Input("extensions") extensions: string = "*"; //format: accept=".doc,.docx"  ou "accept="audio/*"
@@ -77,6 +78,7 @@ export class UploadFileComponent implements OnInit, OnChanges {
   }
 
   import(fileInputEvent: any) {
+    this.onstart.emit(true)
     let files=fileInputEvent.hasOwnProperty("isTrusted") ? fileInputEvent.target.files : fileInputEvent;
     for(let file of files){
       file.reader = new FileReader();

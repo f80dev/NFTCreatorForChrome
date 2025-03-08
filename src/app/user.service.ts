@@ -69,7 +69,7 @@ export class UserService {
     let rc=(this.address.length>0 && this.address!=$event.address)   //True s'il y a changement d'adresse
     this.address = $event.address
     localStorage.setItem("address",this.address)
-    this.account=await toAccount(this.address)
+    this.account=await toAccount(this.address,this.network)
     this.provider = $event.provider
     this.strong=$event.strong
     this.addr_change.next(this.address)

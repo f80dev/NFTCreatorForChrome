@@ -90,11 +90,11 @@ export class SourceComponent {
 
 
   async from_device($event: any) {
-    wait_message(this,"File loading ...")
+    wait_message(this,"File treatment ...")
     this.visual=$event.file
     this.visual=(await this.imageProc.createImageFromBase64(this.visual)).toDataURL("image/webp")
-    this.update_visual.emit(this.visual)
     wait_message(this)
+    this.update_visual.emit(this.visual)
   }
 
   open_photo() {
@@ -118,5 +118,9 @@ export class SourceComponent {
 
   open_about() {
     this.router.navigate(["about"])
+  }
+
+  on_start_upload() {
+    wait_message(this,"Start uploading ...",false,5000)
   }
 }

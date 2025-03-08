@@ -1,8 +1,13 @@
 <div class="mainform">
   <app-hourglass [message]="message"></app-hourglass>
+  <br>
+  <div *ngIf="message==''">
+    <img *ngIf="!user.isDevnet()" (click)="open_about()" src="assets/titre_appli.png"
+         style="width: 80%;max-width: 300px;display: inline-block;margin-top:-15px;"><br>
+    <img *ngIf="user.isDevnet()" (click)="open_about()" src="assets/titre_appli_devnet.png"
+         style="width: 80%;max-width: 300px;display: inline-block;margin-top:-15px;"><br>
 
-  <img *ngIf="!user.isDevnet()" (click)="open_about()" src="assets/titre_appli.png" style="width: 80%;max-width: 300px;display: inline-block;margin:15px;"><br>
-  <img *ngIf="user.isDevnet()" (click)="open_about()" src="assets/titre_appli_devnet.png" style="width: 80%;max-width: 300px;display: inline-block;margin:15px;"><br>
+  </div>
   <mat-accordion style="margin: 10px;" [style.pointer-events]="message=='' ? 'all' : 'none'" [style.opacity]="message=='' ? 1 : 0.3">
     <mat-expansion-panel [expanded]="true">
       <mat-expansion-panel-header>Sources</mat-expansion-panel-header>
@@ -13,7 +18,9 @@
         <button mat-raised-button *ngIf="level(1)" title="Get the content clipboard" (click)="paste()">From clipboard</button>
         <button mat-raised-button *ngIf="level(1)" title="Image editor" (click)="go_editor()">From editor</button>
         <br><br>
-        <app-upload-file (uploaded)="from_device($event)" title="Load a content from your device" style="display: inline-block;">From your device</app-upload-file>
+        <app-upload-file (start)="on_start_upload()"
+                         (uploaded)="from_device($event)"
+                         title="Load a content from your device" style="display: inline-block;">From your device</app-upload-file>
       </div>
 
       <div *ngIf="show_scanner">
