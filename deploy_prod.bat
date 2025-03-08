@@ -1,6 +1,7 @@
 copy .\src\CNAME_prod .\src\CNAME
 copy .\src\index_prod.html .\src\index.html
 copy .\src\manifest-production.webmanifest .\src\manifest.webmanifest
+copy .\src\environments\settings_prod.ts .\src\environments\settings.ts
 git commit -a -m "commit pour publication production"
 call npm version patch
 call ng build --aot --output-hashing=none --source-map=false --optimization=true --configuration production

@@ -9,7 +9,7 @@
       <h3>To make a NFT,<br>you must start from a picture</h3>
       <br>
       <div *ngIf="!show_scanner">
-        <button mat-raised-button *ngIf="level(2)" title="Open the camera of your device to take a photo" (click)="open_photo()">From camera</button>
+        <button mat-raised-button *ngIf="level(1)" title="Open the camera of your device to take a photo" (click)="open_photo()">From camera</button>
         <button mat-raised-button *ngIf="level(1)" title="Get the content clipboard" (click)="paste()">From clipboard</button>
         <button mat-raised-button *ngIf="level(1)" title="Image editor" (click)="go_editor()">From editor</button>
         <br><br>

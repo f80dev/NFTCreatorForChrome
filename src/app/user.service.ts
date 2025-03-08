@@ -83,7 +83,9 @@ export class UserService {
 
 
   get_chain_id(){
-    return this.network.indexOf("devnet") ? "D" : "1"
+    let rc=this.network.indexOf("devnet") ? "D" : "1"
+    $$("Utilisation de la chaine chainid="+rc)
+    return rc
   }
 
   logout(strong=false) {
