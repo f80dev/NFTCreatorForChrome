@@ -1,7 +1,8 @@
 <div class="mainform">
   <app-hourglass [message]="message"></app-hourglass>
-  <img *ngIf="!user.isDevnet()" src="assets/titre_appli.png" style="width: 80%;max-width: 300px;display: inline-block;margin:15px;"><br>
-  <img *ngIf="user.isDevnet()" src="assets/titre_appli_devnet.png" style="width: 80%;max-width: 300px;display: inline-block;margin:15px;"><br>
+
+  <img *ngIf="!user.isDevnet()" (click)="open_about()" src="assets/titre_appli.png" style="width: 80%;max-width: 300px;display: inline-block;margin:15px;"><br>
+  <img *ngIf="user.isDevnet()" (click)="open_about()" src="assets/titre_appli_devnet.png" style="width: 80%;max-width: 300px;display: inline-block;margin:15px;"><br>
   <mat-accordion style="margin: 10px;" [style.pointer-events]="message=='' ? 'all' : 'none'" [style.opacity]="message=='' ? 1 : 0.3">
     <mat-expansion-panel [expanded]="true">
       <mat-expansion-panel-header>Sources</mat-expansion-panel-header>

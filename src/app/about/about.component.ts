@@ -25,14 +25,12 @@ export class AboutComponent implements OnInit {
   version=environment.version
   cgu=environment.website+"/cgu.html"
   contact=""
-  logo="./assets/logo.png"
   exist_faqs: boolean = false;
   show_admin: boolean = false;
 
   constructor(
       public routes:ActivatedRoute,
       public _location:Location,
-      public style:StyleManagerService,
       public user:UserService,
       public router:Router,
   ) { }

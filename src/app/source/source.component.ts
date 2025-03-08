@@ -115,4 +115,8 @@ export class SourceComponent {
   async login() {
     await this.user.login(this,"","",true,0.01)
   }
+
+  open_about() {
+    this.router.navigate(["about"])
+  }
 }

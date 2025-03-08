@@ -8,7 +8,7 @@
   <h2 class="color-primary" *ngIf="settings.appname">{{settings.appname}}</h2>
   <div>version {{version}}</div>
   <br>
-  <img *ngIf="logo!=''" [src]="logo" style="margin: 50px;max-width:300px;max-height:300px;">
+  <img *ngIf="environment.logo!=''" [src]="environment.logo" style="margin: 50px;max-width:300px;max-height:300px;">
   <br>
   <button mat-icon-button (click)="_location.back()">
     <mat-icon>arrow_back</mat-icon>

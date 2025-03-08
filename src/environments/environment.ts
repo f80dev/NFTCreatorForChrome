@@ -2,7 +2,7 @@ export const environment = {
   production: false,
   forum: "https://discord.gg/BfC2E2ent",
   mail: "contact@nfluent.io",
-  telegram: "https://t.me/tokemon_world_official",
+  telegram: "https://t.me/NFTNow_official",
   version: "0.1",
 
   server: "http://localhost:5000",
@@ -12,8 +12,8 @@ export const environment = {
     {label: "MultiversX Test v2", value: "elrond-devnet2"},
   ],
   storage:"github",
-  visual: "./assets/tokemon_logo.png",
-  logo: "./assets/tokemon_logo.png",
+  visual: "./assets/logo.png",
+  logo: "./assets/logo.png",
   claim: "Valoriser vos contenus en quelques clics",
   token: {
     "elrond-devnet":"LIFEPOINT-30c75e",
