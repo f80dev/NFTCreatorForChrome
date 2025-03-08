@@ -82,7 +82,9 @@ export class SourceComponent {
     clearInterval(this.handle)
     this.show_scanner=false
     if(this.image){
-      this.update_visual.emit((await this.imageProc.createImageFromBase64(this.image.imageAsBase64)).toDataURL("image/webp"))
+      let image=await this.imageProc.createImageFromBase64(this.image.imageAsDataUrl)
+      this.visual=image.toDataURL("image/webp")
+      this.update_visual.emit(this.visual)
     }
   }
 
