@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {environment} from "../../environments/environment";
 import {ActivatedRoute, Router} from "@angular/router";
 import {apply_params, deleteAllCookies, getParams} from "../../tools";
@@ -8,6 +8,7 @@ import {_prompt} from "../prompt/prompt.component";
 import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
 import {settings} from '../../environments/settings';
+import {LogUpdateService} from "../log-update.service";
 
 @Component({
   selector: 'app-about',
@@ -27,13 +28,14 @@ export class AboutComponent implements OnInit {
   contact=""
   exist_faqs: boolean = false;
   show_admin: boolean = false;
+  updater=inject(LogUpdateService)
 
   constructor(
       public routes:ActivatedRoute,
       public _location:Location,
       public user:UserService,
       public router:Router,
-  ) { }
+  ) {}
 
   async ngOnInit() {
     let params:any=await getParams(this.routes)
