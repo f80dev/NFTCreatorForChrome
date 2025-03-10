@@ -23,7 +23,6 @@ export class AboutComponent implements OnInit {
 
   website=environment.website
   company=environment.company
-  version=environment.version
   cgu=environment.website+"/cgu.html"
   contact=""
   exist_faqs: boolean = false;
