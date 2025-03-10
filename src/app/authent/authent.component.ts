@@ -31,6 +31,7 @@ import {eval_direct_url_xportal} from "../../crypto";
 import {QRCodeComponent} from 'angularx-qrcode';
 import {settings} from '../../environments/settings';
 import {HourglassComponent, wait_message} from "../hourglass/hourglass.component";
+import {UserService} from "../user.service";
 
 //Installation de @multiversx/sdk-wallet-connect-provider via yarn add @multiversx/sdk-wallet-connect-provider
 
@@ -156,10 +157,9 @@ export class AuthentComponent implements OnInit,OnChanges {
       public _location:Location,
       public socket:Socket,
       public dialog:MatDialog,
-      public routes:ActivatedRoute,
+      public user:UserService,
       public device:DeviceService,
       public socialAuthService: SocialAuthService,
-      public toast:MatSnackBar,
       public evmwalletservice:EvmWalletServiceService
   ) {
   }
@@ -452,9 +452,6 @@ export class AuthentComponent implements OnInit,OnChanges {
     this.enabled_webcam=false;
   }
 
-  get_chain_id(){
-    return this.network.indexOf("devnet") ? "D" : "1"
-  }
 
   private startBgrMsgChannel(operation: string, connectData: any): Promise<any> {
     //voir https://github.com/multiversx/mx-sdk-js-extension-provider/blob/main/src/extensionProvider.ts
@@ -546,7 +543,7 @@ export class AuthentComponent implements OnInit,OnChanges {
         $$("Déconnexion de wallet connect")
       },
     }
-    this.provider = new WalletConnectV2Provider(callbacks, this.get_chain_id(), this.relayUrl, this.walletConnect_ProjectId);
+    this.provider = new WalletConnectV2Provider(callbacks, this.user.get_chain_id(), this.relayUrl, this.walletConnect_ProjectId);
 
     try{
       wait_message(this,"Connexion")

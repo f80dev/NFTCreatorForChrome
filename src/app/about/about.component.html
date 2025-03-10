@@ -6,7 +6,7 @@
   </div>
 
   <h2 class="color-primary" *ngIf="settings.appname">{{settings.appname}}</h2>
-  <div>version {{version}}</div>
+  <div>version {{settings.version}}</div>
   <br>
   <img *ngIf="environment.logo!=''" [src]="environment.logo" style="margin: 50px;max-width:300px;max-height:300px;">
   <br>
