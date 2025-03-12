@@ -184,8 +184,9 @@ export class MainComponent implements OnInit {
         $$("Consultation des metadata https://ipfs.io/ipfs/"+metadata.hash)
       }
 
+      let quantity=col.subType.startsWith("NonFungible") ? 1 : this.quantity
       try{
-        let rc=await makeNFT(col.collection,this.name,this.visual,this.user,this.quantity,this.royalties,this.uris,metadata_tags,metadata_url,hash)
+        let rc=await makeNFT(col.collection,this.name,this.visual,this.user,quantity,this.royalties,this.uris,metadata_tags,metadata_url,hash)
         if(rc.returnMessage=="ok"){
           try{
             if(this.user.action_after_mint.startsWith("redirect"))open(this.user.action_after_mint.replace("redirect:",""))
