@@ -94,6 +94,9 @@ export class MainComponent implements OnInit {
   uncrop: string=""
   filename: string="image.webp"
 
+  normalize(text:string) : string {
+    return text.replace(/[^a-z0-9 A-Z]/gi, '');
+  }
 
   async ngOnInit() {
     let params:any=await getParams(this.routes)
@@ -103,8 +106,8 @@ export class MainComponent implements OnInit {
     await this.user.login(this,"","",false,0.003,"",true)
     await this.refresh_collection()
     if(params.hasOwnProperty("uri"))this.uris.push(params.uri)
-    if(params.hasOwnProperty("description"))this.description=params.description
-    if(params.hasOwnProperty("name"))this.name=params.name.split(".")[0]
+    if(params.hasOwnProperty("description"))this.description=this.normalize(params.description)
+    if(params.hasOwnProperty("name"))this.name=this.normalize(params.name.split(".")[0])
     this.filename=params.filename || "image.webp"
 
     //transformation du visual
