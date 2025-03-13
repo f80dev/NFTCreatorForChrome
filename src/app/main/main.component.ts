@@ -25,7 +25,6 @@ import {WebcamImage, WebcamModule} from "ngx-webcam";
 import {HourglassComponent, wait_message} from "../hourglass/hourglass.component";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {_prompt} from "../prompt/prompt.component";
-import {ClipboardService} from "../clipboard.service";
 import {MatAccordion, MatExpansionPanel, MatExpansionPanelHeader} from "@angular/material/expansion";
 import {JsonEditorComponent} from "ang-jsoneditor";
 import {ImageProcessorService} from "../image-processor.service";
@@ -37,7 +36,7 @@ import {HttpClient} from "@angular/common/http";
 import {CropperComponent} from "../cropper/cropper.component";
 import {PinataService} from "../pinata.service";
 import {environment} from "../../environments/environment";
-import {cat} from "@helia/unixfs/commands/cat";
+import {ClipboardService} from "../clipboard.service";
 
 @Component({
   selector: 'app-main',
@@ -93,6 +92,7 @@ export class MainComponent implements OnInit {
   showCrop: boolean=false
   uncrop: string=""
   filename: string="image.webp"
+  clipboard=inject(ClipboardService)
 
   normalize(text:string) : string {
     return text.replace(/[^a-z0-9 A-Z]/gi, '');
@@ -106,11 +106,21 @@ export class MainComponent implements OnInit {
     await this.user.login(this,"","",false,0.003,"",true)
     await this.refresh_collection()
     if(params.hasOwnProperty("uri"))this.uris.push(params.uri)
+    if(params.hasOwnProperty("collection")){
+     //TODO compléter avec la possibilité de selectionner par défaut une collection
+    }
     if(params.hasOwnProperty("description"))this.description=this.normalize(params.description)
     if(params.hasOwnProperty("name"))this.name=this.normalize(params.name.split(".")[0])
     this.filename=params.filename || "image.webp"
 
-    //transformation du visual
+    //Si l'utilisateur à donner permission on check le clipboard
+    let obj:any={name: 'clipboard-read' }
+    let permission=await navigator.permissions.query(obj)
+    if (permission.state === 'granted') {
+      let visual=await this.clipboard.paste()
+      if(visual.length>0)this.visual=visual
+    }
+  //transformation du visual
     if(this.visual.length>0 && params.self_storage)await this.convert_to_base64("image/webp")
     if(params.hasOwnProperty("source") && params.source!=this.visual)this.properties.push({name:"Sources",value:params.source})
   }

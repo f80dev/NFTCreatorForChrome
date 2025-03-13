@@ -23,7 +23,7 @@ export class EditorComponent {
   toast=inject(MatSnackBar)
 
   async create_nft(){
-    let data=(await this.clipboard.paste("text")) as string
+    let data=await this.clipboard.paste()
     if(data.startsWith("data:")){
       localStorage.setItem("image",data as string)
       this.router.navigate(["main"]);

@@ -52,6 +52,7 @@ export class SourceComponent {
   message: string=""
   user=inject(UserService)
   dialog=inject(MatDialog)
+  show_source=true
 
 
 
@@ -63,7 +64,7 @@ export class SourceComponent {
 
   async paste() {
     let content=await this.clipboard.paste()
-    if(content && content.toString().startsWith("http")){
+    if(content.length>0){
       this.update_visual.emit(content)
     }else{
       showMessage(this,"Nothing in the clipboard")
@@ -72,6 +73,7 @@ export class SourceComponent {
 
 
   open_generator(generator:any) {
+    this.show_source=true
     open(generator.value,"Images")
   }
 

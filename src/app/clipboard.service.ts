@@ -19,28 +19,31 @@ export class ClipboardService {
     });
   }
 
-  async paste(s="") {
-      try {
-        return await navigator.clipboard.readText();
-      }catch (e){
-        $$("On fait la lecture d'une image")
-      }
-
-      if(s=="" || s.indexOf("image")>-1){
-        debugger
-        try {
-          const clipboardContents = await navigator.clipboard.read();
-          for (const item of clipboardContents) {
-            if (!item.types.includes("image/png")) {
-              return Error("Clipboard does not contain PNG image data.")
-            }
-            const blob = await item.getType("image/png");
-            return URL.createObjectURL(blob)
+  paste(): Promise<string> {
+    return new Promise(async (resolve, reject)  => {
+      const clipboardContents = await navigator.clipboard.read();
+      debugger
+      let rc=""
+      for (const item of clipboardContents) {
+        if (item.types.includes("text/plain")) {
+          let url=await (await item.getType("text/plain")).text()
+          if(url.startsWith("http"))rc=url
+        }
+        if (item.types.includes("image/png")) {
+          const reader = new FileReader();
+          const blob = await item.getType("image/png");
+          reader.onloadend = () => {
+            resolve(reader.result as string)
           }
-        } catch (err) {
-          return false
+          reader.readAsDataURL(blob);
+          reader.onerror=reject
         }
       }
-      return false
+      if(rc.length>0){
+        resolve(rc)
+      }else{
+        reject()
+      }
+    })
   }
 }
