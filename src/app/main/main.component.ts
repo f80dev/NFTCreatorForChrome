@@ -98,14 +98,19 @@ export class MainComponent implements OnInit {
     return text.replace(/[^a-z0-9 A-Z]/gi, '');
   }
 
+
+
+
   async ngOnInit() {
     let params:any=await getParams(this.routes)
+    this.user.network=params.network || "elrond-devnet"
     $$("Lecture des paramètres ",params)
     this.user.action_after_mint=params.action || params.action_after_mint || ""
     this.visual=params.url || localStorage.getItem("image") || ""
     await this.user.login(this,"","",false,0.003,"",true)
     await this.refresh_collection()
     if(params.hasOwnProperty("uri"))this.uris.push(params.uri)
+
     if(params.hasOwnProperty("collection")){
      //TODO compléter avec la possibilité de selectionner par défaut une collection
     }

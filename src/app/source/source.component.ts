@@ -8,7 +8,7 @@ import {ClipboardService} from "../clipboard.service";
 import {Subject} from "rxjs";
 import {environment} from "../../environments/environment";
 import {Router} from "@angular/router";
-import {showMessage} from "../../tools";
+import {$$, showMessage} from "../../tools";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {ImageProcessorService} from "../image-processor.service";
 import {HourglassComponent, wait_message} from "../hourglass/hourglass.component";
@@ -65,11 +65,15 @@ export class SourceComponent implements OnDestroy {
 
 
   async paste() {
-    let content=await this.clipboard.paste()
-    if(content.length>0){
-      this.update_visual.emit(content)
-    }else{
-      showMessage(this,"Nothing in the clipboard")
+    try{
+      let content=await this.clipboard.paste()
+      if(content.length>0){
+        this.update_visual.emit(content)
+      }else{
+        showMessage(this,"Nothing in the clipboard")
+      }
+    }catch (e:any){
+     $$("Impossible de récupérer le clipboard",e)
     }
   }
 
@@ -83,6 +87,7 @@ export class SourceComponent implements OnDestroy {
     let obj:any={name:'clipboard-read'}
     if ((await navigator.permissions.query(obj)).state === 'granted') {
       this.clipboard_handle=setInterval(()=>{
+        $$("analyse du clipboard")
         this.paste()
       },1000)
     }
