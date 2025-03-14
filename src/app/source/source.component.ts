@@ -1,4 +1,4 @@
-import {Component, EventEmitter, inject, Input, Output} from '@angular/core';
+import {Component, EventEmitter, inject, Input, OnDestroy, Output} from '@angular/core';
 import {level, view_nft} from "../mvx";
 import {UploadFileComponent} from "../upload-file/upload-file.component";
 import {MatButton} from "@angular/material/button";
@@ -33,10 +33,10 @@ import {MatDialog} from "@angular/material/dialog";
   standalone: true,
   styleUrl: './source.component.scss'
 })
-export class SourceComponent {
+export class SourceComponent implements OnDestroy {
 
-  protected readonly level = level;
   toast=inject(MatSnackBar)
+
   @Input() visual=""
   @Output() update_visual=new EventEmitter();
   clipboard=inject(ClipboardService)
@@ -44,6 +44,8 @@ export class SourceComponent {
   show_scanner: boolean = false;
   handle:any
   generators=environment.generators
+
+
 
 
   trigger = new Subject<void>();
@@ -71,9 +73,19 @@ export class SourceComponent {
     }
   }
 
+  clipboard_handle:any
+  ngOnDestroy(): void {
+    clearInterval(this.clipboard_handle)
+  }
 
-  open_generator(generator:any) {
+  async open_generator(generator:any) {
     this.show_source=true
+    let obj:any={name:'clipboard-read'}
+    if ((await navigator.permissions.query(obj)).state === 'granted') {
+      this.clipboard_handle=setInterval(()=>{
+        this.paste()
+      },1000)
+    }
     open(generator.value,"Images")
   }
 
@@ -125,4 +137,6 @@ export class SourceComponent {
   on_start_upload() {
     wait_message(this,"Start uploading ...",false,5000)
   }
+
+  protected readonly level = level;
 }

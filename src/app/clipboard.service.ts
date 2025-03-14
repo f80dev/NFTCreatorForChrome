@@ -22,7 +22,6 @@ export class ClipboardService {
   paste(): Promise<string> {
     return new Promise(async (resolve, reject)  => {
       const clipboardContents = await navigator.clipboard.read();
-      debugger
       let rc=""
       for (const item of clipboardContents) {
         if (item.types.includes("text/plain")) {

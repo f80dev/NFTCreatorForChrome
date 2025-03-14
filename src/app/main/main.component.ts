@@ -115,8 +115,8 @@ export class MainComponent implements OnInit {
 
     //Si l'utilisateur à donner permission on check le clipboard
     let obj:any={name: 'clipboard-read' }
-    let permission=await navigator.permissions.query(obj)
-    if (permission.state === 'granted') {
+
+    if ((await navigator.permissions.query(obj)).state === 'granted') {
       let visual=await this.clipboard.paste()
       if(visual.length>0)this.visual=visual
     }
