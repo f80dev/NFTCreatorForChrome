@@ -70,7 +70,7 @@ export class SourceComponent implements OnDestroy {
       if(content.length>0){
         this.update_visual.emit(content)
       }else{
-        showMessage(this,"Nothing in the clipboard")
+        showMessage(this,"Nothing in the clipboard",1000)
       }
     }catch (e:any){
      $$("Impossible de récupérer le clipboard",e)
