@@ -242,6 +242,7 @@ export class MainComponent implements OnInit {
 
   reset_image() {
     this.uris=[]
+    this.clipboard.clear()
     localStorage.removeItem("image")
     this.visual=""
     this.uncrop=""

@@ -63,4 +63,8 @@ export class ClipboardService {
       }
     })
   }
+
+  async clear() {
+    await navigator.clipboard.writeText("")
+  }
 }
