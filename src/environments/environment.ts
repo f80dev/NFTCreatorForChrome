@@ -76,6 +76,7 @@ export const environment = {
   generators: [
     {label: "Emojis", value: "https://emojipedia.com/apple/"},
     {label: "Stable Diffusion", value: "https://gen.akash.network/"},
+    {label: "Grok", value: "https://grok.com/"},
     {label: "Pixabay", value: "https://pixabay.com/"},
     {label: "Google Image", value: "https://images.google.com/"},
     {label: "Icons", value: "https://fonts.google.com/icons"},
