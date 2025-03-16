@@ -37,6 +37,7 @@ import {CropperComponent} from "../cropper/cropper.component";
 import {PinataService} from "../pinata.service";
 import {environment} from "../../environments/environment";
 import {ClipboardService} from "../clipboard.service";
+import {settings} from "../../environments/settings";
 
 @Component({
   selector: 'app-main',
@@ -107,6 +108,7 @@ export class MainComponent implements OnInit {
     $$("Lecture des paramètres ",params)
     this.user.action_after_mint=params.action || params.action_after_mint || ""
     this.visual=params.url || localStorage.getItem("image") || ""
+    if(params.intro)localStorage.removeItem(settings.appname)
     await this.user.login(this,"","",false,0.003,"",true)
     await this.refresh_collection()
     if(params.hasOwnProperty("uri"))this.uris.push(params.uri)
