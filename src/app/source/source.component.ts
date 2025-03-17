@@ -97,7 +97,7 @@ export class SourceComponent implements OnDestroy {
     }
     let occ=Number(localStorage.getItem(settings.appname) || "0")
     if(occ<3){
-      showMessage(this,"Right-click on the image you want to use, copy it and return to NFT Now",3000)
+      showMessage(this,"Right-click on the image you want to use, copy it and return to NFT Now",2600)
       setTimeout(()=>{
         localStorage.setItem(settings.appname,(occ+1).toString())
         open(generator.value,"Images")

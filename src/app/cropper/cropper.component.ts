@@ -29,7 +29,7 @@ export class CropperComponent implements OnChanges {
   h=0
   @Output() update_visual=new EventEmitter();
   define_zone: boolean=false
-  zoom: number=0
+  zoom: number=1
   img = new Image()
   square=true;
 
