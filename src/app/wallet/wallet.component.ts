@@ -6,7 +6,7 @@ import {UserService} from '../user.service';
 import {environment} from '../../environments/environment';
 import {MatIcon} from '@angular/material/icon';
 import {settings} from '../../environments/settings';
-import {view_account_on_gallery} from "../mvx";
+import {getExplorer, view_account_on_gallery} from "../mvx";
 
 @Component({
   selector: 'app-wallet',
@@ -109,4 +109,8 @@ export class WalletComponent implements OnChanges {
   }
 
   protected readonly view_account_on_gallery = view_account_on_gallery;
+
+  show_account() {
+    open(getExplorer(this.user.address,this.user.network,"accounts","explorer","/tokens"),"Account")
+  }
 }

@@ -80,6 +80,7 @@ export const environment = {
     {label: "Pixabay", value: "https://pixabay.com/"},
     {label: "Google Image", value: "https://images.google.com/"},
     {label: "Icons", value: "https://fonts.google.com/icons"},
+    {label: "Images IA", value: "https://civitai.com/"},
   ],
   PINATA_JWT:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI1ZTY2NTFkNy0yMGRlLTRhMjgtOTYxZC02Yzk5M2VjMjU3YmMiLCJlbWFpbCI6Imhob2FyZWF1QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaW5fcG9saWN5Ijp7InJlZ2lvbnMiOlt7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6IkZSQTEifV0sInZlcnNpb24iOjF9LCJtZmFfZW5hYmxlZCI6ZmFsc2UsInN0YXR1cyI6IkFDVElWRSJ9LCJhdXRoZW50aWNhdGlvblR5cGUiOiJzY29wZWRLZXkiLCJzY29wZWRLZXlLZXkiOiIzOWJiMWExNDJkMzhjZDYxMmMxZCIsInNjb3BlZEtleVNlY3JldCI6IjJjYzcyODMyNmIxMTQwOWZiYmNlM2IwMTE4OWEwOGJiNzg3MWE2MDBmMWE5OGUzNTBkNjBjOTJiODZhMjMxNmMiLCJleHAiOjE3NzI4MTU4Njl9.FBHAjuEWRzaArbwkgs5f_M02-wj-FTEd5v9ork8-FVw",
   PINATA_API_KEY:"39bb1a142d38cd612c1d",

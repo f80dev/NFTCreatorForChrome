@@ -3,8 +3,9 @@
   <div style="width: 100%;text-align: center;">
     <h4 *ngIf="tokens.length>0">
       Your coins
-      <mat-icon class="icon-button" style="margin-bottom: -8px;" (click)="create_coin()">add</mat-icon>
-      <mat-icon class="icon-button" style="margin-bottom: -8px;" (click)="refresh()">refresh</mat-icon>
+      <mat-icon class="icon-button" style="margin-bottom: -8px;" (click)="create_coin()" title="Create your coin">add</mat-icon>
+      <mat-icon class="icon-button" style="margin-bottom: -8px;" (click)="refresh()" title="Refresh the list">refresh</mat-icon>
+      <mat-icon class="icon-button" style="margin-bottom: -8px;" (click)="show_account()" title="Show your coin">visibility</mat-icon>
     </h4>
 
     <div style="max-height: 200px;overflow: scroll;scrollbar-width: none;">
@@ -28,6 +29,8 @@
   <h4 *ngIf="show.indexOf('nft')>-1 && nfts.length>0">
     Your NFTs
     <mat-icon style="margin-left:5px;margin-bottom: -5px;" (click)="view_account_on_gallery(user)">visibility</mat-icon>
+    <mat-icon class="icon-button" style="margin-bottom: -8px;" (click)="refresh()" title="Refresh the list">refresh</mat-icon>
+
   </h4>
   <h4 *ngIf="show.indexOf('nft')>-1 && nfts.length==0">You don't have any NFT</h4>
   <div *ngIf="show.indexOf('nft')>-1" style="margin-top: -15px;max-height: 200px;overflow:scroll;scrollbar-width: none;">
