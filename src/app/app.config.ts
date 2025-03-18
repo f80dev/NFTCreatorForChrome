@@ -10,7 +10,6 @@ import {GoogleLoginProvider, SocialAuthServiceConfig, SocialLoginModule} from "@
 import {provideHttpClient} from "@angular/common/http";
 import {provideServiceWorker} from "@angular/service-worker";
 import {TestComponent} from "./test/test.component";
-import {IntroComponent} from "./intro/intro.component";
 import {EditorComponent} from "./editor/editor.component";
 import {AboutComponent} from "./about/about.component";
 

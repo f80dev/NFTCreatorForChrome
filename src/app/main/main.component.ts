@@ -94,6 +94,7 @@ export class MainComponent implements OnInit {
   uncrop: string=""
   filename: string="image.webp"
   clipboard=inject(ClipboardService)
+  private after: string="new"
 
   normalize(text:string) : string {
     return text.replace(/[^a-z0-9 A-Z]/gi, '');

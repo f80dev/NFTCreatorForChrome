@@ -34,10 +34,10 @@
     <img *ngFor="let nft of nfts"
          [title]="nft.name+'\n'+(nft.metadata.description ? nft.metadata.description : '')"
          style="margin: 3px;"
-                 [src]="nft.visual"
-                 [style.height]="height"
-                 [style.width]="width"
-                 (dblclick)="select(nft)">
+         [src]="nft.visual"
+         [style.height]="height"
+         [style.width]="width"
+         (dblclick)="select(nft)">
   </div>
 
   <button mat-raised-button *ngIf="selected" (click)="cancel()">Cancel</button>
