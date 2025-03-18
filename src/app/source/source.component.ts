@@ -16,6 +16,9 @@ import {MatAccordion, MatExpansionPanel, MatExpansionPanelHeader} from "@angular
 import {WalletComponent} from "../wallet/wallet.component";
 import {UserService} from "../user.service";
 import {MatDialog} from "@angular/material/dialog";
+import local = chrome.storage.local;
+import {settings} from "../../environments/settings";
+import {_prompt} from "../prompt/prompt.component";
 
 @Component({
   selector: 'app-source',
@@ -46,8 +49,6 @@ export class SourceComponent implements OnDestroy {
   generators=environment.generators
 
 
-
-
   trigger = new Subject<void>();
   private image: WebcamImage | undefined;
   router=inject(Router)
@@ -55,7 +56,6 @@ export class SourceComponent implements OnDestroy {
   user=inject(UserService)
   dialog=inject(MatDialog)
   show_source=true
-
 
 
   capture_image(img: WebcamImage) {
@@ -78,8 +78,10 @@ export class SourceComponent implements OnDestroy {
     }
   }
 
+
   clipboard_handle:any
   ngOnDestroy(): void {
+    $$("Netoyage du timer pour le presse papier")
     clearInterval(this.clipboard_handle)
   }
 
@@ -87,12 +89,24 @@ export class SourceComponent implements OnDestroy {
     this.show_source=true
     let obj:any={name:'clipboard-read'}
     if ((await navigator.permissions.query(obj)).state === 'granted') {
+      clearInterval(this.clipboard_handle)
       this.clipboard_handle=setInterval(()=>{
         $$("analyse du clipboard")
         this.paste()
       },1000)
     }
-    open(generator.value,"Images")
+    let occ=Number(localStorage.getItem(settings.appname) || "0")
+    if(occ<3){
+      showMessage(this,"Right-click on the image you want to use, copy it and return to NFT Now",2600)
+      setTimeout(()=>{
+        localStorage.setItem(settings.appname,(occ+1).toString())
+        open(generator.value,"Images")
+      },3000)
+    }else{
+      open(generator.value,"Images")
+    }
+
+
   }
 
 

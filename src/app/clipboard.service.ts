@@ -57,7 +57,6 @@ export class ClipboardService {
 
           }
 
-
       }catch (e:any){
         reject(e)
       }

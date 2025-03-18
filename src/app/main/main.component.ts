@@ -125,8 +125,13 @@ export class MainComponent implements OnInit {
     let obj:any={name: 'clipboard-read' }
 
     if ((await navigator.permissions.query(obj)).state === 'granted') {
-      let visual=await this.clipboard.paste()
-      if(visual.length>0)this.visual=visual
+      try{
+        let visual=await this.clipboard.paste()
+        if(visual.length>0)this.visual=visual
+      }catch(e:any){
+        $$("Rien dans le presse papier")
+      }
+
     }
   //transformation du visual
     if(this.visual.length>0 && params.self_storage)await this.convert_to_base64("image/webp")

@@ -29,9 +29,9 @@ export class CropperComponent implements OnChanges {
   h=0
   @Output() update_visual=new EventEmitter();
   define_zone: boolean=false
-  zoom: number=0
-  img = new Image();
-  showSave: boolean = false
+  zoom: number=1
+  img = new Image()
+  square=true;
 
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -81,7 +81,7 @@ export class CropperComponent implements OnChanges {
       let x=$event.type=="mousemove" ?  $event.clientX : $event.touches[0].clientX
       let y=$event.type=="mousemove" ?  $event.clientY : $event.touches[0].clientY
       this.w_zone=x-this.x_zone
-      this.h_zone=y-this.y_zone
+      this.h_zone=this.square ? this.w_zone : y-this.y_zone
     }
   }
 
@@ -96,5 +96,9 @@ export class CropperComponent implements OnChanges {
 
   async _rotate() {
     this.update_visual.emit(await rotate(this.visual,-90))
+  }
+
+  force_square() {
+    this.square=!this.square
   }
 }

@@ -178,12 +178,12 @@ export function get_transactions(api:ApiService,smartcontract_addr:string,abi=nu
   })
 }
 
-export function getExplorer(addr = "", network = "elrond-devnet",service="accounts", tools = "xspotlight"): string {
+export function getExplorer(addr = "", network = "elrond-devnet",service="accounts", tools = "xspotlight",suffixe=""): string {
   let url = ""
   let isMain: boolean = (network.indexOf("devnet") == -1)
   if (network.indexOf("elrond") > -1) {
     if (tools == "xspotlight") url = "https://" + (isMain ? "" : "devnet.") + "xspotlight.com/" + addr;
-    if (tools == "explorer") url = "https://" + (isMain ? "" : "devnet-") + "explorer.multiversx.com/"+service+"/" + addr;
+    if (tools == "explorer") url = "https://" + (isMain ? "" : "devnet-") + "explorer.multiversx.com/"+service+"/" + addr+suffixe;
   }
 
   if (network.indexOf("polygon") > -1) {
