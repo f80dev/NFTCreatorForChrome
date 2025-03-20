@@ -1,21 +1,19 @@
 import {
-  Address, BigIntValue, BigUIntValue, BytesValue,
-  SmartContractTransactionsFactory, TokenManagementTransactionsFactory,
-  TokenTransfer, Transaction, TransactionOnNetwork,
+  Account,
+  Address, BytesValue, SmartContractController,
+  SmartContractTransactionsFactory, TokenManagementController, TokenManagementTransactionsFactory,
+  TokenTransfer, Transaction, TransactionComputer, TransactionOnNetwork,
   TransactionsFactoryConfig
 } from "@multiversx/sdk-core/out";
 import { UserSigner } from "@multiversx/sdk-wallet";
-import { QueryRunnerAdapter, SmartContractQueriesController,AbiRegistry,TransactionWatcher,SmartContractTransactionsOutcomeParser, TransactionsConverter   } from "@multiversx/sdk-core";
+import { AbiRegistry,SmartContractQuery,SmartContractTransactionsOutcomeParser,DevnetEntrypoint,MainnetEntrypoint,SmartContractQueryResponse} from "@multiversx/sdk-core";
 import { ApiNetworkProvider } from "@multiversx/sdk-network-providers";
 import {AccountOnNetwork} from "@multiversx/sdk-network-providers/out";
 import {ApiService} from "./api.service";
 import {UserService} from "./user.service";
 import {Octokit} from "@octokit/rest";
 import {$$, now} from "../tools";
-import {numberToPaddedHex, utf8ToHex} from '@multiversx/sdk-core/out/utils.codec';
-import {gatherAllEvents} from '@multiversx/sdk-core/out/transactionsOutcomeParsers/resources';
 import {abi, settings} from '../environments/settings';
-import {PlainSignedTransaction} from "@multiversx/sdk-web-wallet-provider/out/plainSignedTransaction";
 import {environment} from "../environments/environment";
 
 export const DEVNET="https://devnet-api.multiversx.com"
@@ -102,7 +100,7 @@ export async function create_abi(abi_content:any,api:any=null): Promise<AbiRegis
   return new Promise(async (resolve, reject) => {
     try{
       if(!api)
-        {resolve(AbiRegistry.create(abi_content))}
+      {resolve(AbiRegistry.create(abi_content))}
       else{
         api._get(abi_content, { encoding: "utf8" }).subscribe({
           next:(r:string)=>{resolve(AbiRegistry.create(JSON.parse(r)))}
@@ -150,20 +148,21 @@ export function usersigner_from_pem(pemText:string) : UserSigner {
 
 
 
+
 export function get_transactions(api:ApiService,smartcontract_addr:string,abi=null,network="devnet") : Promise<any[]> {
   //voir la documentation https://api.multiversx.com/
   return new Promise(async (resolve, reject) => {
     try{
+      const entrypoint = network.indexOf("devnet")>-1 ? new DevnetEntrypoint() : new MainnetEntrypoint()
       let transactions=await mvx_api("/accounts/"+smartcontract_addr+"/transactions","size=200",api,network)
       let rc=[]
       if(abi){
-        const converter=new TransactionsConverter()
+        const converter=new TransactionComputer()
         const parser=new SmartContractTransactionsOutcomeParser({abi: abi});
 
         for(let t of transactions){
-          t=new Transaction(t)
-          const transactionOutcome = converter.transactionOnNetworkToOutcome(t)
-          rc.push(parser.parseExecute({ transactionOutcome }))
+          const transactionOnNetwork:any = await entrypoint.getTransaction(t.hash);
+          rc.push(parser.parseExecute(transactionOnNetwork))
         }
       }else{
         for(let t of transactions){
@@ -178,12 +177,12 @@ export function get_transactions(api:ApiService,smartcontract_addr:string,abi=nu
   })
 }
 
-export function getExplorer(addr = "", network = "elrond-devnet",service="accounts", tools = "xspotlight",suffixe=""): string {
+export function getExplorer(addr = "", network = "elrond-devnet",service="accounts", tools = "xspotlight"): string {
   let url = ""
   let isMain: boolean = (network.indexOf("devnet") == -1)
   if (network.indexOf("elrond") > -1) {
     if (tools == "xspotlight") url = "https://" + (isMain ? "" : "devnet.") + "xspotlight.com/" + addr;
-    if (tools == "explorer") url = "https://" + (isMain ? "" : "devnet-") + "explorer.multiversx.com/"+service+"/" + addr+suffixe;
+    if (tools == "explorer") url = "https://" + (isMain ? "" : "devnet-") + "explorer.multiversx.com/"+service+"/" + addr;
   }
 
   if (network.indexOf("polygon") > -1) {
@@ -197,25 +196,38 @@ export function getExplorer(addr = "", network = "elrond-devnet",service="accoun
 }
 
 
-
+//voir https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook-v14#creating-transactions
 export function create_transaction(function_name:string,args:any[],
                                    user:UserService,tokens_to_transfer: TokenTransfer[],
                                    gasLimit=50000000n, contract_addr="") : Promise<Transaction>  {
-  return new Promise(async (resolve) => {
-    const factoryConfig = new TransactionsFactoryConfig({ chainID: user.get_chain_id() });
-    let factory = new SmartContractTransactionsFactory({config: factoryConfig,abi:await create_abi(abi)});
-    const apiNetworkProvider = new ApiNetworkProvider(user.network.indexOf("devnet")>-1 ? DEVNET : MAINNET);
-    if(contract_addr=="")contract_addr=user.get_sc_address()
-    let _sender=await apiNetworkProvider.getAccount(Address.fromBech32(user.address))
 
-    let transaction=factory.createTransactionForExecute({
-      sender: _sender.address,
-      contract: Address.fromBech32(contract_addr),
+  return new Promise(async (resolve) => {
+    const entrypoint = user.network.indexOf("devnet")>-1 ? new DevnetEntrypoint() : new MainnetEntrypoint()
+    let controller = entrypoint.createSmartContractController(await create_abi(abi));
+
+    if(contract_addr=="")contract_addr=user.get_sc_address()
+    let nonce=await entrypoint.recallAccountNonce(Address.newFromBech32(user.address))
+
+    let option:any={
+      contract: Address.newFromBech32(contract_addr),
       function: function_name,
       gasLimit: gasLimit,
       arguments: args,
-      tokenTransfers:tokens_to_transfer
-    });
+    }
+    if(tokens_to_transfer.length>0)option.tokenTransfers=tokens_to_transfer
+
+    let transaction=await controller.createTransactionForExecute(user.getAccount(),nonce,option);
+
+    transaction.nonce=BigInt(user.account!.nonce)
+
+    if(user.provider){
+      transaction.signature=await user.provider.signTransaction(transaction)
+    }
+
+    if(user.pem_account){
+      await entrypoint.signTransaction(transaction,user.getAccount())
+    }
+
     resolve(transaction)
   })
 }
@@ -224,23 +236,25 @@ export function level(lv=1) : boolean {
   return settings.ihm_level>=lv
 }
 
-function execute_transaction(transaction:Transaction,function_name:string,user:UserService) {
+
+
+
+function execute_transaction(transaction:Transaction,user:UserService) : Promise<{ values: any[]; returnCode: string; returnMessage: string}> {
   return new Promise(async (resolve, reject) => {
     try{
-      const apiNetworkProvider = new ApiNetworkProvider(user.network.indexOf("devnet")>-1 ? DEVNET : MAINNET);
+      const entrypoint = user.network.indexOf("devnet")>-1 ? new DevnetEntrypoint() : new MainnetEntrypoint()
 
-      let sign_transaction=await user.provider.signTransaction(transaction)
 
-      const transactionOnNetworkUsingApi = await new TransactionWatcher(apiNetworkProvider)
-        .awaitCompleted(await apiNetworkProvider.sendTransaction(sign_transaction));
-      const transactionOutcome = new TransactionsConverter().transactionOnNetworkToOutcome(transactionOnNetworkUsingApi);
-      if(transactionOutcome.directSmartContractCallOutcome.returnCode!="ok"){
-        reject({message:transactionOutcome.directSmartContractCallOutcome.returnCode})
+      //voir https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook-v14#parsing-transaction-outcome
+
+      let txHash=await entrypoint.sendTransaction(transaction)
+      const transactionOnNetwork = await entrypoint.awaitCompletedTransaction(txHash);
+      const parsedOutcome = new SmartContractTransactionsOutcomeParser({abi:await create_abi(abi)}).parseExecute({transactionOnNetwork:transactionOnNetwork})
+
+      if(parsedOutcome.returnCode!="ok"){
+        reject({message:parsedOutcome.returnMessage,code:parsedOutcome.returnCode})
       }else{
-        //voir https://multiversx.github.io/mx-sdk-js-core/v13/classes/SmartContractTransactionsOutcomeParser.html
-        const parsedOutcome = new SmartContractTransactionsOutcomeParser({abi:await create_abi(abi)}).parseExecute(
-          { transactionOutcome:transactionOutcome,function:function_name }
-        );
+
         $$("Resultat transaction ",parsedOutcome)
         resolve(parsedOutcome)
       }
@@ -248,11 +262,12 @@ function execute_transaction(transaction:Transaction,function_name:string,user:U
       reject(e.message)
     }
   })
-
 }
 
+
+
 export function send_transaction_with_transfers(user:UserService,function_name:string,args:any[],
-                                                tokens_to_transfer: TokenTransfer[],
+                                                tokens_to_transfer: TokenTransfer[]=[],
                                                 gasLimit=50000000n, contract_addr="") {
   return new Promise(async (resolve, reject) => {
     if(!user || !user.network)reject(false);
@@ -262,10 +277,9 @@ export function send_transaction_with_transfers(user:UserService,function_name:s
     let transaction = await create_transaction(function_name,args,user,tokens_to_transfer,gasLimit,contract_addr)
 
     await user.refresh()
-    transaction.nonce=BigInt(user.account!.nonce)
 
     try{
-      resolve(await execute_transaction(transaction,function_name,user))
+      resolve(await execute_transaction(transaction,user))
     }catch (e){
       reject(e)
     }
@@ -273,155 +287,6 @@ export function send_transaction_with_transfers(user:UserService,function_name:s
   })
 }
 
-//
-// export async function send_esdt(provider:any,function_name:string,sender_addr:string,dest:string,
-//                                        token,nonce,value,_abi:any=abi,
-//                                        _type: string="",gasLimit=50000000n) {
-//   //envoi d'une transaction
-//
-//
-//   return new Promise(async (resolve, reject) => {
-//     const factoryConfig = new TransactionsFactoryConfig({chainID: "D"});
-//     let factory = new SmartContractTransactionsFactory({
-//       config: factoryConfig,
-//       abi: await create_abi(_abi)
-//     });
-//
-//     const tx2 = await factory.createTransactionForESDTTokenTransfer({
-//       sender: sender_addr,
-//       receiver: dest,
-//       nonce:nonce,
-//       tokenTransfers: [
-//         new TokenTransfer({
-//           token: new Token({identifier: token}),
-//           amount: 10000n
-//         })
-//       ]
-//     });
-//
-//   })
-// }
-
-
-
-
-export async function send_transaction(user:UserService,function_name:string,
-                                       args:any,contract_addr:string="",
-                                       token="",nonce=0,value=0,_abi:any=abi,
-                                       _type: string="",gasLimit=50000000n) {
-  //envoi d'une transaction
-
-  return new Promise(async (resolve, reject) => {
-
-    if (contract_addr == "") contract_addr = user.get_sc_address()
-    if (!user.provider) {
-      reject("Impossible de determiner l'envoyeur")
-    }
-
-    let user_signer = null
-    if (typeof (user.provider) == "object" && user.provider.hasOwnProperty("file")) {
-      user.provider = atob(user.provider.file.split("base64,")[1])
-    }
-    if (typeof (user.provider) == "string") {
-      user_signer = UserSigner.fromPem(user.provider)
-      user.address = user_signer.getAddress().bech32()
-    }
-
-    const factoryConfig = new TransactionsFactoryConfig({chainID: user.get_chain_id()});
-    let factory = new SmartContractTransactionsFactory({
-      config: factoryConfig,
-      abi: await create_abi(_abi)
-    });
-    //voir https://github.com/multiversx/mx-sdk-js-web-wallet-provider/blob/main/src/walletProvider.ts
-    const apiNetworkProvider = new ApiNetworkProvider(user.get_domain());
-
-    //voir https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook-v13#signing-objects
-
-    let sender = Address.fromBech32(user.address);
-    let _sender = await apiNetworkProvider.getAccount(sender)
-
-    // const pemText = await promises.readFile("../wallet/user1.pem", { encoding: "utf8" });
-    // let signer = UserSigner.fromPem(pemText);
-
-    // voir l'exemple https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook-v13#perform-a-contract-deployment
-
-
-    //voir https://multiversx.github.io/mx-sdk-js-core/v13/classes/TokenTransfer.html
-
-    let transaction: Transaction | undefined
-    console.log("Transaction sur le contrat https://devnet-explorer.multiversx.com/accounts/" + contract_addr)
-
-    // if(_type==""){
-    //   transaction = factory.createTransactionForExecute({
-    //     sender: sender,
-    //     contract: Address.fromBech32(contract_addr),
-    //     function: function_name,
-    //     gasLimit: gasLimit,
-    //     arguments: args
-    //   });
-    // }
-    //
-    // if(_type.startsWith("Semi")){
-    //   let _t=TokenTransfer.semiFungible(token,nonce,value)
-    //   transaction = factory.createTransactionForExecute({
-    //     sender: sender,
-    //     contract: Address.fromBech32(contract_addr),
-    //     function: function_name,
-    //     gasLimit: gasLimit,
-    //     arguments: args,
-    //     tokenTransfers:[_t]
-    //   });
-    // }
-    //
-    //
-    // if(_type.startsWith("Fungible")){
-    //   let _t=TokenTransfer.fungibleFromAmount(token,value,18)
-    //   transaction = factory.createTransactionForExecute({
-    //       sender: sender,
-    //       contract: Address.fromBech32(contract_addr),
-    //       function: function_name,
-    //       gasLimit: gasLimit,
-    //       arguments: args,
-    //       tokenTransfers: [_t]
-    //     })
-    // }
-    //
-    // if(_type.startsWith("NonFungible")){
-    //   let _t=TokenTransfer.nonFungible(token,nonce)
-    //     transaction = factory.createTransactionForExecute({
-    //       sender: sender,
-    //       contract: Address.fromBech32(contract_addr),
-    //       function: function_name,
-    //       gasLimit: gasLimit,
-    //       tokenTransfers: [_t],
-    //       arguments: args
-    //     });
-    //   }
-    //
-
-    //voir https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook-v13#transfer--execute
-
-    //voir https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-signing-providers/#signing-transactions-1
-    //voir exemple https://github.com/multiversx/mx-sdk-js-examples/blob/0d35714c9172ea5a31a7563a155a942b9249782e/signing-providers/src/extension.js#L52
-    if (transaction) {
-      transaction.nonce = BigInt(_sender.nonce)
-
-      let sign_transaction
-      if (!user_signer) {
-        sign_transaction = await user.provider.signTransaction(transaction)
-      } else {
-        transaction.signature = await user_signer.sign(transaction.serializeForSigning())
-        sign_transaction = transaction
-      }
-
-      try {
-        resolve(await execute_transaction(transaction, function_name, user))
-      } catch (e) {
-        reject(e)
-      }
-    }
-  })
-}
 
 export function toText(array:Uint8Array) : string {
   return new TextDecoder('utf-8').decode(array)
@@ -439,8 +304,7 @@ async function signTransaction(t:Transaction,user:UserService) : Promise<Transac
 export async function set_roles_to_collection(collection_id:string, user:UserService,type_collection:string="SFT",burn=false,update=false) {
   let factory = new TokenManagementTransactionsFactory({config: new TransactionsFactoryConfig({ chainID: user.get_chain_id() })});
   $$("Affectation des roles sur la collection "+collection_id+" de type "+type_collection)
-  let setRoleTransaction=factory.createTransactionForSettingSpecialRoleOnNonFungibleToken({
-    sender: Address.fromBech32(user.address),
+  let setRoleTransaction=factory.createTransactionForSettingSpecialRoleOnNonFungibleToken( Address.fromBech32(user.address),{
     addRoleNFTAddURI: update,
     addRoleNFTUpdateAttributes: update,
     user: Address.fromBech32(user.address),
@@ -451,22 +315,19 @@ export async function set_roles_to_collection(collection_id:string, user:UserSer
     addRoleESDTModifyCreator:update
   })
   if(type_collection=="SFT"){
-    setRoleTransaction=factory.createTransactionForSettingSpecialRoleOnSemiFungibleToken({
-      sender: Address.fromBech32(user.address),
+    setRoleTransaction=factory.createTransactionForSettingSpecialRoleOnSemiFungibleToken(Address.fromBech32(user.address),{
       user: Address.fromBech32(user.address),
       tokenIdentifier: collection_id,
       addRoleESDTTransferRole: update,
       addRoleNFTAddQuantity: update,
       addRoleNFTBurn: burn,
       addRoleNFTCreate: true,
-      addRoleESDTModifyCreator:update
     })
   }
 
   user.refresh()
   setRoleTransaction.nonce=BigInt(user.account!.nonce)
-  let sign_setRoleTransaction=await signTransaction(setRoleTransaction,user)
-  let rc:any=await executeTransaction(sign_setRoleTransaction,user)
+  let rc:any=await execute_transaction(setRoleTransaction,user)
   return rc
 }
 
@@ -480,7 +341,6 @@ export async function create_collection(name:string,user:UserService,vm:any=null
 
   let option={
     name: name,
-    sender: Address.fromBech32(user.address),
     tokenName:name,
     tokenTicker:name.replace(" ","").toUpperCase().substring(0,10),
     canAddSpecialRoles: true,
@@ -492,15 +352,15 @@ export async function create_collection(name:string,user:UserService,vm:any=null
     canWipe: true,
   }
 
-  let transaction=factory.createTransactionForIssuingNonFungible({...option})
+  let transaction=factory.createTransactionForIssuingNonFungible(Address.fromBech32(user.address),{...option})
   if(collection_type=="SFT"){
-    transaction=factory.createTransactionForIssuingSemiFungible({...option})
+    transaction=factory.createTransactionForIssuingSemiFungible(Address.fromBech32(user.address),{...option})
   }
 
   await user.refresh()
   transaction.nonce=BigInt(user.account!.nonce)
-  let sign_transaction=await signTransaction(transaction,user)
-  let result:any=await executeTransaction(sign_transaction,user)
+
+  let result=await execute_transaction(transaction,user)
 
   let collection_id=new TextDecoder("utf-8").decode(result.values[0])
 
@@ -523,19 +383,6 @@ export async function get_collections(user:UserService,api:ApiService) {
   return rc
 }
 
-async function executeTransaction(sign_transaction:Transaction,user:UserService) : Promise<{ values: any[]; returnCode: string; returnMessage: string}>{
-  try{
-    const apiNetworkProvider = new ApiNetworkProvider(user.network.indexOf("devnet")>-1 ? DEVNET : MAINNET);
-    let hash=await apiNetworkProvider.sendTransaction(sign_transaction)
-    let _t=await new TransactionWatcher(apiNetworkProvider).awaitCompleted(hash);
-    let rc =new SmartContractTransactionsOutcomeParser().parseExecute({transactionOnNetwork:_t});
-    return rc
-  }catch(e:any){
-    $$("erreur ",e)
-    return {values:[],returnCode:"500",returnMessage:e.message}
-  }
-}
-
 
 export function view_nft(user:UserService,identifier:string,explorer=environment.nft_viewer) {
   let url=explorer.replace("%identifier%",identifier)
@@ -543,6 +390,9 @@ export function view_nft(user:UserService,identifier:string,explorer=environment
   open(url,"Gallery")
 }
 
+function getEntrypoint(user:UserService){
+  return user.network.indexOf("devnet")>-1 ? new DevnetEntrypoint() : new MainnetEntrypoint()
+}
 
 //buildNFT
 export async function makeNFT(identifier:string,name:string,visual:string,user:UserService,
@@ -552,53 +402,45 @@ export async function makeNFT(identifier:string,name:string,visual:string,user:U
   //Creation depuis le wallet Mvx : ESDTNFTCreate@SFT-55f2b5@@Londres@2500@QmNq8Kb8J2Aq3fqWu8jRHEvUvyAEwrHt8DSrqAhAWStiDE@tags:;metadata:QmaoTy3G7Cpb72czvs384qFQUqWeWBdTs5grHk311AassH@https://ipfs.io/ipfs/QmNq8Kb8J2Aq3fqWu8jRHEvUvyAEwrHt8DSrqAhAWStiDE
 
   $$("Construction de "+name+" sur la collection "+identifier+" en quantite "+quantity)
-
+  const entrypoint=getEntrypoint(user)
   //if(metadata_url.length>0)uris.unshift(metadata_url)
   if(uris.length==0 || uris[0]!=visual)uris.unshift(visual)
 
-  let factory = new TokenManagementTransactionsFactory({
-    config: new TransactionsFactoryConfig({ chainID:user.get_chain_id() })
-  });
-  let transaction=factory.createTransactionForCreatingNFT({
+  let controller = entrypoint.createTokenManagementController()
+  let transaction=await controller.createTransactionForCreatingNft(
+    user.getAccount(),
+    BigInt(user.account!.nonce),
+    {
     attributes: new TextEncoder().encode(metadata),
     hash: hash,
     initialQuantity: BigInt(quantity),
     name: name,
     royalties: Math.round(royalties*100),
-    sender: Address.fromBech32(user.address),
+
     tokenIdentifier: identifier,
     uris: uris,
   })
   transaction.gasLimit=environment.max_gaz
   user.refresh()
-  transaction.nonce=BigInt(user.account!.nonce)
 
-  let sign_transaction=await signTransaction(transaction,user)
-  return await executeTransaction(sign_transaction,user)
-
-  //voir https://docs.multiversx.com/tokens/nft-tokens/#creation-of-an-nft
-  //voir https://docs.multiversx.com/developers/sc-calls-format/#converting-numeric-values-in-javascript
-  //voir https://github.com/multiversx/mx-sdk-js-core/blob/main/src/utils.codec.ts
+  return await execute_transaction(transaction,user)
 }
 
 
-export async function query(function_name:string,args:any[],domain:string,sc_address:string) : Promise<any> {
-  //voir https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook-v13#contract-queries
+//voir https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook-v14#querying-smart-contracts
+export async function query(function_name:string,args:any[],domain:string,sc_address:string,network="devnet") : Promise<any> {
   return new Promise(async (resolve, reject) => {
-    if (domain.endsWith("/")) domain = domain.substring(0, domain.length - 1)
-    const apiNetworkProvider = new ApiNetworkProvider(domain)
-    const queryRunner = new QueryRunnerAdapter({networkProvider: apiNetworkProvider});
-    let controller = new SmartContractQueriesController({
-      queryRunner: queryRunner,
-      abi: await create_abi(abi)
-    });
-    const query = controller.createQuery({
-      contract: sc_address,
+    const entrypoint = network.indexOf("devnet")>-1 ? new DevnetEntrypoint() : new MainnetEntrypoint()
+
+    const controller=entrypoint.createSmartContractController(await create_abi(abi))
+    const query = new SmartContractQuery({
+      contract: Address.fromBech32(sc_address),
       function: function_name,
       arguments: args,
-    });
+    })
+
     try {
-      const response = await controller.runQuery(query);
+      const response=await controller.runQuery(query)
       let jsonResponse = controller.parseQueryResponse(response)
       resolve(jsonResponse[0])
     } catch (e) {
@@ -616,8 +458,7 @@ export async  function deploy(user:UserService,code:BytesValue) {
   });
   let args = [10];
 
-  const deployTransaction = factory.createTransactionForDeploy({
-    sender: Address.fromBech32(user.address),
+  const deployTransaction = factory.createTransactionForDeploy(Address.fromBech32(user.address),{
     bytecode: code.valueOf(),
     gasLimit: 6000000n,
     arguments: args

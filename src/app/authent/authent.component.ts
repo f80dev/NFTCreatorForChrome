@@ -2,19 +2,18 @@
 import {Component, EventEmitter, Input, OnChanges,  OnInit, Output, SimpleChanges} from '@angular/core';
 import {NetworkService} from "../network.service";
 import { NativeAuthClient } from "@multiversx/sdk-native-auth-client";
-import {$$, isEmail, isLocal, now,  showError, showMessage} from "../../tools";
-import {MatSnackBar} from "@angular/material/snack-bar";
+import {$$, isEmail,  now,  showError, showMessage} from "../../tools";
+
 import {environment} from "../../environments/environment";
 import {Location, NgIf} from "@angular/common";
-import {ActivatedRoute} from "@angular/router";
-import {GoogleSigninButtonModule, SocialAuthService} from "@abacritt/angularx-social-login";
+
 import {Connexion, Operation} from "../../operation";
-import {ADDR_ADMIN} from "../../definitions";
+
 import {DeviceService} from "../device.service";
-import { WalletConnectV2Provider } from "@multiversx/sdk-wallet-connect-provider";
+//import { WalletConnectV2Provider } from "@multiversx/sdk-wallet-connect-provider";
 import { ExtensionProvider } from "@multiversx/sdk-extension-provider";
 import {WALLET_PROVIDER_DEVNET, WALLET_PROVIDER_MAINNET, WalletProvider} from "@multiversx/sdk-web-wallet-provider";
-import {Socket} from "ngx-socket-io";
+
 import {EvmWalletServiceService} from "../evm-wallet-service.service";
 import {_prompt} from "../prompt/prompt.component";
 import {MatDialog} from "@angular/material/dialog";
@@ -27,7 +26,6 @@ import {MatIcon} from "@angular/material/icon";
 import {UploadFileComponent} from "../upload-file/upload-file.component";
 import {MatButton} from "@angular/material/button";
 import {XALIAS_PROVIDER_DEVNET, XALIAS_PROVIDER_MAINNET} from "@multiversx/sdk-web-wallet-provider/out";
-import {eval_direct_url_xportal} from "../../crypto";
 import {QRCodeComponent} from 'angularx-qrcode';
 import {settings} from '../../environments/settings';
 import {HourglassComponent, wait_message} from "../hourglass/hourglass.component";
@@ -43,6 +41,16 @@ enum Wallet_Operation {
   SignMessage = "signMessage",
   CancelAction = "cancelAction",
 }
+
+
+
+
+export function eval_direct_url_xportal(uri:string) : string {
+  let rc="https://xportal.com/?wallet-connect="+uri; //"+this.provider.?relay-protocol%3Dirn&symKey=2a0e80dd8b982dac05eef5ce071fbe541d390fc302666d09856ae379416bfa6e"
+  return "https://maiar.page.link/?apn=com.elrond.maiar.wallet&isi=1519405832&ibi=com.elrond.maiar.wallet&link="+encodeURIComponent(rc);
+}
+
+
 
 interface IExtensionAccount {
   address: string;
@@ -64,7 +72,6 @@ interface IExtensionAccount {
     ScannerComponent,
     CdkCopyToClipboard,
     InputComponent,
-    GoogleSigninButtonModule,
     MatIcon,
     UploadFileComponent,
     NgIf,
@@ -153,23 +160,21 @@ export class AuthentComponent implements OnInit,OnChanges {
   message: string=""
 
   constructor(
-      public api:NetworkService,
-      public _location:Location,
-      public socket:Socket,
-      public dialog:MatDialog,
-      public user:UserService,
-      public device:DeviceService,
-      public socialAuthService: SocialAuthService,
-      public evmwalletservice:EvmWalletServiceService
+    public api:NetworkService,
+    public _location:Location,
+    public dialog:MatDialog,
+    public user:UserService,
+    public device:DeviceService,
+    public evmwalletservice:EvmWalletServiceService
   ) {
   }
 
 
   private toHex(stringToConvert: string) {
     return stringToConvert
-        .split('')
-        .map((c) => c.charCodeAt(0).toString(16).padStart(2, '0'))
-        .join('');
+      .split('')
+      .map((c) => c.charCodeAt(0).toString(16).padStart(2, '0'))
+      .join('');
   }
 
 
@@ -188,25 +193,12 @@ export class AuthentComponent implements OnInit,OnChanges {
       //   }
       // });
 
-      if (isLocal(settings.appli) && this.showAccesCode && this.autoconnect_for_localhost) {
-        this.onauthent.emit({address: ADDR_ADMIN,provider:this.provider,strong:true,encrypted:"",url_direct_xportal_connect:this.url_xportal_direct_connect});
-      }
+      // if (isLocal(settings.appli) && this.showAccesCode && this.autoconnect_for_localhost) {
+      //   this.onauthent.emit({address: ADDR_ADMIN,provider:this.provider,strong:true,encrypted:"",url_direct_xportal_connect:this.url_xportal_direct_connect});
+      // }
     }
 
 
-    if(this.showGoogle){
-      this.socialAuthService.authState.subscribe((socialUser) => {
-        this.strong=true;
-        this.onauthent.emit({
-          address: socialUser.email,
-          provider:this.provider,
-          strong:true,
-          encrypted:"",
-          url_direct_xportal_connect:this.url_xportal_direct_connect});
-      },(err)=>{
-        $$("Erreur de connexion",err);
-      });
-    }
   }
 
 
@@ -249,12 +241,12 @@ export class AuthentComponent implements OnInit,OnChanges {
       this.refresh();
       //Création d'un validateur nécéssaire pour le nfluent wallet connect
       let validator_name="val_"+now("rand")
-      if(this.connexion.nfluent_wallet_connect && this.socket){
-        this.socket.on(validator_name,((data:any) => {
-          this.address=data.address;
-          this.success()
-        }))
-      }
+      // if(this.connexion.nfluent_wallet_connect && this.socket){
+      //   this.socket.on(validator_name,((data:any) => {
+      //     this.address=data.address;
+      //     this.success()
+      //   }))
+      // }
 
       // if(this.operation.length>0){
       //   $$("On utilise "+this.operation+" pour le paramétrage du module");
@@ -405,7 +397,7 @@ export class AuthentComponent implements OnInit,OnChanges {
         next:(r:any)=>{
           this.address=r.address;
           this.strong_connect();
-          },
+        },
         error:()=>{showMessage(this,'Phrase incorrecte');}
       })
     }
@@ -414,18 +406,18 @@ export class AuthentComponent implements OnInit,OnChanges {
 
   onflash($event: {data:string}) {
     //Flash du nfluent_wallet
-      if($event.data.length>20){
-        let addr=$event.data
-        addr=addr.replace("multiversx:","").split("?")[0]
-        $$("Lecture de l'adresse "+addr);
-        this.api.check_access_code(addr).subscribe((result:any)=>{
-          this.address=result.addr;
-          this.enabled_webcam=false;
-          this.validate();
-        },(err:any)=>{
-          showMessage(this,"Code incorrect")
-        })
-      }
+    if($event.data.length>20){
+      let addr=$event.data
+      addr=addr.replace("multiversx:","").split("?")[0]
+      $$("Lecture de l'adresse "+addr);
+      this.api.check_access_code(addr).subscribe((result:any)=>{
+        this.address=result.addr;
+        this.enabled_webcam=false;
+        this.validate();
+      },(err:any)=>{
+        showMessage(this,"Code incorrect")
+      })
+    }
 
   }
 
@@ -437,13 +429,13 @@ export class AuthentComponent implements OnInit,OnChanges {
 
   update_dynamic_token() {
     navigator.clipboard.readText().then(
-        text => {
-          this.onflash({data:text});
-        }
+      text => {
+        this.onflash({data:text});
+      }
     ).catch(error => {
-              showMessage(this,'Impossible de lire le presse-papier');
-            }
-        );
+        showMessage(this,'Impossible de lire le presse-papier');
+      }
+    );
 
   }
 
@@ -488,11 +480,14 @@ export class AuthentComponent implements OnInit,OnChanges {
     //voir https://github.com/multiversx/mx-sdk-js-examples/tree/main/signing-providers
     this.provider=await ExtensionProvider.getInstance();
     try{
-      await this.provider.init();
+      await this.provider.init()
       let wallet=await this.provider.login()  //{ token: await this.createNativeAuthInitialPart() }
+
+      //this.account=wallet.getAccount()
       if(wallet.address.length>0){
         this.strong=true;
         this.validate(wallet.address);
+
       } else {
         this.strong=false;
         this.oninvalid.emit(false);
@@ -503,17 +498,23 @@ export class AuthentComponent implements OnInit,OnChanges {
       this.oninvalid.emit(false);
     }
   }
+
+
+
   async open_web_wallet(service="standard"){
     //tag webwallet open_webwallet
     //https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-signing-providers/#the-web-wallet-provider
     let connexion_mode=this.network.indexOf("devnet")>-1 ? WALLET_PROVIDER_DEVNET : WALLET_PROVIDER_MAINNET
     if(service=="xAlias")connexion_mode=this.network.indexOf("devnet")>-1 ? XALIAS_PROVIDER_DEVNET : XALIAS_PROVIDER_MAINNET
+
     this.provider=new WalletProvider(connexion_mode)
     this.provider.redirectDelayMilliseconds=30000
 
     const callback_url = this.callback=="" ? encodeURIComponent(this._location.path(true)) : encodeURIComponent(this.callback)
     try{
+
       let address=await this.provider.login({callback_url,token:await this.createNativeAuthInitialPart()})
+
       this.strong=address.length>0;
       if(this.strong){
         this.validate(address);
@@ -538,12 +539,12 @@ export class AuthentComponent implements OnInit,OnChanges {
       onClientLogin: async ()=> {
         $$("Connexion wallet connect ")
         this.address=await this.provider.getAddress();
-        },
+      },
       onClientLogout: ()=> {
         $$("Déconnexion de wallet connect")
       },
     }
-    this.provider = new WalletConnectV2Provider(callbacks, this.user.get_chain_id(), this.relayUrl, this.walletConnect_ProjectId);
+    //this.provider = new WalletConnectV2Provider(callbacks, this.user.get_chain_id(), this.relayUrl, this.walletConnect_ProjectId);
 
     try{
       wait_message(this,"Connexion")
@@ -616,9 +617,9 @@ export class AuthentComponent implements OnInit,OnChanges {
     })
   }
 
-    run_scanner() {
-      this.enabled_webcam=true;
-    }
+  run_scanner() {
+    this.enabled_webcam=true;
+  }
 
   on_retreive_address($event: any) {
     this.address=$event.data;

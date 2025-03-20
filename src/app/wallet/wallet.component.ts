@@ -111,6 +111,6 @@ export class WalletComponent implements OnChanges {
   protected readonly view_account_on_gallery = view_account_on_gallery;
 
   show_account() {
-    open(getExplorer(this.user.address,this.user.network,"accounts","explorer","/tokens"),"Account")
+    open(getExplorer(this.user.address,this.user.network,"accounts","explorer"),"Account")
   }
 }

@@ -4,16 +4,13 @@ import {_ask_for_authent} from "./authent-dialog/authent-dialog.component";
 import {query, toAccount, usersigner_from_pem} from "./mvx";
 import {$$, showMessage} from "../tools";
 import {ApiService} from './api.service';
-import {Location} from '@angular/common';
 import {DeviceService} from './device.service';
 import {Connexion} from '../operation';
 import {settings} from "../environments/settings";
 import {environment} from "../environments/environment";
-import {Account, UserSigner} from "@multiversx/sdk-core/out";
+import {Account, ApiNetworkProvider, KeyPair, UserSigner} from "@multiversx/sdk-core/out";
 import {AccountOnNetwork} from "@multiversx/sdk-network-providers/out";
-import add = chrome.systemLog.add;
-
-(window as any).global = window;
+import {Router} from "@angular/router";
 
 @Injectable({
   providedIn: 'root'
@@ -24,19 +21,16 @@ export class UserService {
   provider: any
   strong: boolean=false
   tokens:any={}
-  location=inject(Location)
+  api=inject(ApiService)
+  router=inject(Router)
+
   device=inject(DeviceService)
   addr_change = new Subject<string>();
 
   network:string=settings.network || "elrond-devnet"
-  params:any
-  nonce:number=0
-
-  tokemons: any[] = []
-  visibility: number = 0
-  account: AccountOnNetwork | undefined;
+  account: AccountOnNetwork | undefined
   idx:number=0
-  fee=0;
+
   zone: any;
   connexion:Connexion={
     address: false,
@@ -55,7 +49,9 @@ export class UserService {
   }
   preview: boolean = false;
   balance: number=0
-  action_after_mint: string = "";
+  pem_account: Account | undefined
+  action_after_mint: string=""
+  params: any={}
 
   constructor() { }
 
@@ -65,7 +61,7 @@ export class UserService {
     provider: any;
     encrypted: string;
     url_direct_xportal_connect: string
-  }) {
+  },required_balance=0,message_balance="") {
     let rc=(this.address.length>0 && this.address!=$event.address)   //True s'il y a changement d'adresse
     this.address = $event.address
     localStorage.setItem("address",this.address)
@@ -73,8 +69,13 @@ export class UserService {
     this.provider = $event.provider
     this.strong=$event.strong
     this.addr_change.next(this.address)
+
+    await this.init_balance(this.api)
+    if(required_balance>0 && this.balance<required_balance)this.router.navigate(["faucet"],{queryParams:{message:message_balance}})
+
     return rc
   }
+
 
   isConnected(strong=false) : boolean {
     return this.address!="" && (this.provider || !strong)
@@ -108,7 +109,6 @@ export class UserService {
   }
 
 
-
   login(vm: any,subtitle="",pem_file="",strong=false,
         required_balance=0,message_balance="",
         silence_mode=false) {
@@ -124,28 +124,26 @@ export class UserService {
         resolve(false)
       }else{
         if(pem_file.length>0){
+          let provider=UserSigner.fromPem(pem_file)
+          let k=new KeyPair(provider.secretKey)
+          this.pem_account=Account.newFromKeypair(k)
+
           let r={
-            address:usersigner_from_pem(pem_file).getAddress().bech32(),
-            provider:UserSigner.fromPem(pem_file),
+            address:provider.getAddress().bech32(),
+            provider:null,
             strong: true,
             encrypted:"",
             url_direct_xportal_connect:""
           }
-          let address_change=await this.authent(r)
-          await this.init_balance(vm.api)
-
-          if(required_balance>0 && this.balance<required_balance)vm.router.navigate(["faucet"],{queryParams:{message:message_balance}})
-
+          let address_change=await this.authent(r,required_balance,message_balance)
           resolve(address_change)
+
           showMessage(vm,"Identification ok")
         } else {
           try{
             if(this.device.isMobile())this.connexion.extension_wallet=false
             let r:any=await _ask_for_authent(vm,"Authentification",subtitle,this.network,this.connexion)
-            let address_change=await this.authent(r)
-            await this.init_balance(vm.api)
-
-            if(required_balance>0 && this.balance<required_balance)vm.router.navigate(["faucet"],{queryParams:{message:message_balance}})
+            let address_change=await this.authent(r,required_balance,message_balance)
 
             resolve(address_change)
           }catch (e){
@@ -156,6 +154,7 @@ export class UserService {
       }
     })
   }
+
 
 
   get_domain(){
@@ -217,5 +216,9 @@ export class UserService {
 
   isDevnet() {
     return this.network.indexOf("devnet")>-1
+  }
+
+  getAccount() {
+    return this.pem_account || this.provider.account
   }
 }
