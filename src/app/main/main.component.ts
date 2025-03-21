@@ -10,12 +10,11 @@ import {MatList, MatListItem} from "@angular/material/list";
 import {UploadFileComponent} from "../upload-file/upload-file.component";
 import {$$, getParams, showError, showMessage} from "../../tools";
 import {
-  create_collection,
+  create_collection, execute_transaction,
   get_collections,
   getExplorer,
-  level,
-  makeNFT,
-  set_roles_to_collection, view_account_on_gallery,
+  level, makeNFTTransaction,
+  set_roles_to_collection, signTransaction, view_account_on_gallery,
   view_nft
 } from "../mvx";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
@@ -38,6 +37,7 @@ import {PinataService} from "../pinata.service";
 import {environment} from "../../environments/environment";
 import {ClipboardService} from "../clipboard.service";
 import {settings} from "../../environments/settings";
+import {TokenManagementTransactionsOutcomeParser} from "@multiversx/sdk-core/out";
 
 @Component({
   selector: 'app-main',
@@ -209,16 +209,14 @@ export class MainComponent implements OnInit {
 
       let quantity=col.subType.startsWith("NonFungible") ? 1 : this.quantity
       try{
-        let rc=await makeNFT(col.collection,this.name,this.visual,this.user,quantity,this.royalties,this.uris,metadata_tags,metadata_url,hash)
-        if(rc.returnMessage=="ok"){
+
+        let identifier=await makeNFTTransaction(col.collection,this.name,this.visual,this.user,quantity,this.royalties,this.uris,metadata_tags,metadata_url,hash)
+
+        if(identifier!="error"){
           try{
             if(this.user.action_after_mint.startsWith("redirect"))open(this.user.action_after_mint.replace("redirect:",""))
             if(this.user.action_after_mint=="close")window.close()
             if(this.user.action_after_mint=="wallet")this.view_on_gallery(true)
-
-            let nonce=(rc.values[0][0]).toString(16).toLowerCase()
-            if(nonce.length==1)nonce="0"+nonce
-            let identifier=col.collection+"-"+nonce
 
             $$("Visibilité du NFT sur "+getExplorer(identifier,this.user.network,"nfts"))
 
@@ -229,10 +227,7 @@ export class MainComponent implements OnInit {
 
           }
           this.reset_image()
-        }else{
-          showMessage(this,rc.returnMessage)
         }
-
       } catch (e) {
         showError(this,e)
       }

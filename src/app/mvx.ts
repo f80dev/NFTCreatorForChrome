@@ -1,8 +1,16 @@
 import {
   Account,
-  Address, BytesValue, SmartContractController,
-  SmartContractTransactionsFactory, TokenManagementController, TokenManagementTransactionsFactory,
-  TokenTransfer, Transaction, TransactionComputer, TransactionOnNetwork,
+  Address,
+  BytesValue, ContractExecuteInput,
+  SmartContractController,
+  SmartContractTransactionsFactory, Token,
+  TokenManagementController,
+  TokenManagementTransactionsFactory,
+  TokenManagementTransactionsOutcomeParser,
+  TokenTransfer,
+  Transaction,
+  TransactionComputer,
+  TransactionOnNetwork,
   TransactionsFactoryConfig
 } from "@multiversx/sdk-core/out";
 import { UserSigner } from "@multiversx/sdk-wallet";
@@ -199,16 +207,15 @@ export function getExplorer(addr = "", network = "elrond-devnet",service="accoun
 //voir https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook-v14#creating-transactions
 export function create_transaction(function_name:string,args:any[],
                                    user:UserService,tokens_to_transfer: TokenTransfer[],
-                                   gasLimit=50000000n, contract_addr="") : Promise<Transaction>  {
+                                   contract_addr="",abi:any={},gasLimit=50000000n) : Promise<Transaction>  {
 
   return new Promise(async (resolve) => {
     const entrypoint = user.network.indexOf("devnet")>-1 ? new DevnetEntrypoint() : new MainnetEntrypoint()
-    let controller = entrypoint.createSmartContractController(await create_abi(abi));
 
     if(contract_addr=="")contract_addr=user.get_sc_address()
     let nonce=await entrypoint.recallAccountNonce(Address.newFromBech32(user.address))
 
-    let option:any={
+    let option:ContractExecuteInput={
       contract: Address.newFromBech32(contract_addr),
       function: function_name,
       gasLimit: gasLimit,
@@ -216,21 +223,25 @@ export function create_transaction(function_name:string,args:any[],
     }
     if(tokens_to_transfer.length>0)option.tokenTransfers=tokens_to_transfer
 
-    let transaction=await controller.createTransactionForExecute(user.getAccount(),nonce,option);
 
-    transaction.nonce=BigInt(user.account!.nonce)
-
-    if(user.provider){
-      transaction.signature=await user.provider.signTransaction(transaction)
+    let transaction
+    if(!user.provider){
+      //voir https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook-v14/#calling-a-smart-contract-using-the-controller
+      let ctrl=entrypoint.createSmartContractController(await create_abi(abi))
+      transaction=await ctrl.createTransactionForExecute(user.getAccount(),nonce,option)
+    }else{
+      //https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook-v14/#calling-a-smart-contract-using-the-factory
+      let fact=entrypoint.createSmartContractTransactionsFactory()
+      transaction= fact.createTransactionForExecute(Address.newFromBech32(user.address),option)
+      transaction.nonce=nonce
     }
-
-    if(user.pem_account){
-      await entrypoint.signTransaction(transaction,user.getAccount())
-    }
-
     resolve(transaction)
+
   })
 }
+
+
+
 
 export function level(lv=1) : boolean {
   return settings.ihm_level>=lv
@@ -238,27 +249,27 @@ export function level(lv=1) : boolean {
 
 
 
-
-function execute_transaction(transaction:Transaction,user:UserService) : Promise<{ values: any[]; returnCode: string; returnMessage: string}> {
+//ExecuteTransaction
+export function execute_transaction(transaction:Transaction,user:UserService) : Promise<{ values: any[]; returnCode: string; returnMessage: string}> {
   return new Promise(async (resolve, reject) => {
     try{
       const entrypoint = user.network.indexOf("devnet")>-1 ? new DevnetEntrypoint() : new MainnetEntrypoint()
 
-
       //voir https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook-v14#parsing-transaction-outcome
 
       let txHash=await entrypoint.sendTransaction(transaction)
+
       const transactionOnNetwork = await entrypoint.awaitCompletedTransaction(txHash);
-      const parsedOutcome = new SmartContractTransactionsOutcomeParser({abi:await create_abi(abi)}).parseExecute({transactionOnNetwork:transactionOnNetwork})
+      let parser = new SmartContractTransactionsOutcomeParser({abi:await create_abi(abi)}).parseExecute({transactionOnNetwork:transactionOnNetwork})
 
-      if(parsedOutcome.returnCode!="ok"){
-        reject({message:parsedOutcome.returnMessage,code:parsedOutcome.returnCode})
+      if(parser.returnCode!="ok"){
+        reject({message:parser.returnMessage,code:parser.returnCode})
       }else{
-
-        $$("Resultat transaction ",parsedOutcome)
-        resolve(parsedOutcome)
+        $$("Resultat transaction ",parser)
+        resolve(parser)
       }
     } catch (e:any) {
+      $$("Execution failed ",e.message)
       reject(e.message)
     }
   })
@@ -274,7 +285,7 @@ export function send_transaction_with_transfers(user:UserService,function_name:s
 
     $$("Appel de "+function_name+" avec les arguments "+args.join(" , "))
     if(tokens_to_transfer.length>0)$$(" ... avec transfert de token")
-    let transaction = await create_transaction(function_name,args,user,tokens_to_transfer,gasLimit,contract_addr)
+    let transaction = await create_transaction(function_name,args,user,tokens_to_transfer,contract_addr,abi,gasLimit)
 
     await user.refresh()
 
@@ -293,9 +304,9 @@ export function toText(array:Uint8Array) : string {
 }
 
 
-async function signTransaction(t:Transaction,user:UserService) : Promise<Transaction>  {
+export async function signTransaction(t:Transaction,user:UserService) : Promise<Transaction>  {
   try{
-    return await user.provider.signTransaction(t)
+      return await user.provider.signTransaction(t)
   }catch(e){
     return await user.provider.sign(t.serializeForSigning())
   }
@@ -394,9 +405,9 @@ function getEntrypoint(user:UserService){
   return user.network.indexOf("devnet")>-1 ? new DevnetEntrypoint() : new MainnetEntrypoint()
 }
 
-//buildNFT
-export async function makeNFT(identifier:string,name:string,visual:string,user:UserService,
-                              quantity=1,royalties=0,uris:string[]=[],metadata="",metadata_url="",hash="")  {
+//buildNFT transaction
+export async function makeNFTTransaction(identifier:string,name:string,visual:string,user:UserService,
+                              quantity=1,royalties=0,uris:string[]=[],metadata="",metadata_url="",hash="")   {
   //Voir https://docs.multiversx.com/tokens/nft-tokens/#creation-of-an-nft
 
   //Creation depuis le wallet Mvx : ESDTNFTCreate@SFT-55f2b5@@Londres@2500@QmNq8Kb8J2Aq3fqWu8jRHEvUvyAEwrHt8DSrqAhAWStiDE@tags:;metadata:QmaoTy3G7Cpb72czvs384qFQUqWeWBdTs5grHk311AassH@https://ipfs.io/ipfs/QmNq8Kb8J2Aq3fqWu8jRHEvUvyAEwrHt8DSrqAhAWStiDE
@@ -406,24 +417,38 @@ export async function makeNFT(identifier:string,name:string,visual:string,user:U
   //if(metadata_url.length>0)uris.unshift(metadata_url)
   if(uris.length==0 || uris[0]!=visual)uris.unshift(visual)
 
-  let controller = entrypoint.createTokenManagementController()
-  let transaction=await controller.createTransactionForCreatingNft(
-    user.getAccount(),
-    BigInt(user.account!.nonce),
+  let factory = entrypoint.createTokenManagementTransactionsFactory()
+
+  let transaction=await factory.createTransactionForCreatingNFT(
+    Address.newFromBech32(user.address),
     {
-    attributes: new TextEncoder().encode(metadata),
-    hash: hash,
-    initialQuantity: BigInt(quantity),
-    name: name,
-    royalties: Math.round(royalties*100),
-
-    tokenIdentifier: identifier,
-    uris: uris,
-  })
+      attributes: new TextEncoder().encode(metadata),
+      hash: hash,
+      initialQuantity: BigInt(quantity),
+      name: name,
+      royalties: Math.round(royalties*100),
+      tokenIdentifier: identifier,
+      uris: uris
+    })
   transaction.gasLimit=environment.max_gaz
-  user.refresh()
 
-  return await execute_transaction(transaction,user)
+  user.refresh()
+  transaction.nonce=BigInt(user.account!.nonce)
+  transaction=await signTransaction(transaction,user)
+  let txHash=await entrypoint.sendTransaction(transaction)
+
+  const transactionOnNetwork = await entrypoint.awaitCompletedTransaction(txHash);
+  let results:any = new TokenManagementTransactionsOutcomeParser().parseNftCreate(transactionOnNetwork)
+
+  let rc=results[0]
+  if(rc.hasOwnProperty("tokenIdentifier")){
+    let nonce=rc.nonce.toString(16).toLowerCase()
+    if(nonce.length==1)nonce="0"+nonce
+    return rc.tokenIdentifier+"-"+nonce
+  }else{
+    return "error"
+  }
+
 }
 
 
@@ -449,6 +474,17 @@ export async function query(function_name:string,args:any[],domain:string,sc_add
 
   })
 }
+
+
+export async function share_token(user:UserService,token_identifier:string,amount=1) {
+  let tokens=[new TokenTransfer({token:new Token({identifier:token_identifier, nonce:0n}),amount:BigInt(amount*1e18)})]
+  let t=await create_transaction("upload",[],user,tokens,user.get_sc_address(),abi,3078541n)
+  let t_signed=await signTransaction(t,user)
+  let rc=await execute_transaction(t_signed,user)
+  debugger
+}
+
+
 
 export async  function deploy(user:UserService,code:BytesValue) {
   const factoryConfig = new TransactionsFactoryConfig({ chainID:user.get_chain_id() });

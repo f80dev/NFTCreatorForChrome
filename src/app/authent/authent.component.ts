@@ -10,7 +10,7 @@ import {Location, NgIf} from "@angular/common";
 import {Connexion, Operation} from "../../operation";
 
 import {DeviceService} from "../device.service";
-//import { WalletConnectV2Provider } from "@multiversx/sdk-wallet-connect-provider";
+import { WalletConnectV2Provider } from "@multiversx/sdk-wallet-connect-provider";
 import { ExtensionProvider } from "@multiversx/sdk-extension-provider";
 import {WALLET_PROVIDER_DEVNET, WALLET_PROVIDER_MAINNET, WalletProvider} from "@multiversx/sdk-web-wallet-provider";
 
@@ -111,7 +111,7 @@ export class AuthentComponent implements OnInit,OnChanges {
   @Input() autoconnect_for_localhost=false;   //Connection automatique sur le localhost
   @Input() prompt="Votre email ou adresse de wallet";   //Connection automatique sur le localhost
 
-  @Output('authent') onauthent: EventEmitter<{strong:boolean,address:string,provider:any,encrypted:string,url_direct_xportal_connect:string}>=new EventEmitter();
+  @Output('authent') onauthent: EventEmitter<{pem_wallet:any,strong:boolean,address:string,provider:any,encrypted:string,url_direct_xportal_connect:string}>=new EventEmitter();
   @Output('invalid') oninvalid: EventEmitter<any>=new EventEmitter();
   @Output('cancel') oncancel: EventEmitter<any>=new EventEmitter();
   @Output('disconnect') onlogout: EventEmitter<any>=new EventEmitter();
@@ -309,7 +309,13 @@ export class AuthentComponent implements OnInit,OnChanges {
 
   success(){
     //Se charge de retourner le message d'authentification réussi
-    this.onauthent.emit({address:this.address,provider:this.provider,strong:this.strong,encrypted:this.private_key,url_direct_xportal_connect:this.url_xportal_direct_connect})
+    this.onauthent.emit({
+      address:this.address,
+      provider:this.provider,
+      strong:this.strong,
+      encrypted:this.private_key,
+      pem_wallet:null,
+      url_direct_xportal_connect:this.url_xportal_direct_connect})
     if(this._operation && this._operation.validate?.actions.success && this._operation.validate?.actions.success.redirect.length>0)
       open(this._operation.validate.actions.success.redirect);
   }
@@ -544,7 +550,7 @@ export class AuthentComponent implements OnInit,OnChanges {
         $$("Déconnexion de wallet connect")
       },
     }
-    //this.provider = new WalletConnectV2Provider(callbacks, this.user.get_chain_id(), this.relayUrl, this.walletConnect_ProjectId);
+    this.provider = new WalletConnectV2Provider(callbacks, this.user.get_chain_id(), this.relayUrl, this.walletConnect_ProjectId);
 
     try{
       wait_message(this,"Connexion")

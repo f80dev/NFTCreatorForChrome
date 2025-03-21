@@ -124,6 +124,7 @@ export class UserService {
         resolve(false)
       }else{
         if(pem_file.length>0){
+          $$("On utilise un fichier PEM")
           let provider=UserSigner.fromPem(pem_file)
           let k=new KeyPair(provider.secretKey)
           this.pem_account=Account.newFromKeypair(k)
@@ -141,7 +142,10 @@ export class UserService {
           showMessage(vm,"Identification ok")
         } else {
           try{
-            if(this.device.isMobile())this.connexion.extension_wallet=false
+            if(this.device.isMobile()){
+              $$("Impossible de trouver l'extended wallet en version mobile")
+              this.connexion.extension_wallet=false
+            }
             let r:any=await _ask_for_authent(vm,"Authentification",subtitle,this.network,this.connexion)
             let address_change=await this.authent(r,required_balance,message_balance)
 
