@@ -1,5 +1,5 @@
 export const settings={
-  contract_addr:"erd1qqqqqqqqqqqqqpgql36f6pa8d6x44858l59q4u5qmzwrv4u6835sgcxfvg",
+  contract_addr:"erd1qqqqqqqqqqqqqpgqjua0yku6flxc8mqvk4y97npclu4nudkk835svlah2a",
   ihm_level:2,
   version: "0.91",
   appname: "NFTNow Devnet",
@@ -11,11 +11,11 @@ export const settings={
 export const abi={
   "buildInfo": {
     "rustc": {
-      "version": "1.85.0",
-      "commitHash": "4d91de4e48198da2e33413efdcd9cd2cc0c46688",
-      "commitDate": "2025-02-17",
+      "version": "1.85.1",
+      "commitHash": "4eb161250e340c8f48f66e2b929ef4a5bed7c181",
+      "commitDate": "2025-03-15",
       "channel": "Stable",
-      "short": "rustc 1.85.0 (4d91de4e4 2025-02-17)"
+      "short": "rustc 1.85.1 (4eb161250 2025-03-15)"
     },
     "contractCrate": {
       "name": "secretvault",
@@ -98,8 +98,12 @@ export const abi={
           "type": "Address"
         },
         {
-          "name": "coin",
-          "type": "EgldOrEsdtTokenIdentifier"
+          "name": "token_identifier",
+          "type": "TokenIdentifier"
+        },
+        {
+          "name": "nonce",
+          "type": "u64"
         },
         {
           "name": "amount",
@@ -109,4 +113,3 @@ export const abi={
     }
   }
 }
-

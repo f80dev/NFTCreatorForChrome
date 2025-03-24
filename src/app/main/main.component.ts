@@ -14,7 +14,7 @@ import {
   get_collections,
   getExplorer,
   level, makeNFTTransaction,
-  set_roles_to_collection, share_token, signTransaction, view_account_on_gallery,
+  set_roles_to_collection, share_token, share_token_wallet, signTransaction, view_account_on_gallery,
   view_nft
 } from "../mvx";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
@@ -243,13 +243,7 @@ export class MainComponent implements OnInit {
   }
 
   async share_nft(identifier: any) {
-    let amount=await _prompt(this,"Amount to share","1","","number","ok","annuler",false)
-    if(amount){
-      let rc=await share_token(this.user,identifier,Number(amount))
-      this.share_url=(environment.share_appli+"/?vault="+rc)
-      if(!this.user.isDevnet())this.share_url=this.share_url.replace("devnet.","")
-    }
-
+    share_token_wallet(this,{identifier:identifier})
   }
 
 

@@ -23,6 +23,8 @@ import {Octokit} from "@octokit/rest";
 import {$$, now} from "../tools";
 import {abi, settings} from '../environments/settings';
 import {environment} from "../environments/environment";
+import {_prompt} from "./prompt/prompt.component";
+import {wait_message} from "./hourglass/hourglass.component";
 
 export const DEVNET="https://devnet-api.multiversx.com"
 export const MAINNET="https://api.multiversx.com"
@@ -210,7 +212,7 @@ export function create_transaction(function_name:string,args:any[],
                                    contract_addr="",abi:any={},gasLimit=50000000n) : Promise<Transaction>  {
 
   return new Promise(async (resolve) => {
-    const entrypoint = user.network.indexOf("devnet")>-1 ? new DevnetEntrypoint() : new MainnetEntrypoint()
+    const entrypoint = getEntrypoint(user)
 
     if(contract_addr=="")contract_addr=user.get_sc_address()
     let nonce=await entrypoint.recallAccountNonce(Address.newFromBech32(user.address))
@@ -250,17 +252,18 @@ export function level(lv=1) : boolean {
 
 
 //ExecuteTransaction
-export function execute_transaction(transaction:Transaction,user:UserService) : Promise<{ values: any[]; returnCode: string; returnMessage: string}> {
+export function execute_transaction(transaction:Transaction,user:UserService,function_name:string) : Promise<{ values: any[]; returnCode: string; returnMessage: string}> {
   return new Promise(async (resolve, reject) => {
     try{
-      const entrypoint = user.network.indexOf("devnet")>-1 ? new DevnetEntrypoint() : new MainnetEntrypoint()
+      const entrypoint = getEntrypoint(user)
 
       //voir https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook-v14#parsing-transaction-outcome
+      debugger
 
-      let txHash=await entrypoint.sendTransaction(transaction)
+      const transactionOnNetwork = await entrypoint.awaitCompletedTransaction(await entrypoint.sendTransaction(transaction));
+      let parser = new SmartContractTransactionsOutcomeParser(
+        {abi:await create_abi(abi)}).parseExecute({transactionOnNetwork:transactionOnNetwork,function:function_name})
 
-      const transactionOnNetwork = await entrypoint.awaitCompletedTransaction(txHash);
-      let parser = new SmartContractTransactionsOutcomeParser({abi:await create_abi(abi)}).parseExecute({transactionOnNetwork:transactionOnNetwork})
 
       if(parser.returnCode!="ok"){
         reject({message:parser.returnMessage,code:parser.returnCode})
@@ -290,7 +293,7 @@ export function send_transaction_with_transfers(user:UserService,function_name:s
     await user.refresh()
 
     try{
-      resolve(await execute_transaction(transaction,user))
+      resolve(await execute_transaction(transaction,user,function_name))
     }catch (e){
       reject(e)
     }
@@ -313,7 +316,9 @@ export async function signTransaction(t:Transaction,user:UserService) : Promise<
 }
 
 export async function set_roles_to_collection(collection_id:string, user:UserService,type_collection:string="SFT",burn=false,update=false) {
-  let factory = new TokenManagementTransactionsFactory({config: new TransactionsFactoryConfig({ chainID: user.get_chain_id() })});
+  const entrypoint=getEntrypoint(user)
+  let factory = entrypoint.createTokenManagementTransactionsFactory();
+
   $$("Affectation des roles sur la collection "+collection_id+" de type "+type_collection)
   let setRoleTransaction=factory.createTransactionForSettingSpecialRoleOnNonFungibleToken( Address.fromBech32(user.address),{
     addRoleNFTAddURI: update,
@@ -330,16 +335,18 @@ export async function set_roles_to_collection(collection_id:string, user:UserSer
       user: Address.fromBech32(user.address),
       tokenIdentifier: collection_id,
       addRoleESDTTransferRole: update,
-      addRoleNFTAddQuantity: update,
+      addRoleNFTAddQuantity: true,
       addRoleNFTBurn: burn,
       addRoleNFTCreate: true,
     })
   }
 
   user.refresh()
-  setRoleTransaction.nonce=BigInt(user.account!.nonce)
-  let rc:any=await execute_transaction(setRoleTransaction,user)
-  return rc
+  setRoleTransaction.nonce=await entrypoint.recallAccountNonce(Address.newFromBech32(user.address))
+  let transactionOnNetwork=await entrypoint.awaitCompletedTransaction(await entrypoint.sendTransaction(await signTransaction(setRoleTransaction,user)))
+  let rc=new TokenManagementTransactionsOutcomeParser().parseSetSpecialRole(transactionOnNetwork)
+
+  return rc[0]
 }
 
 
@@ -348,7 +355,8 @@ export async function create_collection(name:string,user:UserService,vm:any=null
   //puis appel de setSpecialRole@544f4b454d4f4e2d346561303466@15432c1a00ea0f72466e099db66e6059d4becc9bb9eed17f3db817f29a0fc26b@45534454526f6c654e4654437265617465@45534454526f6c654e46544164645175616e74697479
 
   if(vm)vm.message="Collection building phase"
-  let factory = new TokenManagementTransactionsFactory({config: new TransactionsFactoryConfig({ chainID:user.get_chain_id() })});
+  const entrypoint=getEntrypoint(user)
+  let factory = entrypoint.createTokenManagementTransactionsFactory()
 
   let option={
     name: name,
@@ -363,19 +371,18 @@ export async function create_collection(name:string,user:UserService,vm:any=null
     canWipe: true,
   }
 
-  let transaction=factory.createTransactionForIssuingNonFungible(Address.fromBech32(user.address),{...option})
-  if(collection_type=="SFT"){
-    transaction=factory.createTransactionForIssuingSemiFungible(Address.fromBech32(user.address),{...option})
-  }
+  let transaction=collection_type=="SFT"
+    ? factory.createTransactionForIssuingSemiFungible(Address.newFromBech32(user.address),{...option})
+    : factory.createTransactionForIssuingNonFungible(Address.newFromBech32(user.address),{...option})
 
-  await user.refresh()
-  transaction.nonce=BigInt(user.account!.nonce)
+  transaction.nonce=await entrypoint.recallAccountNonce(Address.newFromBech32(user.address))
+  let transactionOnNetwork=await entrypoint.awaitCompletedTransaction(await entrypoint.sendTransaction(await signTransaction(transaction,user)))
+  let parser = collection_type=="SFT"
+    ? new TokenManagementTransactionsOutcomeParser().parseIssueSemiFungible(transactionOnNetwork)
+    : new TokenManagementTransactionsOutcomeParser().parseIssueNonFungible(transactionOnNetwork)
 
-  let result=await execute_transaction(transaction,user)
-
-  let collection_id=new TextDecoder("utf-8").decode(result.values[0])
-
-  return {result:result,collection_id:collection_id}
+  debugger
+  return {result:parser,collection_id:parser[0].tokenIdentifier}
 }
 
 
@@ -419,7 +426,7 @@ export async function makeNFTTransaction(identifier:string,name:string,visual:st
 
   let factory = entrypoint.createTokenManagementTransactionsFactory()
 
-  let transaction=await factory.createTransactionForCreatingNFT(
+  let transaction=factory.createTransactionForCreatingNFT(
     Address.newFromBech32(user.address),
     {
       attributes: new TextEncoder().encode(metadata),
@@ -432,12 +439,10 @@ export async function makeNFTTransaction(identifier:string,name:string,visual:st
     })
   transaction.gasLimit=environment.max_gaz
 
-  user.refresh()
-  transaction.nonce=BigInt(user.account!.nonce)
+  transaction.nonce=await entrypoint.recallAccountNonce(Address.newFromBech32(user.address))
   transaction=await signTransaction(transaction,user)
-  let txHash=await entrypoint.sendTransaction(transaction)
+  const transactionOnNetwork =await entrypoint.awaitCompletedTransaction(await entrypoint.sendTransaction(transaction))
 
-  const transactionOnNetwork = await entrypoint.awaitCompletedTransaction(txHash);
   let results:any = new TokenManagementTransactionsOutcomeParser().parseNftCreate(transactionOnNetwork)
 
   let rc=results[0]
@@ -476,17 +481,43 @@ export async function query(function_name:string,args:any[],domain:string,sc_add
 }
 
 
-export async function share_token(user:UserService,token_identifier:string,amount=1) {
-  let tokens=[new TokenTransfer({token:new Token({identifier:token_identifier, nonce:0n}),amount:BigInt(amount*1e18)})]
+export async function share_token(user:UserService,collection:string,nonce:number,amount=1) {
+  let tokens=[new TokenTransfer({token:new Token({identifier:collection, nonce:BigInt(nonce)}),amount:BigInt(amount)})]
   let t=await create_transaction("upload",[],user,tokens,user.get_sc_address(),abi,3078541n)
   let t_signed=await signTransaction(t,user)
-  let rc=await execute_transaction(t_signed,user)
-  return rc.values[0]
+  let rc=await execute_transaction(t_signed,user,"upload")
+  return rc
 }
 
 
 
-export async  function deploy(user:UserService,code:BytesValue) {
+export async function share_token_wallet(vm:any,token: any) {
+  if(!vm.user.isConnected(true))await vm.user.login(vm,"","",true)
+  if(vm.user.isConnected(true)){
+    let amount=await _prompt(vm,"Amount to share","1","","number","ok","annuler",false)
+    if(amount){
+      try{
+        wait_message(vm,"Share link building")
+        let rc=await share_token(vm.user,token.identifier,Number(amount))
+
+        let url=(environment.share_appli+"/?vault="+rc.values[0])
+        if(!vm.user.isDevnet())url=url.replace("devnet.","")
+        vm.shareService.share({
+          title:"Get a NFT",
+          text:"Click on this link to create or use your account and get the NFT",
+          uri:url
+        })
+      }catch (e:any){
+        $$("Error ",e)
+      }
+      wait_message(vm)
+    }
+  }
+}
+
+
+
+export async function deploy(user:UserService,code:BytesValue) {
   const factoryConfig = new TransactionsFactoryConfig({ chainID:user.get_chain_id() });
   let factory = new SmartContractTransactionsFactory({
     config: factoryConfig,

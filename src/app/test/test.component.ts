@@ -24,8 +24,12 @@ export class TestComponent implements OnInit {
   dialog=inject(MatDialog)
 
   async ngOnInit() {
+
+    this.user.network="elrond-devnet"
+    let token_identifier="SFT2-269456"
+
     await this.user.login(this,"","",true)
-    let rc=await share_token(this.user,"HPOINT-ec0673",100)
+    let rc=await share_token(this.user,token_identifier,2,1)
     $$("resultat ",rc)
   }
 

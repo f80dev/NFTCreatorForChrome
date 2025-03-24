@@ -1,5 +1,5 @@
 import {Component, EventEmitter, inject, Input, OnDestroy, Output} from '@angular/core';
-import {level, share_token, view_nft} from "../mvx";
+import {level, share_token, share_token_wallet, view_nft} from "../mvx";
 import {UploadFileComponent} from "../upload-file/upload-file.component";
 import {MatButton} from "@angular/material/button";
 import {NgForOf, NgIf} from "@angular/common";
@@ -19,6 +19,7 @@ import {MatDialog} from "@angular/material/dialog";
 import local = chrome.storage.local;
 import {settings} from "../../environments/settings";
 import {_prompt} from "../prompt/prompt.component";
+import {NgNavigatorShareService} from "ng-navigator-share";
 
 @Component({
   selector: 'app-source',
@@ -47,7 +48,7 @@ export class SourceComponent implements OnDestroy {
   show_scanner: boolean = false;
   handle:any
   generators=environment.generators
-
+  shareService=inject(NgNavigatorShareService)
 
   trigger = new Subject<void>();
   private image: WebcamImage | undefined;
@@ -161,12 +162,9 @@ export class SourceComponent implements OnDestroy {
   protected readonly level = level;
   protected readonly share_token = share_token;
 
-  async share_token_wallet($event: any) {
-    if(this.user.provider){
-      let amount=await _prompt(this,"Amount to share","1","","number","ok","annuler",false)
-      if(amount){
-        await share_token(this.user,$event,Number(amount))
-      }
-    }
+
+
+  on_share($event: any) {
+    share_token_wallet(this,$event)
   }
 }
