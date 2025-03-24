@@ -481,7 +481,7 @@ export async function share_token(user:UserService,token_identifier:string,amoun
   let t=await create_transaction("upload",[],user,tokens,user.get_sc_address(),abi,3078541n)
   let t_signed=await signTransaction(t,user)
   let rc=await execute_transaction(t_signed,user)
-  debugger
+  return rc.values[0]
 }
 
 

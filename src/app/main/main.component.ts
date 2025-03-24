@@ -14,7 +14,7 @@ import {
   get_collections,
   getExplorer,
   level, makeNFTTransaction,
-  set_roles_to_collection, signTransaction, view_account_on_gallery,
+  set_roles_to_collection, share_token, signTransaction, view_account_on_gallery,
   view_nft
 } from "../mvx";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
@@ -38,6 +38,7 @@ import {environment} from "../../environments/environment";
 import {ClipboardService} from "../clipboard.service";
 import {settings} from "../../environments/settings";
 import {TokenManagementTransactionsOutcomeParser} from "@multiversx/sdk-core/out";
+import {NgNavigatorShareService} from "ng-navigator-share";
 
 @Component({
   selector: 'app-main',
@@ -79,6 +80,8 @@ export class MainComponent implements OnInit {
   dialog=inject(MatDialog)
   toast=inject(MatSnackBar)
   http=inject(HttpClient)
+  shareService=inject(NgNavigatorShareService)
+
 
   collections: {label:string,value:any}[]=[]
   sel_collection:{label:string,value:any} | undefined
@@ -95,6 +98,7 @@ export class MainComponent implements OnInit {
   filename: string="image.webp"
   clipboard=inject(ClipboardService)
   private after: string="new"
+  public  share_url="";
 
   normalize(text:string) : string {
     return text.replace(/[^a-z0-9 A-Z]/gi, '');
@@ -220,8 +224,11 @@ export class MainComponent implements OnInit {
 
             $$("Visibilité du NFT sur "+getExplorer(identifier,this.user.network,"nfts"))
 
-            let r=await _prompt(this,"Mint terminated of "+identifier,"","See your NFT in your wallet ?","yesno","See my NFT","New NFT",true)
-            if(r=="yes")view_nft(this.user,identifier)
+            let r=await _prompt(this,"Mint terminated of "+identifier,"","Send your NFT in your wallet ?","yesno","Send it","New NFT",true)
+            if(r=="yes"){
+              view_nft(this.user,identifier)
+              this.share_nft(identifier)
+            }
 
           }catch (e:any){
 
@@ -233,6 +240,16 @@ export class MainComponent implements OnInit {
       }
       wait_message(this)
     }
+  }
+
+  async share_nft(identifier: any) {
+    let amount=await _prompt(this,"Amount to share","1","","number","ok","annuler",false)
+    if(amount){
+      let rc=await share_token(this.user,identifier,Number(amount))
+      this.share_url=(environment.share_appli+"/?vault="+rc)
+      if(!this.user.isDevnet())this.share_url=this.share_url.replace("devnet.","")
+    }
+
   }
 
 

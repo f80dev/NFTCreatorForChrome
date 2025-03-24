@@ -96,8 +96,8 @@ export const environment = {
 
   collection_viewer:"https://devnet.xspotlight.com/collections/%collection%",
   nft_viewer_old: "https://devnet.xspotlight.com/nfts/%identifier%",
-  account_viewer: "https://devnet.xspotlight.com/%address%"
-
+  account_viewer: "https://devnet.xspotlight.com/%address%",
+  share_appli: "https://devnet.vault.af10.fr",
 
 
 }

@@ -1,5 +1,5 @@
 import {Component, EventEmitter, inject, Input, OnDestroy, Output} from '@angular/core';
-import {level, view_nft} from "../mvx";
+import {level, share_token, view_nft} from "../mvx";
 import {UploadFileComponent} from "../upload-file/upload-file.component";
 import {MatButton} from "@angular/material/button";
 import {NgForOf, NgIf} from "@angular/common";
@@ -159,4 +159,14 @@ export class SourceComponent implements OnDestroy {
   }
 
   protected readonly level = level;
+  protected readonly share_token = share_token;
+
+  async share_token_wallet($event: any) {
+    if(this.user.provider){
+      let amount=await _prompt(this,"Amount to share","1","","number","ok","annuler",false)
+      if(amount){
+        await share_token(this.user,$event,Number(amount))
+      }
+    }
+  }
 }
