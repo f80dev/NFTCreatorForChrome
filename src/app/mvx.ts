@@ -254,26 +254,31 @@ export function level(lv=1) : boolean {
 //ExecuteTransaction
 export function execute_transaction(transaction:Transaction,user:UserService,function_name:string) : Promise<{ values: any[]; returnCode: string; returnMessage: string}> {
   return new Promise(async (resolve, reject) => {
+    let transactionOnNetwork:TransactionOnNetwork
     try{
       const entrypoint = getEntrypoint(user)
+      //voir https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook-v13/#parsing-transaction-outcome-1
+      transactionOnNetwork = await entrypoint.awaitCompletedTransaction(await entrypoint.sendTransaction(transaction));
 
-      //voir https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook-v14#parsing-transaction-outcome
-      debugger
-
-      const transactionOnNetwork = await entrypoint.awaitCompletedTransaction(await entrypoint.sendTransaction(transaction));
-      let parser = new SmartContractTransactionsOutcomeParser(
-        {abi:await create_abi(abi)}).parseExecute({transactionOnNetwork:transactionOnNetwork,function:function_name})
-
-
-      if(parser.returnCode!="ok"){
-        reject({message:parser.returnMessage,code:parser.returnCode})
-      }else{
-        $$("Resultat transaction ",parser)
-        resolve(parser)
-      }
     } catch (e:any) {
       $$("Execution failed ",e.message)
       reject(e.message)
+    }
+
+    try{
+      const _abi=await create_abi(abi)
+      const parser = new SmartContractTransactionsOutcomeParser({abi:_abi})
+      let result=parser.parseExecute({transactionOnNetwork:transactionOnNetwork,function:function_name})
+
+      if(result.returnCode!="ok"){
+        reject({message:result.returnMessage,code:result.returnCode})
+      }else{
+        $$("Resultat transaction ",result)
+        resolve(result)
+      }
+    }catch (e:any) {
+      debugger
+     resolve({values:transactionOnNetwork!.logs.events,returnCode:"ok",returnMessage:"error"})
     }
   })
 }
@@ -494,13 +499,16 @@ export async function share_token(user:UserService,collection:string,nonce:numbe
 export async function share_token_wallet(vm:any,token: any) {
   if(!vm.user.isConnected(true))await vm.user.login(vm,"","",true)
   if(vm.user.isConnected(true)){
-    let amount=await _prompt(vm,"Amount to share","1","","number","ok","annuler",false)
+    let amount="1"
+    if(token.type.indexOf("Semi")>-1){
+      amount=await _prompt(vm,"Amount to share","1","","number","ok","annuler",false)
+    }
     if(amount){
       try{
         wait_message(vm,"Share link building")
         let rc=await share_token(vm.user,token.identifier,Number(amount))
-
-        let url=(environment.share_appli+"/?vault="+rc.values[0])
+        debugger
+        let url=environment.share_appli+"/?vault="+rc.values[0]
         if(!vm.user.isDevnet())url=url.replace("devnet.","")
         vm.shareService.share({
           title:"Get a NFT",
