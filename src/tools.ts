@@ -146,9 +146,9 @@ export function setParams(_d:any,prefix="",param_name="p",domain="") : string {
     }
   }
   if(param_name!="")
-    return domain+param_name+"="+encodeURIComponent(url);
+    return domain+param_name+"="+url;
   else
-    return domain+encodeURIComponent(url);
+    return domain+url;
 }
 
 export function enterFullScreen(element:any) {

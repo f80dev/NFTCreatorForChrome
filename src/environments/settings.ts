@@ -1,5 +1,5 @@
 export const settings={
-  contract_addr:"erd1qqqqqqqqqqqqqpgqjua0yku6flxc8mqvk4y97npclu4nudkk835svlah2a",
+  contract_addr:"erd1qqqqqqqqqqqqqpgqeweudfyxn5vxya2yumvu0v7u6p6lwrr3835skxed3j",
   ihm_level:2,
   version: "0.91",
   appname: "NFTNow Devnet",
@@ -7,6 +7,7 @@ export const settings={
   network: "elrond-devnet",
   intro: "Create your NFT on the devnet network in one minute"
 }
+
 
 export const abi={
   "buildInfo": {
@@ -38,11 +39,15 @@ export const abi={
     {
       "name": "documents",
       "mutability": "readonly",
-      "inputs": [],
+      "inputs": [
+        {
+          "name": "key",
+          "type": "u32"
+        }
+      ],
       "outputs": [
         {
-          "type": "variadic<Document>",
-          "multi_result": true
+          "type": "Document"
         }
       ]
     },
@@ -67,6 +72,21 @@ export const abi={
       "outputs": [
         {
           "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "preview",
+      "mutability": "readonly",
+      "inputs": [
+        {
+          "name": "key",
+          "type": "u32"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "Document"
         }
       ]
     },

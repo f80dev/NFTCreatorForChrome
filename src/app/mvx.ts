@@ -1,3 +1,4 @@
+//Version official 0.1
 import {
   Account,
   Address,
@@ -20,11 +21,12 @@ import {AccountOnNetwork} from "@multiversx/sdk-network-providers/out";
 import {ApiService} from "./api.service";
 import {UserService} from "./user.service";
 import {Octokit} from "@octokit/rest";
-import {$$, now} from "../tools";
+import {$$, hashCode, now, setParams, showMessage} from "../tools";
 import {abi, settings} from '../environments/settings';
 import {environment} from "../environments/environment";
 import {_prompt} from "./prompt/prompt.component";
 import {wait_message} from "./hourglass/hourglass.component";
+import {sha256} from "multiformats/hashes/sha2";
 
 export const DEVNET="https://devnet-api.multiversx.com"
 export const MAINNET="https://api.multiversx.com"
@@ -254,32 +256,45 @@ export function level(lv=1) : boolean {
 //ExecuteTransaction
 export function execute_transaction(transaction:Transaction,user:UserService,function_name:string) : Promise<{ values: any[]; returnCode: string; returnMessage: string}> {
   return new Promise(async (resolve, reject) => {
-    let transactionOnNetwork:TransactionOnNetwork
+    let transactionOnNetwork:TransactionOnNetwork | undefined=undefined
     try{
       const entrypoint = getEntrypoint(user)
       //voir https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook-v13/#parsing-transaction-outcome-1
-      transactionOnNetwork = await entrypoint.awaitCompletedTransaction(await entrypoint.sendTransaction(transaction));
+      let hash=await entrypoint.sendTransaction(transaction)
+      transactionOnNetwork = await entrypoint.awaitCompletedTransaction(hash)
 
+      if(transactionOnNetwork.smartContractResults.length==0)transactionOnNetwork = await entrypoint.awaitCompletedTransaction(hash)
     } catch (e:any) {
       $$("Execution failed ",e.message)
       reject(e.message)
     }
 
-    try{
-      const _abi=await create_abi(abi)
-      const parser = new SmartContractTransactionsOutcomeParser({abi:_abi})
-      let result=parser.parseExecute({transactionOnNetwork:transactionOnNetwork,function:function_name})
+    if(transactionOnNetwork){
+      try{
+        const _abi=await create_abi(abi)
+        const parser = new SmartContractTransactionsOutcomeParser({abi:_abi})
+        let result=parser.parseExecute({transactionOnNetwork:transactionOnNetwork,function:function_name})
 
-      if(result.returnCode!="ok"){
-        reject({message:result.returnMessage,code:result.returnCode})
-      }else{
-        $$("Resultat transaction ",result)
-        resolve(result)
+        if(result.returnCode!="ok"){
+          reject({message:result.returnMessage,code:result.returnCode})
+        }else{
+          $$("Resultat transaction ",result)
+          resolve(result)
+        }
+      }catch (e:any) {
+        if(transactionOnNetwork.isCompleted){
+
+          let rc=[]
+          for(let result of transactionOnNetwork.smartContractResults){
+              rc.push(atob(result.data.toString()))
+          }
+          resolve({values:rc,returnCode:"ok",returnMessage:"error"})
+        } else {
+          reject(e.message)
+        }
       }
-    }catch (e:any) {
-      debugger
-     resolve({values:transactionOnNetwork!.logs.events,returnCode:"ok",returnMessage:"error"})
     }
+
   })
 }
 
@@ -386,7 +401,6 @@ export async function create_collection(name:string,user:UserService,vm:any=null
     ? new TokenManagementTransactionsOutcomeParser().parseIssueSemiFungible(transactionOnNetwork)
     : new TokenManagementTransactionsOutcomeParser().parseIssueNonFungible(transactionOnNetwork)
 
-  debugger
   return {result:parser,collection_id:parser[0].tokenIdentifier}
 }
 
@@ -503,21 +517,44 @@ export async function share_token_wallet(vm:any,token: any) {
     if(token.type.indexOf("Semi")>-1){
       amount=await _prompt(vm,"Amount to share","1","","number","ok","annuler",false)
     }
-    if(amount){
+    if(Number(amount)>0){
+      let url=""
       try{
         wait_message(vm,"Share link building")
-        let rc=await share_token(vm.user,token.identifier,Number(amount))
-        debugger
-        let url=environment.share_appli+"/?vault="+rc.values[0]
+
+        let rc=await share_token(vm.user,token.identifier,token.nonce,Number(amount))
+        let id=0
+        for(let v of rc.values){
+          if(v!="upload"){
+            id=v.indexOf("@")>-1 ? v.split("@")[2] : v
+          }
+        }
+        let hash=hashCode("code"+id)
+
+        url=environment.share_appli+"?p="+setParams({vault:id,checker:hash},"","")
+        $$("Url de récupération "+url)
+
         if(!vm.user.isDevnet())url=url.replace("devnet.","")
-        vm.shareService.share({
-          title:"Get a NFT",
-          text:"Click on this link to create or use your account and get the NFT",
-          uri:url
-        })
+
       }catch (e:any){
         $$("Error ",e)
       }
+      wait_message(vm)
+
+      if(url.length>0){
+        $$("Copy de "+url)
+        try{
+          await vm.shareService.share({
+            title:"Get the "+token.name+" NFT",
+            text:"Click on this link to create or use your account and get the NFT",
+            url:url
+          })
+        }catch (e:any){
+          showMessage(vm,"NFT link "+url+" to share in the clipboard")
+          await navigator.clipboard.writeText(url)
+        }
+      }
+
       wait_message(vm)
     }
   }
