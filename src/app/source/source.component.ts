@@ -159,6 +159,6 @@ export class SourceComponent implements OnDestroy {
 
 
   on_share($event: any) {
-    share_token_wallet(this,$event)
+    share_token_wallet(this,$event,environment.share_cost)
   }
 }

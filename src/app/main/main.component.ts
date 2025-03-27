@@ -243,7 +243,7 @@ export class MainComponent implements OnInit {
   }
 
   async share_nft(identifier: any) {
-    share_token_wallet(this,{identifier:identifier})
+    share_token_wallet(this,{identifier:identifier},environment.share_cost)
   }
 
 

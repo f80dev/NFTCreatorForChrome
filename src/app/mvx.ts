@@ -496,9 +496,9 @@ export async function query(function_name:string,args:any[],sc_address:string,ne
 }
 
 
-export async function share_token(user:UserService,collection:string,nonce:number,amount=1) {
+export async function share_token(user:UserService,collection:string,nonce:number,amount=1,cost=0.001) {
   let tokens=[new TokenTransfer({token:new Token({identifier:collection, nonce:BigInt(nonce)}),amount:BigInt(amount)})]
-  let t=await create_transaction("upload",[],user,tokens,user.get_sc_address(),abi,4078541n,0.01)
+  let t=await create_transaction("upload",[],user,tokens,user.get_sc_address(),abi,4078541n,cost)
   let t_signed=await signTransaction(t,user)
   let rc=await execute_transaction(t_signed,user,"upload")
   return rc
@@ -506,7 +506,7 @@ export async function share_token(user:UserService,collection:string,nonce:numbe
 
 
 
-export async function share_token_wallet(vm:any,token: any) {
+export async function share_token_wallet(vm:any,token: any,cost=0.001) {
   if(!vm.user.isConnected(true))await vm.user.login(vm,"","",true)
   if(vm.user.isConnected(true)){
     let amount="1"
@@ -518,7 +518,7 @@ export async function share_token_wallet(vm:any,token: any) {
       try{
         wait_message(vm,"Share link building")
 
-        let rc=await share_token(vm.user,token.collection,token.nonce,Number(amount))
+        let rc=await share_token(vm.user,token.collection,token.nonce,Number(amount),cost)
         let id =""
 
         for(let v of rc.values){
