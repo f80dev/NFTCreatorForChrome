@@ -1,4 +1,4 @@
-//Version official 0.3
+//Version official 0.4
 import {
   Address,
   BytesValue, ContractExecuteInput,
@@ -22,8 +22,6 @@ import {abi, settings} from '../environments/settings';
 import {environment} from "../environments/environment";
 import {_prompt} from "./prompt/prompt.component";
 import {wait_message} from "./hourglass/hourglass.component";
-import {sha1} from "multiformats/hashes/sha1";
-import {hashes} from "multiformats/basics";
 
 export const DEVNET="https://devnet-api.multiversx.com"
 export const MAINNET="https://api.multiversx.com"
@@ -507,13 +505,14 @@ export async function share_token(user:UserService,collection:string,nonce:numbe
 
 
 export async function share_token_wallet(vm:any,token: any,cost=0.001) {
-  if(!vm.user.isConnected(true))await vm.user.login(vm,"","",true)
-  if(vm.user.isConnected(true)){
-    let amount="1"
-    if(token.type.indexOf("Semi")>-1){
-      amount=await _prompt(vm,"Amount to share","1","","number","ok","annuler",false)
-    }
-    if(amount){
+  let amount="1"
+  if(token.type.indexOf("Semi")>-1){
+    amount=await _prompt(vm,"Amount to share","1","","number","ok","annuler",false)
+  }
+
+  if(amount){
+    if(!vm.user.isConnected(true))await vm.user.login(vm,"","",true)
+    if(vm.user.isConnected(true)){
       let url=""
       try{
         wait_message(vm,"Share link building")
@@ -522,8 +521,8 @@ export async function share_token_wallet(vm:any,token: any,cost=0.001) {
         let id =""
 
         for(let v of rc.values){
-          if(v!="upload"){
-            id=v.indexOf("@")>-1 ? v.split("@")[2] : v
+          if(v.startsWith("@6f6b")){
+            id=v.split("@")[2]
             break
           }
         }
@@ -556,7 +555,6 @@ export async function share_token_wallet(vm:any,token: any,cost=0.001) {
           await navigator.clipboard.writeText(url)
         }
       }
-
       wait_message(vm)
     }
   }
