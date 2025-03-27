@@ -65,7 +65,7 @@ export class SourceComponent implements OnDestroy {
   async paste() {
     try{
       let content=await this.clipboard.paste()
-      if(content.length>0 && !content.endsWith("html") && !content.endsWith("htm") && content.startsWith(environment.share_appli)){
+      if(content.length>0 && !content.endsWith("html") && !content.endsWith("htm") && !content.startsWith(environment.share_appli)){
         this.update_visual.emit(content)
       }else{
         showMessage(this,"Nothing in the clipboard",1000
