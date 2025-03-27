@@ -35,9 +35,9 @@
   <h4 *ngIf="show.indexOf('nft')>-1 && nfts.length==0">You don't have any NFT</h4>
   <div *ngIf="show.indexOf('nft')>-1" style="margin-top: -15px;max-height: 200px;overflow:scroll;scrollbar-width: none;">
     <img *ngFor="let nft of nfts"
-         [title]="nft.name+'\n'+(nft.metadata.description ? nft.metadata.description : '')"
+         [title]="nft.name+' ('+nft.collection+')\n'+(nft.metadata.description ? nft.metadata.description : '')"
          style="margin: 3px;"
-         [src]="nft.visual"
+         [srcset]="nft.visual"
          [style.height]="height"
          [style.width]="width"
          (dblclick)="select(nft)">

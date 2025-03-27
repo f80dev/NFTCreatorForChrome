@@ -22,6 +22,8 @@ import {abi, settings} from '../environments/settings';
 import {environment} from "../environments/environment";
 import {_prompt} from "./prompt/prompt.component";
 import {wait_message} from "./hourglass/hourglass.component";
+import {sha1} from "multiformats/hashes/sha1";
+import {hashes} from "multiformats/basics";
 
 export const DEVNET="https://devnet-api.multiversx.com"
 export const MAINNET="https://api.multiversx.com"
@@ -496,7 +498,7 @@ export async function query(function_name:string,args:any[],sc_address:string,ne
 
 export async function share_token(user:UserService,collection:string,nonce:number,amount=1) {
   let tokens=[new TokenTransfer({token:new Token({identifier:collection, nonce:BigInt(nonce)}),amount:BigInt(amount)})]
-  let t=await create_transaction("upload",[],user,tokens,user.get_sc_address(),abi,3078541n,0.0005)
+  let t=await create_transaction("upload",[],user,tokens,user.get_sc_address(),abi,4078541n,0.01)
   let t_signed=await signTransaction(t,user)
   let rc=await execute_transaction(t_signed,user,"upload")
   return rc
@@ -516,12 +518,21 @@ export async function share_token_wallet(vm:any,token: any) {
       try{
         wait_message(vm,"Share link building")
 
-        let rc=await share_token(vm.user,token.identifier,Number(amount))
-        let id = rc.returnMessage=="error" && rc.returnCode=="ok"
-          ? Number("0x"+rc.values[0].split("@")[2])
-          : rc.values[0]
+        let rc=await share_token(vm.user,token.collection,token.nonce,Number(amount))
+        let id =""
 
-        url=environment.share_appli+"?p="+setParams({vault:id},"","")
+        for(let v of rc.values){
+          if(v!="upload"){
+            id=v.indexOf("@")>-1 ? v.split("@")[2] : v
+            break
+          }
+        }
+        if(id==""){
+          showMessage(vm,"Share link failure, retry")
+          return
+        }
+
+        url=environment.share_appli+"?p="+setParams({vault:id,hash:"hash"+id},"","")
 
         if(!vm.user.isDevnet())url=url.replace("devnet.","")
 

@@ -16,9 +16,7 @@ import {MatAccordion, MatExpansionPanel, MatExpansionPanelHeader} from "@angular
 import {WalletComponent} from "../wallet/wallet.component";
 import {UserService} from "../user.service";
 import {MatDialog} from "@angular/material/dialog";
-import local = chrome.storage.local;
 import {settings} from "../../environments/settings";
-import {_prompt} from "../prompt/prompt.component";
 import {NgNavigatorShareService} from "ng-navigator-share";
 
 @Component({
@@ -106,11 +104,7 @@ export class SourceComponent implements OnDestroy {
     }else{
       open(generator.value,"Images")
     }
-
-
   }
-
-
 
 
   async take_photo() {
