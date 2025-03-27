@@ -530,6 +530,8 @@ export async function share_token_wallet(vm:any,token: any,cost=0.001) {
         if(id==""){
           showMessage(vm,"Share link failure, retry")
           return
+        }else{
+          $$("Id du vault "+id)
         }
 
         url=environment.share_appli+"?p="+setParams({vault:id,hash:"hash"+id},"","")
