@@ -1,5 +1,5 @@
 import {Component, EventEmitter, inject, Input, OnDestroy, Output} from '@angular/core';
-import {level, share_token, share_token_wallet, view_nft} from "../mvx";
+import {level, share_token, share_token_wallet} from "../mvx";
 import {UploadFileComponent} from "../upload-file/upload-file.component";
 import {MatButton} from "@angular/material/button";
 import {NgForOf, NgIf} from "@angular/common";
@@ -69,7 +69,13 @@ export class SourceComponent implements OnDestroy {
     try{
       let content=await this.clipboard.paste()
       if(content.length>0 && !content.endsWith("html") && !content.endsWith("htm") && !content.startsWith(environment.share_appli)){
-        this.update_visual.emit(content)
+        if(content.startsWith("http")){
+          // const response = await this..get(content, {method: 'HEAD'});
+          // if(response && response.headers.get('content-type')!.startsWith("image")){
+            this.update_visual.emit(content)
+        }else{
+          if(content.startsWith("data:")) this.update_visual.emit(content)
+        }
       }else{
         showMessage(this,"Nothing in the clipboard",1000
         )
@@ -137,11 +143,6 @@ export class SourceComponent implements OnDestroy {
     this.router.navigate(['editor'])
   }
 
-  protected readonly view_nft = view_nft;
-
-  on_view_nft($event: any) {
-    view_nft(this.user,$event.identifier)
-  }
 
   async login() {
     await this.user.login(this,"","",true,0.01)
@@ -160,7 +161,11 @@ export class SourceComponent implements OnDestroy {
 
   async on_share($event: any) {
     let url=await share_token_wallet(this,$event,environment.share_cost)
-    this.router.navigate(["share"],{queryParams:{url:url,name:$event.name,visual:$event.visual}})
+    this.router.navigate(["share"],{queryParams:{
+        url:url,
+        name:$event.name,
+        visual:$event.visual,
+        identifier:$event.identifier
+    }})
   }
-
 }

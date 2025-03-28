@@ -229,7 +229,7 @@ export class MainComponent implements OnInit {
               let nft=await get_nft(identifier,this.api,this.user.network)
               if(nft){
                 let url=await share_token_wallet(this,nft,environment.share_cost)
-                this.router.navigate(["share"],{queryParams:{url:url,name:nft.name,visual:this.visual}})
+                this.router.navigate(["share"],{queryParams:{url:url,name:nft.name,visual:this.visual,identifier:nft.identifier}})
               }
             }
 

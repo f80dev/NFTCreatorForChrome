@@ -10,6 +10,8 @@ import {InputComponent} from "../input/input.component";
 import {MatExpansionPanel, MatExpansionPanelHeader} from "@angular/material/expansion";
 import {Clipboard, ClipboardModule} from "@angular/cdk/clipboard";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {view_nft} from "../mvx";
+import {UserService} from "../user.service";
 
 @Component({
   selector: 'app-shareform',
@@ -33,6 +35,7 @@ export class ShareformComponent implements OnInit {
     this.url=params.url || ""
     this.name=params.name || ""
     this.visual=params.visual || ""
+    this.identifier=params.identifier
   }
 
   @Input() url: string=""
@@ -46,8 +49,10 @@ export class ShareformComponent implements OnInit {
   toast=inject(MatSnackBar)
   qrcode=""
   visual=""
+  user=inject(UserService)
   title="Get this NFT"
   description="Open this link to catch an NFT in your wallet"
+  identifier=""
 
   async on_share(){
     await this.shareService.share(
@@ -66,5 +71,9 @@ export class ShareformComponent implements OnInit {
   copy_url() {
     this.clipboard.copy(this.url)
     showMessage(this,"Link in your clipboard")
+  }
+
+  sell() {
+    view_nft(this.user,this.identifier)
   }
 }
