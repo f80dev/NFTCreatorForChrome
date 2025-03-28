@@ -1,0 +1,49 @@
+<div class="mainform">
+
+  <h2>Share this link to send this content to friends</h2>
+
+  <div style="display: inline-block;background-color: #021b1b;border:solid #353535 2px;text-align: center;padding:15px;">
+    <div style="font-size: x-large;">{{name}}</div>
+    <br>
+    <img *ngIf="visual.length>0"
+         [srcset]="visual"
+         style="width: 200px;height: 200px;">
+  </div>
+
+  <br>
+  <br>
+
+  <h3>
+    {{url}}
+    <mat-icon style="margin-bottom: -5px;margin-left:10px;" (click)="copy_url()">content_copy</mat-icon>
+  </h3>
+
+  <br>
+
+  <br>
+
+  <mat-expansion-panel style="max-width:600px;display: inline-block;width:90%;">
+    <mat-expansion-panel-header>Advanced settings</mat-expansion-panel-header>
+    <br>
+    <qrcode [qrdata]="url"
+            *ngIf="url.length>0"
+            [width]="200" [errorCorrectionLevel]="'M'"></qrcode>
+
+    <br>
+    <app-input value_type="text" [value]="title" (valueChange)="title=$event" label="Title of share"></app-input><br>
+    <app-input value_type="text" [value]="description" (valueChange)="description=$event" label="Title of share"></app-input><br>
+  </mat-expansion-panel>
+
+
+  <div style="position: absolute;width:100%;text-align: center;bottom:10px;left:0;">
+    <button mat-raised-button (click)="on_share()">
+      <mat-icon>share</mat-icon>Send
+    </button>
+    <button mat-raised-button (click)="quit()">
+      <mat-icon>close</mat-icon>Close
+    </button>
+
+  </div>
+
+</div>
+

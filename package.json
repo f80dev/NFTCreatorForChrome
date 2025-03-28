@@ -33,7 +33,6 @@
     "@multiversx/sdk-wallet": "^4.6.0",
     "@multiversx/sdk-wallet-connect-provider": "^6.0.1",
     "@multiversx/sdk-web-wallet-provider": "^5.0.0",
-    "ng-navigator-share": "^1.0.4",
     "@octokit/rest": "^21.0.0",
     "@types/chrome": "^0.0.304",
     "ang-jsoneditor": "^4.0.1",

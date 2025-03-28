@@ -55,7 +55,8 @@ export function network_config(network="") : Promise<any> {
 
 export function get_nft(identifier: string, api:any,network: string) {
   //voir https://api.multiversx.com/#/nfts/NftController_getNft
-  return mvx_api("/nfts/" + identifier,"",api,network)
+  let rc:any= mvx_api("/nfts/" + identifier,"",api,network)
+  return rc
 }
 
 
@@ -441,6 +442,7 @@ export async function makeNFTTransaction(identifier:string,name:string,visual:st
 
   let factory = entrypoint.createTokenManagementTransactionsFactory()
 
+
   let transaction=factory.createTransactionForCreatingNFT(
     Address.newFromBech32(user.address),
     {
@@ -505,59 +507,47 @@ export async function share_token(user:UserService,collection:string,nonce:numbe
 
 
 export async function share_token_wallet(vm:any,token: any,cost=0.001) {
+
   let amount="1"
   if(token.type.indexOf("Semi")>-1){
     amount=await _prompt(vm,"Amount to share","1","","number","ok","annuler",false)
   }
 
-  if(amount){
-    if(!vm.user.isConnected(true))await vm.user.login(vm,"","",true)
-    if(vm.user.isConnected(true)){
-      let url=""
-      try{
-        wait_message(vm,"Share link building")
+  if(!amount || Number(amount)==0)return ""
 
-        let rc=await share_token(vm.user,token.collection,token.nonce,Number(amount),cost)
-        let id =""
+  if(!vm.user.isConnected(true))await vm.user.login(vm,"","",true)
+  if(vm.user.isConnected(true)){
+    let url=""
+    try{
+      wait_message(vm,"Share link building")
 
-        for(let v of rc.values){
-          if(v.startsWith("@6f6b")){
-            id=v.split("@")[2]
-            break
-          }
-        }
-        if(id==""){
-          showMessage(vm,"Share link failure, retry")
-          return
-        }else{
-          $$("Id du vault "+id)
-        }
+      let rc=await share_token(vm.user,token.collection,token.nonce,Number(amount),cost)
+      let id =""
 
-        url=environment.share_appli+"?p="+setParams({vault:id,hash:"hash"+id},"","")
-
-        if(!vm.user.isDevnet())url=url.replace("devnet.","")
-
-      }catch (e:any){
-        $$("Error ",e)
-      }
-      wait_message(vm)
-
-      if(url.length>0){
-        $$("Copy de "+url)
-        try{
-          await vm.shareService.share({
-            title:"Get the "+token.name+" NFT",
-            text:"Click on this link to create or use your account and get the NFT",
-            url:url
-          })
-        }catch (e:any){
-          showMessage(vm,"NFT link "+url+" to share in the clipboard")
-          await navigator.clipboard.writeText(url)
+      for(let v of rc.values){
+        if(v.startsWith("@6f6b")){
+          id=v.split("@")[2]
+          break
         }
       }
-      wait_message(vm)
+
+      if(id==""){
+        showMessage(vm,"Share link failure, retry")
+        return ""
+      }
+
+      $$("Id du vault "+id)
+      url=environment.share_appli+"?p="+setParams({vault:id,hash:"hash"+id},"","")
+      if(!vm.user.isDevnet())url=url.replace("devnet.","")
+      return url
+
+    }catch (e:any){
+      $$("Error ",e)
     }
+    wait_message(vm)
   }
+
+  return ""
 }
 
 

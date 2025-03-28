@@ -17,7 +17,8 @@ import {WalletComponent} from "../wallet/wallet.component";
 import {UserService} from "../user.service";
 import {MatDialog} from "@angular/material/dialog";
 import {settings} from "../../environments/settings";
-import {NgNavigatorShareService} from "ng-navigator-share";
+import {ShareService} from "../share.service";
+import {ShareformComponent} from "../shareform/shareform.component";
 
 @Component({
   selector: 'app-source',
@@ -29,7 +30,7 @@ import {NgNavigatorShareService} from "ng-navigator-share";
     WebcamModule,
     HourglassComponent,
     MatExpansionPanel, MatExpansionPanelHeader,
-    WalletComponent, MatAccordion
+    WalletComponent, MatAccordion, ShareformComponent
   ],
   templateUrl: './source.component.html',
   standalone: true,
@@ -46,7 +47,7 @@ export class SourceComponent implements OnDestroy {
   show_scanner: boolean = false;
   handle:any
   generators=environment.generators
-  shareService=inject(NgNavigatorShareService)
+  shareService=inject(ShareService)
 
   trigger = new Subject<void>();
   private image: WebcamImage | undefined;
@@ -55,6 +56,8 @@ export class SourceComponent implements OnDestroy {
   user=inject(UserService)
   dialog=inject(MatDialog)
   show_source=true
+  url: string=""
+  nft: any;
 
 
   capture_image(img: WebcamImage) {
@@ -155,8 +158,9 @@ export class SourceComponent implements OnDestroy {
   protected readonly level = level
   protected readonly share_token = share_token
 
-
   async on_share($event: any) {
-    await share_token_wallet(this,$event,environment.share_cost)
+    let url=await share_token_wallet(this,$event,environment.share_cost)
+    this.router.navigate(["share"],{queryParams:{url:url,name:$event.name,visual:$event.visual}})
   }
+
 }

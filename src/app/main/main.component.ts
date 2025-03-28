@@ -11,7 +11,7 @@ import {UploadFileComponent} from "../upload-file/upload-file.component";
 import {$$, getParams, showError, showMessage} from "../../tools";
 import {
   create_collection, execute_transaction,
-  get_collections,
+  get_collections, get_nft,
   getExplorer,
   level, makeNFTTransaction,
   set_roles_to_collection, share_token, share_token_wallet, signTransaction, view_account_on_gallery,
@@ -37,8 +37,7 @@ import {PinataService} from "../pinata.service";
 import {environment} from "../../environments/environment";
 import {ClipboardService} from "../clipboard.service";
 import {settings} from "../../environments/settings";
-import {TokenManagementTransactionsOutcomeParser} from "@multiversx/sdk-core/out";
-import {NgNavigatorShareService} from "ng-navigator-share";
+import {ShareService} from "../share.service";
 
 @Component({
   selector: 'app-main',
@@ -80,7 +79,7 @@ export class MainComponent implements OnInit {
   dialog=inject(MatDialog)
   toast=inject(MatSnackBar)
   http=inject(HttpClient)
-  shareService=inject(NgNavigatorShareService)
+  shareService=inject(ShareService)
 
 
   collections: {label:string,value:any}[]=[]
@@ -225,9 +224,13 @@ export class MainComponent implements OnInit {
             $$("Visibilité du NFT sur "+getExplorer(identifier,this.user.network,"nfts"))
 
             let r=await _prompt(this,"Mint terminated of "+identifier,"","Send your NFT in your wallet ?","yesno","Send it","New NFT",true)
+
             if(r=="yes"){
-              view_nft(this.user,identifier)
-              this.share_nft(identifier)
+              let nft=await get_nft(identifier,this.api,this.user.network)
+              if(nft){
+                let url=await share_token_wallet(this,nft,environment.share_cost)
+                this.router.navigate(["share"],{queryParams:{url:url,name:nft.name,visual:this.visual}})
+              }
             }
 
           }catch (e:any){
@@ -242,9 +245,7 @@ export class MainComponent implements OnInit {
     }
   }
 
-  async share_nft(identifier: any) {
-    share_token_wallet(this,{identifier:identifier},environment.share_cost)
-  }
+
 
 
   upload_pem($event: any) {
