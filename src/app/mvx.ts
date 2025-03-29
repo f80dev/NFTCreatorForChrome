@@ -1,4 +1,4 @@
-//Version official 0.4
+//Version official 0.5
 import {
   Address,
   BytesValue, ContractExecuteInput,
@@ -509,13 +509,19 @@ export async function share_token(user:UserService,collection:string,nonce:numbe
 export async function share_token_wallet(vm:any,token: any,cost=0.001) {
 
   let amount="1"
-  if(token.type.indexOf("Semi")>-1){
-    amount=await _prompt(vm,"Amount to share","1","","number","ok","annuler",false)
+  if(token.type.indexOf("Semi")>-1 && Number(token.balance)>1){
+    amount=await _prompt(vm,
+      "Amount to share","1",
+      "between 1 and "+token.balance,"number","ok","annuler",false)
   }
 
   if(!amount || Number(amount)==0)return ""
+  if(Number(amount)>Number(token.balance)){
+    showMessage(vm,"You have not enought token to send this amount")
+    return  ""
+  }
 
-  if(!vm.user.isConnected(true))await vm.user.login(vm,"","",true)
+    if(!vm.user.isConnected(true))await vm.user.login(vm,"","",true)
   if(vm.user.isConnected(true)){
     let url=""
     try{
