@@ -19,6 +19,7 @@ import {MatDialog} from "@angular/material/dialog";
 import {settings} from "../../environments/settings";
 import {ShareService} from "../share.service";
 import {ShareformComponent} from "../shareform/shareform.component";
+import {analyse_clipboard} from "../../main";
 
 @Component({
   selector: 'app-source',
@@ -65,21 +66,12 @@ export class SourceComponent implements OnDestroy {
   }
 
 
+
+
   async paste() {
     try{
-      let content=await this.clipboard.paste()
-      if(content.length>0 && !content.endsWith("html") && !content.endsWith("htm") && !content.startsWith(environment.share_appli)){
-        if(content.startsWith("http")){
-          // const response = await this..get(content, {method: 'HEAD'});
-          // if(response && response.headers.get('content-type')!.startsWith("image")){
-            this.update_visual.emit(content)
-        }else{
-          if(content.startsWith("data:")) this.update_visual.emit(content)
-        }
-      }else{
-        showMessage(this,"Nothing in the clipboard",1000
-        )
-      }
+      let content=await analyse_clipboard(this,environment.share_appli)
+      if(content)this.update_visual.emit(content)
     }catch (e:any){
      $$("Impossible de récupérer le clipboard",e)
     }

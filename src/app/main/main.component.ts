@@ -38,6 +38,7 @@ import {environment} from "../../environments/environment";
 import {ClipboardService} from "../clipboard.service";
 import {settings} from "../../environments/settings";
 import {ShareService} from "../share.service";
+import {analyse_clipboard} from "../../main";
 
 @Component({
   selector: 'app-main',
@@ -125,17 +126,12 @@ export class MainComponent implements OnInit {
     this.filename=params.filename || "image.webp"
 
     //Si l'utilisateur à donner permission on check le clipboard
-    let obj:any={name: 'clipboard-read' }
 
-    if ((await navigator.permissions.query(obj)).state === 'granted') {
-      try{
-        let visual=await this.clipboard.paste()
-        if(visual.length>0)this.visual=visual
-      }catch(e:any){
-        $$("Rien dans le presse papier")
-      }
-
+    if(this.visual==""){
+      this.visual=await analyse_clipboard(this,environment.share_appli)
     }
+
+
   //transformation du visual
     if(this.visual.length>0 && params.self_storage)await this.convert_to_base64("image/webp")
     if(params.hasOwnProperty("source") && params.source!=this.visual)this.properties.push({name:"Sources",value:params.source})
@@ -244,7 +240,6 @@ export class MainComponent implements OnInit {
       wait_message(this)
     }
   }
-
 
 
 
