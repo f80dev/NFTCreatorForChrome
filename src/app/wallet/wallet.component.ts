@@ -28,7 +28,9 @@ export class WalletComponent implements OnChanges {
 
   @Input() nft_market=environment.nft_market
   nfts: any[] = []
+
   @Input() address=""
+  @Input() help=""
   @Input() show : "coin" | "nft" | "coin,nft" ="coin,nft"
   @Input() strong_token=""
   @Input() network=settings.network || "elrond-devnet"

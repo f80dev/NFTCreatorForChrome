@@ -42,6 +42,7 @@
          [style.width]="width"
          (dblclick)="select(nft)">
   </div>
+  <div *ngIf="help.length>0" style="font-size: small;font-weight: lighter;margin:10px">{{help}}</div>
 
   <button mat-raised-button *ngIf="selected" (click)="cancel()">Cancel</button>
 

@@ -47,6 +47,9 @@
     <br>
     <mat-expansion-panel *ngIf="!show_scanner && message==''">
       <mat-expansion-panel-header>Gallery and AI Generators</mat-expansion-panel-header>
+      <div style="font-weight: lighter;font-size: small;margin:20px;">
+        Once generated, copy the image with the right click and close the window
+      </div>
       <button *ngFor="let generator of generators"
               mat-raised-button (click)="open_generator(generator)">
         {{generator.label}}
@@ -62,6 +65,7 @@
       <div *ngIf="user.isConnected(false)">
         <app-wallet [address]="user.address" show="coin" [network]="user.network"></app-wallet>
         <app-wallet [address]="user.address"  [network]="user.network"
+                    help="Double click on a picture to create a share link for the NFT"
                     show="nft" height="75px" width="75px" (selectChanged)="on_share($event)"></app-wallet>
       </div>
 
