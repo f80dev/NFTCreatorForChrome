@@ -2,7 +2,7 @@ export const settings={
   contract_addr:"erd1qqqqqqqqqqqqqpgqt54xwdjqm4keu0n7zjas2659sg2cntgl835smthcge",
   ihm_level:1,
   appname: "NFTNow",
-  version: "0.8",
+  version: "0.95",
   appli:"https://nftnow.af10.fr",
   network: "elrond-mainnet",
   intro: "Create your NFT in one minute"

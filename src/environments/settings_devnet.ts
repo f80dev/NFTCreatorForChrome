@@ -1,7 +1,7 @@
 export const settings={
   contract_addr:"erd1qqqqqqqqqqqqqpgq5n0hfwglxah3yeuy52nlqjpzv3ma8kjt835sawndnt",
-  ihm_level:2,
-  version: "0.92",
+  ihm_level:1,
+  version: "0.95",
   appname: "NFTNow Devnet",
   appli:"https://devnet.nftnow.af10.fr",
   network: "elrond-devnet",
