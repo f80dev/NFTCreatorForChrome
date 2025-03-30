@@ -38,7 +38,7 @@ import {environment} from "../../environments/environment";
 import {ClipboardService} from "../clipboard.service";
 import {settings} from "../../environments/settings";
 import {ShareService} from "../share.service";
-import {analyse_clipboard} from "../../main";
+import {analyse_clipboard, url_shorter} from "../../main";
 
 @Component({
   selector: 'app-main',
@@ -109,7 +109,7 @@ export class MainComponent implements OnInit {
 
   async ngOnInit() {
     let params:any=await getParams(this.routes)
-    this.user.network=params.network || "elrond-devnet"
+    this.user.network=params.network || settings.network || "elrond-devnet"
     $$("Lecture des paramètres ",params)
     this.user.action_after_mint=params.action || params.action_after_mint || ""
     this.visual=params.url || localStorage.getItem("image") || ""
@@ -224,7 +224,7 @@ export class MainComponent implements OnInit {
             if(r=="yes"){
               let nft=await get_nft(identifier,this.api,this.user.network)
               if(nft){
-                let url=await share_token_wallet(this,nft,environment.share_cost)
+                let url=await url_shorter(await share_token_wallet(this,nft,environment.share_cost))
                 this.router.navigate(["share"],{queryParams:{url:url,name:nft.name,visual:this.visual,identifier:nft.identifier}})
               }
             }

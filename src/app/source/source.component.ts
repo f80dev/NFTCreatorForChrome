@@ -19,7 +19,7 @@ import {MatDialog} from "@angular/material/dialog";
 import {settings} from "../../environments/settings";
 import {ShareService} from "../share.service";
 import {ShareformComponent} from "../shareform/shareform.component";
-import {analyse_clipboard} from "../../main";
+import {analyse_clipboard, url_shorter} from "../../main";
 
 @Component({
   selector: 'app-source',
@@ -152,7 +152,7 @@ export class SourceComponent implements OnDestroy {
   protected readonly share_token = share_token
 
   async on_share($event: any) {
-    let url=await share_token_wallet(this,$event,environment.share_cost)
+    let url=await url_shorter(await share_token_wallet(this,$event,environment.share_cost))
     if(url!=''){
       this.router.navigate(["share"],{queryParams:{
           url:url,

@@ -162,7 +162,9 @@ export class UserService {
 
 
   get_domain(){
-    return this.network.indexOf("devnet")>-1 ? "https://devnet-api.multiversx.com/" : "https://api.multiversx.com/"
+    if(this.network.indexOf("devnet")>-1)return "https://devnet-api.multiversx.com/"
+    if(this.network.indexOf("testnet")>-1)return "https://testnet-api.multiversx.com/"
+    return "https://api.multiversx.com/"
   }
 
 
@@ -187,7 +189,7 @@ export class UserService {
       }else{
         await this.refresh()
         let tokens=await api._service("accounts/"+this.address+"/tokens","",this.get_domain())
-        let egld_prefix=this.network.indexOf("devnet")>-1 ? "x" : ""
+        let egld_prefix=this.isTestnet() || this.isDevnet() ? "x" : ""
         tokens.push({identifier:egld_prefix+"EGLD",name:egld_prefix+"EGLD",balance:Number(this.account!.balance)})
         this.balance=Number(this.account!.balance)/1e18
 
@@ -220,6 +222,14 @@ export class UserService {
 
   isDevnet() {
     return this.network.indexOf("devnet")>-1
+  }
+
+  isMainnet() {
+    return !this.isTestnet() && !this.isDevnet()
+  }
+
+  isTestnet() {
+    return this.network.indexOf("testnet")>-1
   }
 
   getAccount() {

@@ -142,7 +142,11 @@
 
     <br>
     <mat-expansion-panel *ngIf="user.isConnected(false)" [expanded]="true">
-      <mat-expansion-panel-header>Your Wallet</mat-expansion-panel-header>
+      <mat-expansion-panel-header>
+        Your Wallet
+        &nbsp;({{user.network}})
+
+      </mat-expansion-panel-header>
       <div style="display: inline-flex;align-items: center;justify-content: center;" >
         {{user.address.substring(0,10)+"..."+user.address.substring(user.address.length-10)}}
         &nbsp;

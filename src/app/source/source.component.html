@@ -6,6 +6,8 @@
          style="width: 80%;max-width: 300px;display: inline-block;margin-top:-15px;"><br>
     <img *ngIf="user.isDevnet()" (click)="open_about()" src="assets/titre_appli_devnet.png"
          style="width: 80%;max-width: 300px;display: inline-block;margin-top:-15px;"><br>
+    <img *ngIf="user.isTestnet()" (click)="open_about()" src="assets/titre_appli_testnet.png"
+         style="width: 80%;max-width: 300px;display: inline-block;margin-top:-15px;"><br>
 
   </div>
   <mat-accordion style="margin: 10px;display: block;text-align: center;" [style.pointer-events]="message=='' ? 'all' : 'none'" [style.opacity]="message=='' ? 1 : 0.3">
@@ -59,6 +61,7 @@
 
     <mat-expansion-panel >
       <mat-expansion-panel-header>Wallet</mat-expansion-panel-header>
+      {{user.network}}<br>
       <button mat-raised-button *ngIf="user.isConnected(false)" (click)="user.logout(true)">Log out</button>
       <button mat-raised-button *ngIf="!user.isConnected(false)" (click)="login()">Log in</button>
       <br>

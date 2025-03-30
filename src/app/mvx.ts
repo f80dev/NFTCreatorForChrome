@@ -1,8 +1,8 @@
-//Version official 0.5
+//Version official 0.6
 import {
   Address,
   BytesValue, ContractExecuteInput,
-  SmartContractTransactionsFactory, Token,
+  SmartContractTransactionsFactory, TestnetEntrypoint, Token,
   TokenManagementTransactionsOutcomeParser,
   TokenTransfer,
   Transaction,
@@ -210,7 +210,7 @@ export function create_transaction(function_name:string,args:any[],
                                    contract_addr="",abi:any={},gasLimit=50000000n,cost=0) : Promise<Transaction>  {
 
   return new Promise(async (resolve) => {
-    const entrypoint = getEntrypoint(user)
+    const entrypoint = getEntrypoint(user.network)
 
     if(contract_addr=="")contract_addr=user.get_sc_address()
     let nonce=await entrypoint.recallAccountNonce(Address.newFromBech32(user.address))
@@ -255,7 +255,7 @@ export function execute_transaction(transaction:Transaction,user:UserService,fun
   return new Promise(async (resolve, reject) => {
     let transactionOnNetwork:TransactionOnNetwork | undefined=undefined
     try{
-      const entrypoint = getEntrypoint(user)
+      const entrypoint = getEntrypoint(user.network)
       //voir https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook-v13/#parsing-transaction-outcome-1
       let hash=await entrypoint.sendTransaction(transaction)
       transactionOnNetwork = await entrypoint.awaitCompletedTransaction(hash)
@@ -333,7 +333,7 @@ export async function signTransaction(t:Transaction,user:UserService) : Promise<
 }
 
 export async function set_roles_to_collection(collection_id:string, user:UserService,type_collection:string="SFT",burn=false,update=false) {
-  const entrypoint=getEntrypoint(user)
+  const entrypoint=getEntrypoint(user.network)
   let factory = entrypoint.createTokenManagementTransactionsFactory();
 
   $$("Affectation des roles sur la collection "+collection_id+" de type "+type_collection)
@@ -372,7 +372,7 @@ export async function create_collection(name:string,user:UserService,vm:any=null
   //puis appel de setSpecialRole@544f4b454d4f4e2d346561303466@15432c1a00ea0f72466e099db66e6059d4becc9bb9eed17f3db817f29a0fc26b@45534454526f6c654e4654437265617465@45534454526f6c654e46544164645175616e74697479
 
   if(vm)vm.message="Collection building phase"
-  const entrypoint=getEntrypoint(user)
+  const entrypoint=getEntrypoint(user.network)
   let factory = entrypoint.createTokenManagementTransactionsFactory()
 
   let option={
@@ -424,8 +424,10 @@ export function view_nft(user:UserService,identifier:string,explorer=environment
   open(url,"Gallery")
 }
 
-function getEntrypoint(user:UserService){
-  return user.network.indexOf("devnet")>-1 ? new DevnetEntrypoint() : new MainnetEntrypoint()
+function getEntrypoint(network:string){
+  if(network.indexOf("devnet")>-1)return new DevnetEntrypoint()
+  if(network.indexOf("testnet")>-1)return new TestnetEntrypoint()
+  return new MainnetEntrypoint()
 }
 
 //buildNFT transaction
@@ -436,7 +438,7 @@ export async function makeNFTTransaction(identifier:string,name:string,visual:st
   //Creation depuis le wallet Mvx : ESDTNFTCreate@SFT-55f2b5@@Londres@2500@QmNq8Kb8J2Aq3fqWu8jRHEvUvyAEwrHt8DSrqAhAWStiDE@tags:;metadata:QmaoTy3G7Cpb72czvs384qFQUqWeWBdTs5grHk311AassH@https://ipfs.io/ipfs/QmNq8Kb8J2Aq3fqWu8jRHEvUvyAEwrHt8DSrqAhAWStiDE
 
   $$("Construction de "+name+" sur la collection "+identifier+" en quantite "+quantity)
-  const entrypoint=getEntrypoint(user)
+  const entrypoint=getEntrypoint(user.network)
   //if(metadata_url.length>0)uris.unshift(metadata_url)
   if(uris.length==0 || uris[0]!=visual)uris.unshift(visual)
 
@@ -477,7 +479,7 @@ export async function makeNFTTransaction(identifier:string,name:string,visual:st
 //voir https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook-v14#smart-contract-queries
 export async function query(function_name:string,args:any[],sc_address:string,network="devnet") : Promise<any> {
   return new Promise(async (resolve, reject) => {
-    const entrypoint = network.indexOf("devnet")>-1 ? new DevnetEntrypoint() : new MainnetEntrypoint()
+    const entrypoint = getEntrypoint(network)
     const controller = entrypoint.createSmartContractController(await create_abi(abi));
     const query = controller.createQuery({
       contract: Address.newFromBech32(sc_address),
@@ -544,7 +546,9 @@ export async function share_token_wallet(vm:any,token: any,cost=0.001) {
 
       $$("Id du vault "+id)
       url=environment.share_appli+"?p="+setParams({vault:id,hash:"hash"+id},"","")
-      if(!vm.user.isDevnet())url=url.replace("devnet.","")
+      if(vm.user.isTestnet())url=url.replace("devnet.","tesnet.")
+      if(vm.user.isMainnet())url=url.replace("devnet.","")
+
       return url
 
     }catch (e:any){

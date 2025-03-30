@@ -51,9 +51,10 @@ export class WalletComponent implements OnChanges {
   async refresh(){
     this.nfts=[]
     if(this.show.indexOf("nft")>-1){
+      let prefix=(this.user.isDevnet() ? "devnet-" : (this.user.isTestnet() ? "testnet-" : ""))
       let nfts=await this.api._service(
         "accounts/"+this.address+"/nfts","",
-        "https://"+(this.user.isDevnet() ? "devnet-" : "")+"api.multiversx.com/")
+        "https://"+prefix+"api.multiversx.com/")
 
       nfts.reverse()
 
@@ -106,7 +107,8 @@ export class WalletComponent implements OnChanges {
 
   create_coin() {
     let url="https://devnet.usewarp.to/create-token"
-    if(this.user.network.indexOf("devnet")==-1)url=url.replace("devnet.","")
+    if(this.user.isTestnet())url=url.replace("devnet","testnet")
+    if(!this.user.isTestnet() && !this.user.isDevnet())url=url.replace("devnet.","")
     open(url,"ESDT Creator")
   }
 

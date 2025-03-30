@@ -3,11 +3,22 @@ import { appConfig } from './app/app.config';
 import { AppComponent } from './app/app.component';
 import {environment} from "./environments/environment";
 import {showMessage} from "./tools";
-import {cat} from "@helia/unixfs/commands/cat";
 
 (window as any).global = window;
 
 bootstrapApplication(AppComponent, appConfig).catch((err) => console.error(err));
+
+
+
+export function url_shorter(url_to_short:string) : Promise<string> {
+  return new Promise(async (resolve, reject) => {
+    let url="https://is.gd/create.php?format=json&url="+encodeURIComponent(url_to_short)
+    let r=await fetch(url,{mode:'cors'});
+    let resp:any=await r.json()
+    resolve(resp.shorturl);
+  })
+}
+
 
 
 export async function analyse_clipboard(vm:any,share_appli=environment.share_appli,force=false) {
