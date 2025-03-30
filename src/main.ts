@@ -10,19 +10,22 @@ import {cat} from "@helia/unixfs/commands/cat";
 bootstrapApplication(AppComponent, appConfig).catch((err) => console.error(err));
 
 
-export async function analyse_clipboard(vm:any,share_appli=environment.share_appli) {
+export async function analyse_clipboard(vm:any,share_appli=environment.share_appli,force=false) {
 
   try{
-    let content=await vm.clipboard.paste()
-
-    if(content.length>0 && !content.endsWith("html") && !content.endsWith("htm") && !content.startsWith(share_appli)){
-      if(content.startsWith("http")){
-        // const response = await this..get(content, {method: 'HEAD'});
-        // if(response && response.headers.get('content-type')!.startsWith("image")){
-        return content
-      }else{
-        if(content.startsWith("data:"))return content
+    let obj:any={name:'clipboard-read'}
+    if(force || (await navigator.permissions.query(obj)).state === 'granted' ){
+      let content=await vm.clipboard.paste()
+      if(content.length>0 && !content.endsWith("html") && !content.endsWith("htm") && !content.startsWith(share_appli)){
+        if(content.startsWith("http")){
+          // const response = await this..get(content, {method: 'HEAD'});
+          // if(response && response.headers.get('content-type')!.startsWith("image")){
+          return content
+        }else{
+          if(content.startsWith("data:"))return content
+        }
       }
+
     }
 
   }catch(e:any){

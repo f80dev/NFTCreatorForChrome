@@ -70,7 +70,7 @@ export class SourceComponent implements OnDestroy {
 
   async paste() {
     try{
-      let content=await analyse_clipboard(this,environment.share_appli)
+      let content=await analyse_clipboard(this,environment.share_appli,true)
       if(content)this.update_visual.emit(content)
     }catch (e:any){
      $$("Impossible de récupérer le clipboard",e)
