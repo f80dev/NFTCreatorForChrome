@@ -2,7 +2,7 @@
   <app-hourglass [message]="message"></app-hourglass>
   <br>
   <div *ngIf="message==''">
-    <img *ngIf="!user.isDevnet()" (click)="open_about()" src="assets/titre_appli.png"
+    <img *ngIf="user.isMainnet()" (click)="open_about()" src="assets/titre_appli.png"
          style="width: 80%;max-width: 300px;display: inline-block;margin-top:-15px;"><br>
     <img *ngIf="user.isDevnet()" (click)="open_about()" src="assets/titre_appli_devnet.png"
          style="width: 80%;max-width: 300px;display: inline-block;margin-top:-15px;"><br>
