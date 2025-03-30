@@ -43,9 +43,9 @@
        style="color-interpolation-filters:sRGB"
        id="filter2"
        x="-0.024161102"
-       y="-0.095036484"
+       y="-0.097880132"
        width="1.0483222"
-       height="1.190073">
+       height="1.1957603">
       <feGaussianBlur
          inkscape:collect="always"
          stdDeviation="0.17461422"
@@ -145,5 +145,32 @@
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.5778px;font-family:'Freestyle Script Std';-inkscape-font-specification:'Freestyle Script Std, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke:#686868;stroke-width:2.44579;stroke-dasharray:none;stroke-opacity:1"
          x="106.65463"
          y="92.611694">DEVNET</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:36.6384px;line-height:1.25;font-family:'Gill Sans MT Ultra Bold';-inkscape-font-specification:'Gill Sans MT Ultra Bold, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#23f7dd;fill-opacity:1;stroke-width:0.264582"
+       x="24.240234"
+       y="104.50964"
+       id="text3"
+       transform="scale(0.84047611,1.1898018)"
+       inkscape:export-filename="assets\titre_appli_testnet.png"
+       inkscape:export-xdpi="128"
+       inkscape:export-ydpi="128"><tspan
+         sodipodi:role="line"
+         id="tspan3"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:36.6384px;font-family:'Gill Sans MT Ultra Bold';-inkscape-font-specification:'Gill Sans MT Ultra Bold, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#23f7dd;fill-opacity:1;stroke-width:0.264582"
+         x="24.240234"
+         y="104.50964">NFT Now</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.5778px;line-height:1.25;font-family:'Freestyle Script Std';-inkscape-font-specification:'Freestyle Script Std, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;opacity:0.952508;mix-blend-mode:normal;stroke:#686868;stroke-width:2.44579;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter2)"
+       x="106.65463"
+       y="92.611694"
+       id="text4"
+       transform="matrix(0.55334057,0.00861946,-0.00902298,0.52859435,77.36169,77.14907)"><tspan
+         sodipodi:role="line"
+         id="tspan4"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.5778px;font-family:'Freestyle Script Std';-inkscape-font-specification:'Freestyle Script Std, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke:#686868;stroke-width:2.44579;stroke-dasharray:none;stroke-opacity:1"
+         x="106.65463"
+         y="92.611694">TESTNET</tspan></text>
   </g>
 </svg>

@@ -61,7 +61,7 @@
 
     <mat-expansion-panel >
       <mat-expansion-panel-header>Wallet</mat-expansion-panel-header>
-      {{user.network}}<br>
+      <div *ngIf="!user.isMainnet()">{{user.network}}</div>
       <button mat-raised-button *ngIf="user.isConnected(false)" (click)="user.logout(true)">Log out</button>
       <button mat-raised-button *ngIf="!user.isConnected(false)" (click)="login()">Log in</button>
       <br>
