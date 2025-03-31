@@ -549,6 +549,7 @@ export async function share_token_wallet(vm:any,token: any,cost=0.001) {
       if(vm.user.isTestnet())url=url.replace("devnet.","tesnet.")
       if(vm.user.isMainnet())url=url.replace("devnet.","")
 
+      $$("url de partage "+url)
       return url
 
     }catch (e:any){
