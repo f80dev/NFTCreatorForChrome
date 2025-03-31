@@ -517,6 +517,13 @@ export async function share_token(user:UserService,collection:string,nonce:numbe
 
 
 
+export function get_token(identifier: string, api:any,network: string) {
+  //voir https://api.multiversx.com/#/nfts/NftController_getNft
+  let rc:any= mvx_api("/tokens/" + identifier,"",api,network)
+  return rc
+}
+
+
 export async function share_token_wallet(vm:any,token: any,cost=0.0003) : Promise<{url:string,amount:number} | null> {
 
   //Permet le partage d'un token
