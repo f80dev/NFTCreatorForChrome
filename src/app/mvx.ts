@@ -527,7 +527,7 @@ export async function share_token_wallet(vm:any,token: any,cost=0.001) {
   if(vm.user.isConnected(true)){
     let url=""
     try{
-      wait_message(vm,"Share link building")
+      wait_message(vm,"Sharing link building")
 
       let rc=await share_token(vm.user,token.collection,token.nonce,Number(amount),cost)
       let id =""
@@ -540,7 +540,7 @@ export async function share_token_wallet(vm:any,token: any,cost=0.001) {
       }
 
       if(id==""){
-        showMessage(vm,"Share link failure, retry")
+        showMessage(vm,"Sharing link failure, retry")
         return ""
       }
 

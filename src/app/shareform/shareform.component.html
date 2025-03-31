@@ -14,7 +14,7 @@
   <br>
   <br>
 
-  <div style="padding: 15px;border: grey solid 2px;border-radius: 15px;font-size:clamp(10px, 2vw,25px);text-wrap: pretty; display: inline-block;margin:10px;width: 60%;">
+  <div style="padding: 15px;border: grey solid 2px;border-radius: 15px;font-size:clamp(15px, 2.2vw,30px);text-wrap: pretty; display: inline-block;margin:10px;width: 50%;max-width:550px;">
     {{url}}
     <mat-icon style="margin-bottom: -5px;margin-left:10px;"
               title="Copy this link"
@@ -26,10 +26,11 @@
 
   <mat-expansion-panel style="max-width:600px;display: inline-block;width:90%;">
     <mat-expansion-panel-header>Advanced settings</mat-expansion-panel-header>
-    <br>
+
     <qrcode [qrdata]="url"
             *ngIf="url.length>0"
             [width]="200" [errorCorrectionLevel]="'M'"></qrcode>
+    <p>This QR code corresponds to the sharing link of your NFT to be distributed</p>
 
     <br>
     <app-input value_type="text" [value]="title" (valueChange)="title=$event" label="Title of share"></app-input>

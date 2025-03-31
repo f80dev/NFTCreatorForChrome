@@ -219,10 +219,11 @@ export class MainComponent implements OnInit {
 
             $$("Visibilité du NFT sur "+getExplorer(identifier,this.user.network,"nfts"))
 
-            let r=await _prompt(this,"Mint terminated of "+identifier,"","Send your NFT in your wallet ?","yesno","Send it","New NFT",true)
+            let r=await _prompt(this,"Mint terminated of "+this.name+" ("+identifier+")","","Send your NFT with a sharing link ? ","yesno","Send it","New NFT",true)
 
             if(r=="yes"){
               let nft=await get_nft(identifier,this.api,this.user.network)
+              nft.balance=nft.supply
               if(nft){
                 let url=await url_shorter(await share_token_wallet(this,nft,environment.share_cost))
                 this.router.navigate(["share"],{queryParams:{url:url,name:nft.name,visual:this.visual,identifier:nft.identifier}})

@@ -10,6 +10,26 @@ bootstrapApplication(AppComponent, appConfig).catch((err) => console.error(err))
 
 
 
+export async function checkImageURL(url:string) {
+  try {
+    const response = await fetch(url, { method: 'HEAD' }); // HEAD request is faster
+
+    if (response.ok) {
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.startsWith('image/')) {
+        return { ok: true, message: 'Image URL is valid.' };
+      } else {
+        return { ok: false, message: 'URL is not an image.' };
+      }
+    } else {
+      return { ok: false, message: `URL returned status: ${response.status}` };
+    }
+  } catch (error:any) {
+    return { ok: false, message: `Error checking URL: ${error.message}` };
+  }
+}
+
+
 export function url_shorter(url_to_short:string) : Promise<string> {
   return new Promise(async (resolve, reject) => {
     let url="https://is.gd/create.php?format=json&url="+encodeURIComponent(url_to_short)
@@ -43,6 +63,6 @@ export async function analyse_clipboard(vm:any,share_appli=environment.share_app
 
   }
 
-  showMessage(vm,"Nothing in the clipboard",1000)
+  if(force)showMessage(vm,"Nothing in the clipboard",1000)
   return ""
 }

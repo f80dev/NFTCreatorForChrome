@@ -66,7 +66,6 @@ export class WalletComponent implements OnChanges {
           if(!nft.hasOwnProperty("metadata")){nft.metadata=await this.api._service("ipfs/"+cid,"","https://ipfs.io/",false)}
           nft.tags=tags
         }
-        debugger
         nft.visual=nft.hasOwnProperty("media") ? nft.media[0].originalUrl : ""
         //nft.visual=nft.media[0].originalUrl
         this.nfts.push(nft)
