@@ -55,6 +55,7 @@ export class ShareformComponent implements OnInit {
   identifier=""
 
   async on_share(){
+    debugger
     await this.shareService.share(
       this.title,
       this.description,
