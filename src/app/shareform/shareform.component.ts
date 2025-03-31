@@ -34,12 +34,14 @@ export class ShareformComponent implements OnInit {
     let params:any=await getParams(this.routes)
     this.url=params.url || ""
     this.name=params.name || ""
+    this.amount=Number(params.amount || "0")
     this.visual=params.visual || ""
     this.identifier=params.identifier
   }
 
   @Input() url: string=""
   @Input() name: string=""
+  @Input() amount=0
   @Output() onshare=new EventEmitter()
 
   routes=inject(ActivatedRoute)
@@ -55,7 +57,6 @@ export class ShareformComponent implements OnInit {
   identifier=""
 
   async on_share(){
-    debugger
     await this.shareService.share(
       this.title,
       this.description,

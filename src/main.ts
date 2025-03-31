@@ -42,7 +42,6 @@ export function url_shorter(url_to_short:string) : Promise<string> {
 
 
 export async function analyse_clipboard(vm:any,share_appli=environment.share_appli,force=false) {
-
   try{
     let obj:any={name:'clipboard-read'}
     if(force || (await navigator.permissions.query(obj)).state === 'granted' ){

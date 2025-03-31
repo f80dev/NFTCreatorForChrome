@@ -1,8 +1,8 @@
-//Version official 0.6
+//Version official 0.7 - 31/03/2025
 import {
   Address,
   BytesValue, ContractExecuteInput,
-  SmartContractTransactionsFactory, TestnetEntrypoint, Token,
+  SmartContractTransactionsFactory, TestnetEntrypoint, Token, TokenComputer,
   TokenManagementTransactionsOutcomeParser,
   TokenTransfer,
   Transaction,
@@ -222,7 +222,9 @@ export function create_transaction(function_name:string,args:any[],
       arguments: args,
       nativeTransferAmount:BigInt(cost*1e18),
     }
-    if(tokens_to_transfer.length>0)option.tokenTransfers=tokens_to_transfer
+    if(tokens_to_transfer.length>0){
+      option.tokenTransfers=tokens_to_transfer
+    }
 
 
     let transaction
@@ -233,7 +235,7 @@ export function create_transaction(function_name:string,args:any[],
     }else{
       //https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook-v14/#calling-a-smart-contract-using-the-factory
       let fact=entrypoint.createSmartContractTransactionsFactory()
-      transaction= fact.createTransactionForExecute(Address.newFromBech32(user.address),option)
+      transaction=fact.createTransactionForExecute(Address.newFromBech32(user.address),option)
       transaction.nonce=nonce
     }
     resolve(transaction)
@@ -498,9 +500,16 @@ export async function query(function_name:string,args:any[],sc_address:string,ne
 }
 
 
-export async function share_token(user:UserService,collection:string,nonce:number,amount=1,cost=0.001) {
-  let tokens=[new TokenTransfer({token:new Token({identifier:collection, nonce:BigInt(nonce)}),amount:BigInt(amount)})]
-  let t=await create_transaction("upload",[],user,tokens,user.get_sc_address(),abi,4078541n,cost)
+export async function share_token(user:UserService,collection:string,nonce:number,amount=1,cost=0.001,decimals=0) {
+
+  let opt:any={identifier:collection}
+  if(nonce)opt.nonce=BigInt(nonce)
+
+  let token=new TokenTransfer({
+    token:new Token(opt),
+    amount:BigInt(amount)
+  })
+  let t=await create_transaction("upload",[],user,[token],user.get_sc_address(),abi,4078541n,cost)
   let t_signed=await signTransaction(t,user)
   let rc=await execute_transaction(t_signed,user,"upload")
   return rc
@@ -508,19 +517,22 @@ export async function share_token(user:UserService,collection:string,nonce:numbe
 
 
 
-export async function share_token_wallet(vm:any,token: any,cost=0.001) {
+export async function share_token_wallet(vm:any,token: any,cost=0.0003) : Promise<{url:string,amount:number} | null> {
+
+  //Permet le partage d'un token
+  //vm doit contenir MatDialog, user
 
   let amount="1"
-  if(token.type.indexOf("Semi")>-1 && Number(token.balance)>1){
+  if((token.type.indexOf("SemiFungible")>-1 || token.type.startsWith("Fungible")) && Number(token.balance)>1){
     amount=await _prompt(vm,
       "Amount to share","1",
       "between 1 and "+token.balance,"number","ok","annuler",false)
   }
 
-  if(!amount || Number(amount)==0)return ""
+  if(!amount || Number(amount)==0)return null
   if(Number(amount)>Number(token.balance)){
     showMessage(vm,"You have not enought token to send this amount")
-    return  ""
+    return null
   }
 
     if(!vm.user.isConnected(true))await vm.user.login(vm,"","",true)
@@ -528,7 +540,11 @@ export async function share_token_wallet(vm:any,token: any,cost=0.001) {
     let url=""
     try{
       wait_message(vm,"Sharing link building")
-
+      if(token.type.startsWith("Fungible")){
+        token.decimals=18
+        amount=(Number(amount)*1e18).toString()
+        token.collection=token.identifier
+      }
       let rc=await share_token(vm.user,token.collection,token.nonce,Number(amount),cost)
       let id =""
 
@@ -541,7 +557,7 @@ export async function share_token_wallet(vm:any,token: any,cost=0.001) {
 
       if(id==""){
         showMessage(vm,"Sharing link failure, retry")
-        return ""
+        return null
       }
 
       $$("Id du vault "+id)
@@ -550,7 +566,7 @@ export async function share_token_wallet(vm:any,token: any,cost=0.001) {
       if(vm.user.isMainnet())url=url.replace("devnet.","")
 
       $$("url de partage "+url)
-      return url
+      return {url:url,amount:Number(amount)}
 
     }catch (e:any){
       $$("Error ",e)
@@ -558,7 +574,7 @@ export async function share_token_wallet(vm:any,token: any,cost=0.001) {
     wait_message(vm)
   }
 
-  return ""
+  return null
 }
 
 

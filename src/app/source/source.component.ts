@@ -152,14 +152,28 @@ export class SourceComponent implements OnDestroy {
   protected readonly share_token = share_token
 
   async on_share($event: any) {
-    let url=await url_shorter(await share_token_wallet(this,$event,environment.share_cost))
-    if(url!=''){
-      this.router.navigate(["share"],{queryParams:{
-          url:url,
-          name:$event.name,
-          visual:$event.visual,
-          identifier:$event.identifier
-        }})
+    let obj=await share_token_wallet(this,$event,environment.share_cost)
+    if(obj){
+      let url=await url_shorter(obj.url)
+      if(url!=''){
+        this.router.navigate(["share"],{queryParams:{
+            url:url,
+            name:$event.name,
+            visual:$event.visual,
+            identifier:$event.identifier,
+            amount:obj.amount
+          }})
+      }
     }
+
+  }
+
+  share_coin(content:any) {
+    this.router.navigate(["share"],{queryParams:{
+        url:content.url,
+        visual:"",
+        name:content.token.name,
+        amount:content.amount/1e18
+    }})
   }
 }

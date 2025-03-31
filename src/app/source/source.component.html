@@ -66,7 +66,11 @@
       <button mat-raised-button *ngIf="!user.isConnected(false)" (click)="login()">Log in</button>
       <br>
       <div *ngIf="user.isConnected(false)">
-        <app-wallet [address]="user.address" show="coin" [network]="user.network"></app-wallet>
+        <app-wallet [address]="user.address" show="coin"
+                    (shareCoin)="share_coin($event)"
+                    [network]="user.network"></app-wallet>
+
+
         <app-wallet [address]="user.address"  [network]="user.network"
                     help="Double click on a picture to create a share link for the NFT"
                     show="nft" height="75px" width="75px" (selectChanged)="on_share($event)"></app-wallet>

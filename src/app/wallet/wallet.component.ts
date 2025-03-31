@@ -6,7 +6,9 @@ import {UserService} from '../user.service';
 import {environment} from '../../environments/environment';
 import {MatIcon} from '@angular/material/icon';
 import {settings} from '../../environments/settings';
-import {getExplorer, view_account_on_gallery} from "../mvx";
+import {getExplorer, share_token_wallet, view_account_on_gallery} from "../mvx";
+import {MatDialog} from "@angular/material/dialog";
+import {url_shorter} from "../../main";
 
 @Component({
   selector: 'app-wallet',
@@ -25,6 +27,7 @@ import {getExplorer, view_account_on_gallery} from "../mvx";
 export class WalletComponent implements OnChanges {
   api=inject(ApiService)
   user=inject(UserService)
+  dialog=inject(MatDialog)
 
   @Input() nft_market=environment.nft_market
   nfts: any[] = []
@@ -35,6 +38,7 @@ export class WalletComponent implements OnChanges {
   @Input() strong_token=""
   @Input() network=settings.network || "elrond-devnet"
   @Output() selectChanged = new EventEmitter()
+  @Output() shareCoin = new EventEmitter()
   @Output() onCancel = new EventEmitter()
   @Output() listChanged = new EventEmitter()
 
@@ -117,5 +121,16 @@ export class WalletComponent implements OnChanges {
 
   show_account() {
     open(getExplorer(this.user.address,this.user.network,"accounts","explorer"),"Account")
+  }
+
+  async send_coin(identifier: string) {
+    let balance=this.user.get_balance(identifier)
+    let token=this.user.tokens[identifier]
+    token.balance=token.balance/1e18
+    let obj=await share_token_wallet(this,token,environment.share_cost)
+    if(obj){
+      let url=await url_shorter(obj.url)
+      this.shareCoin.emit({url:url,token:token,amount:obj.amount})
+    }
   }
 }
