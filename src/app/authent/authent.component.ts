@@ -53,10 +53,12 @@ enum Wallet_Operation {
 
 export function eval_direct_url_xportal(uri:string) : string {
   //let rc="https://xportal.com/?wallet-connect="+uri; //"+this.provider.?relay-protocol%3Dirn&symKey=2a0e80dd8b982dac05eef5ce071fbe541d390fc302666d09856ae379416bfa6e"
-  debugger
-  return walletConnectDeepLink+encodeURIComponent(uri);
+  let url=walletConnectDeepLink+encodeURIComponent(uri)
+  $$("url de connexion ",url)
+  return url
 }
-
+//https://maiar.page.link/?apn=com.elrond.maiar.wallet&isi=1519405832&ibi=com.elrond.maiar.wallet&link=https://maiar.com/?wallet-connect=wc%3Aa093c06fa53b3a8e226c27b16f1a6c3f735ed97012ac1dde69c294c7ea4892df%402%3Frelay-protocol%3Dirn%26symKey%3D1cc9dbc136ffa3cdf3370359d16a43346ae3dc45cbc799892fc9bf565a1701a0%26expiryTimestamp%3D1743544892
+//https://maiar.page.link/?apn=com.elrond.maiar.wallet&isi=1519405832&ibi=com.elrond.maiar.wallet&link=https://maiar.com/?wallet-connect=wc%3A47d070b33052413aecb6ae0698c3dad1b207f36111611caafee3ed1f0a1d7550%402%3FexpiryTimestamp%3D1743544759%26relay-protocol%3Dirn%26symKey%3D03faea9e23a1e06038e26067d00f0054ca5da5a4feb62d354c72163383acede2
 
 
 interface IExtensionAccount {
