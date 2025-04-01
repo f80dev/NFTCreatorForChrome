@@ -18,6 +18,7 @@ import {_prompt} from "../prompt/prompt.component";
 import {ApiService} from "../api.service";
 import {HourglassComponent, wait_message} from "../hourglass/hourglass.component";
 import {MatDialog} from "@angular/material/dialog";
+import {XportalSwitchComponent} from "../xportal-switch/xportal-switch.component";
 
 @Component({
   selector: 'app-shareform',
@@ -28,7 +29,7 @@ import {MatDialog} from "@angular/material/dialog";
     NgIf,
     QRCodeComponent,
     InputComponent,
-    MatExpansionPanel, MatExpansionPanelHeader, HourglassComponent
+    MatExpansionPanel, MatExpansionPanelHeader, HourglassComponent, XportalSwitchComponent
   ],
   templateUrl: './shareform.component.html',
   standalone: true,
@@ -59,15 +60,16 @@ export class ShareformComponent implements OnInit {
 
   async ngOnInit() {
     let params:any=await getParams(this.routes)
-    this.content=await get_nft(params.identifier,this.api,this.user.network)
-    this.visual=params.visual
+    await this.user.login(this,"","",false)
+    this.content=params.content
+    this.visual=params.visual || this.content.media[0].originalUrl
   }
 
 
   async transfer() {
-      let obj=await share_token_wallet(this,this.content,environment.share_cost)
-      this.url=await url_shorter(obj!.url)
-      wait_message(this)
+    let obj=await share_token_wallet(this,this.content,environment.share_cost)
+    this.url=await url_shorter(obj!.url)
+    wait_message(this)
   }
 
 

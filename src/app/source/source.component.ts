@@ -8,7 +8,7 @@ import {ClipboardService} from "../clipboard.service";
 import {Subject} from "rxjs";
 import {environment} from "../../environments/environment";
 import {Router} from "@angular/router";
-import {$$, showMessage} from "../../tools";
+import {$$, setParams, showMessage} from "../../tools";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {ImageProcessorService} from "../image-processor.service";
 import {HourglassComponent, wait_message} from "../hourglass/hourglass.component";
@@ -152,27 +152,14 @@ export class SourceComponent implements OnDestroy {
   protected readonly share_token = share_token
 
   async on_share($event: any) {
-    let obj=await share_token_wallet(this,$event,environment.share_cost)
-    if(obj){
-      let url=await url_shorter(obj.url)
-      if(url!=''){
-        this.router.navigate(["share"],{queryParams:{
-            url:url,
-            name:$event.name,
-            visual:$event.visual,
-            identifier:$event.identifier,
-            amount:obj.amount
-          }})
-      }
-    }
-
+    this.router.navigate(["share"],{queryParams:{p:setParams({visual:$event.visual,content:$event},"","")}})
   }
 
   share_coin(content:any) {
     this.router.navigate(["share"],{queryParams:{
         url:content.url,
         visual:"",
-        name:content.token.name,
+        content:content.token,
         amount:content.amount/1e18
     }})
   }

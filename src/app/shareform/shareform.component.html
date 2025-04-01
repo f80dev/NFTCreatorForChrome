@@ -1,16 +1,23 @@
-<app-hourglass [message]="message"></app-hourglass>
-<div class="mainform" *ngIf="message==''">
+
+<div class="mainform">
+
+  <app-hourglass [message]="message" ></app-hourglass>
+  <app-xportal-switch [uri]="user.uri_to_xportal"></app-xportal-switch>
 
 
-  <br>
-  <img *ngIf="visual.length>0"
-       [srcset]="visual"
-       [title]="visual"
-       style="width: 100px;height: 100px;">
+  <div *ngIf="url===''">
+    <br>
+    <img *ngIf="visual.length>0"
+         [srcset]="visual"
+         [title]="visual"
+         style="width: 100px;height: 100px;">
 
-  <br><br>
-  <div style="font-size: large;">
-    {{content.name}} minted !
+    <br><br>
+    <div style="font-size: large;">
+      {{content.balance}} {{content.name}} available to share !
+    </div>
+    <br>
+
   </div>
 
 
@@ -25,7 +32,7 @@
                 (click)="copy_url()">content_copy</mat-icon>
     </div>
 
-    <mat-expansion-panel style="max-width:600px;display: inline-block;width:90%;">
+    <mat-expansion-panel style="max-width:600px;display: inline-block;width:90%;margin-top:40px;">
       <mat-expansion-panel-header>Advanced settings</mat-expansion-panel-header>
 
       <qrcode [qrdata]="url"
@@ -39,18 +46,22 @@
     </mat-expansion-panel>
 
     <br>
-    <button mat-raised-button (click)="on_share()">
-      <mat-icon>share</mat-icon>Share
-    </button>
+
   </div>
 
 
 
-  <div style="width:100%;text-align:center;margin-top:20px;">
-    <button mat-raised-button (click)="sell()">
-      <mat-icon>paid</mat-icon>Sell
-    </button>
-    <button mat-raised-button (click)="transfer()">
+  <div style="width:100%;text-align:center;margin-top:20px;" *ngIf="message==''">
+    <div *ngIf="url===''" style="display: inline-block;">
+      <button mat-raised-button (click)="sell()">
+        <mat-icon>paid</mat-icon>Sell
+      </button>
+      <button mat-raised-button (click)="transfer()">
+        <mat-icon>link</mat-icon>Link to share
+      </button>
+    </div>
+
+    <button mat-raised-button *ngIf="url!=''" (click)="on_share()">
       <mat-icon>share</mat-icon>Share
     </button>
     <button mat-raised-button (click)="quit()">

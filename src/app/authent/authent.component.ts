@@ -13,7 +13,6 @@ import {DeviceService} from "../device.service";
 import { WalletConnectV2Provider } from "@multiversx/sdk-wallet-connect-provider";
 import { ExtensionProvider } from "@multiversx/sdk-extension-provider";
 import {WALLET_PROVIDER_DEVNET, WALLET_PROVIDER_MAINNET, WalletProvider} from "@multiversx/sdk-web-wallet-provider";
-
 import {EvmWalletServiceService} from "../evm-wallet-service.service";
 import {_prompt} from "../prompt/prompt.component";
 import {MatDialog} from "@angular/material/dialog";
@@ -35,6 +34,7 @@ import {QRCodeComponent} from 'angularx-qrcode';
 import {settings} from '../../environments/settings';
 import {HourglassComponent, wait_message} from "../hourglass/hourglass.component";
 import {UserService} from "../user.service";
+import {XportalSwitchComponent} from "../xportal-switch/xportal-switch.component";
 
 //Installation de @multiversx/sdk-wallet-connect-provider via yarn add @multiversx/sdk-wallet-connect-provider
 
@@ -82,6 +82,7 @@ interface IExtensionAccount {
     NgIf,
     MatButton,
     HourglassComponent,
+    XportalSwitchComponent,
   ],
   providers: [],
   styleUrls: ['./authent.component.css']
@@ -559,7 +560,6 @@ export class AuthentComponent implements OnInit,OnChanges {
       const { uri, approval } = await this.provider.connect();
       this.qrcode=uri
       wait_message(this)
-      //this.qrcode=this.api.server_nfluent+"/api/qrcode/"+encodeURIComponent(uri);
 
       this.url_xportal_direct_connect=eval_direct_url_xportal(uri)
       let address=await this.provider.login({approval});

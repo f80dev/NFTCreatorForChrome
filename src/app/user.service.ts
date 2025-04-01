@@ -52,6 +52,7 @@ export class UserService {
   pem_account: Account | undefined
   action_after_mint: string=""
   params: any={}
+  uri_to_xportal=""
 
   constructor() { }
 
@@ -147,6 +148,8 @@ export class UserService {
               this.connexion.extension_wallet=false
             }
             let r:any=await _ask_for_authent(vm,"Authentification",subtitle,this.network,this.connexion)
+
+            this.uri_to_xportal=r.url_direct_xportal_connect
             let address_change=await this.authent(r,required_balance,message_balance)
 
             resolve(address_change)

@@ -6,7 +6,7 @@ import {UserService} from '../user.service';
 import {environment} from '../../environments/environment';
 import {MatIcon} from '@angular/material/icon';
 import {settings} from '../../environments/settings';
-import {getExplorer, share_token_wallet, view_account_on_gallery} from "../mvx";
+import {decode_metadata, get_nfts, getExplorer, share_token_wallet, view_account_on_gallery} from "../mvx";
 import {MatDialog} from "@angular/material/dialog";
 import {url_shorter} from "../../main";
 
@@ -55,32 +55,20 @@ export class WalletComponent implements OnChanges {
   async refresh(){
     this.nfts=[]
     if(this.show.indexOf("nft")>-1){
-      let prefix=(this.user.isDevnet() ? "devnet-" : (this.user.isTestnet() ? "testnet-" : ""))
-      let nfts=await this.api._service(
-        "accounts/"+this.address+"/nfts","",
-        "https://"+prefix+"api.multiversx.com/")
+      this.nfts=await decode_metadata(
+        await get_nfts(this.user,this.api),
+        this.api
+      )
 
-      nfts.reverse()
-
-      for (let nft of nfts) {
-        if(!nft.metadata){
-          let prop = atob(nft.attributes)
-          let tags=prop.split(";metadata:")[0].replace("tags:" ,"")
-          let cid=prop.split("metadata:")[1]
-          if(!nft.hasOwnProperty("metadata")){nft.metadata=await this.api._service("ipfs/"+cid,"","https://ipfs.io/",false)}
-          nft.tags=tags
-        }
-        nft.visual=nft.hasOwnProperty("media") ? nft.media[0].originalUrl : ""
-        //nft.visual=nft.media[0].originalUrl
-        this.nfts.push(nft)
-      }
       this.listChanged.emit(this.nfts)
     }
+
 
     if(this.show.indexOf("coin")>-1){
       await this.user.init_balance(this.api)
       this.tokens=Object.keys(this.user.tokens)
     }
+
   }
 
 
@@ -117,11 +105,18 @@ export class WalletComponent implements OnChanges {
     open(url,"ESDT Creator")
   }
 
+
+
+
   protected readonly view_account_on_gallery = view_account_on_gallery;
+
+
 
   show_account() {
     open(getExplorer(this.user.address,this.user.network,"accounts","explorer"),"Account")
   }
+
+
 
   async send_coin(identifier: string) {
     let balance=this.user.get_balance(identifier)

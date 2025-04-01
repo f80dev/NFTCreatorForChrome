@@ -1,4 +1,5 @@
-//Version official 0.7 - 31/03/2025
+//Version official 0.8 - 01/04/2025
+
 import {
   Address,
   BytesValue, ContractExecuteInput,
@@ -121,6 +122,8 @@ export async function create_abi(abi_content:any,api:any=null): Promise<AbiRegis
 }
 
 
+
+
 export function address_from_pem(pemText:string) : string {
   return UserSigner.fromPem(pemText).getAddress().bech32()
 }
@@ -184,6 +187,8 @@ export function get_transactions(api:ApiService,smartcontract_addr:string,abi=nu
     }
   })
 }
+
+
 
 export function getExplorer(addr = "", network = "elrond-devnet",service="accounts", tools = "xspotlight"): string {
   let url = ""
@@ -420,6 +425,37 @@ export async function get_collections(user:UserService,api:ApiService) {
 }
 
 
+
+export async function get_nfts(user:UserService,api:ApiService) : Promise<any[]> {
+  //Récupére l'ensemble des NFTs d'un user avec la balance
+  let prefix=(user.isDevnet() ? "devnet-" : (user.isTestnet() ? "testnet-" : ""))
+  let nfts=await api._service(
+    "accounts/"+user.address+"/nfts","",
+    "https://"+prefix+"api.multiversx.com/")
+
+  nfts.reverse()
+  return nfts
+}
+
+
+export async function decode_metadata(nfts:any[],api:ApiService) : Promise<any[]> {
+//Permet de décoder les metadata des API
+  let rc=[]
+  for (let nft of nfts) {
+    if(!nft.metadata){
+      let prop = atob(nft.attributes)
+      let tags=prop.split(";metadata:")[0].replace("tags:" ,"")
+      let cid=prop.split("metadata:")[1]
+      if(!nft.hasOwnProperty("metadata")){nft.metadata=await api._service("ipfs/"+cid,"","https://ipfs.io/",false)}
+      nft.tags=tags
+    }
+    nft.visual=nft.hasOwnProperty("media") ? nft.media[0].originalUrl : ""
+    //nft.visual=nft.media[0].originalUrl
+    rc.push(nft)
+  }
+  return rc
+}
+
 export function view_nft(user:UserService,identifier:string,explorer=environment.nft_viewer) {
   let url=explorer.replace("%identifier%",identifier)
   if(!user.isDevnet())url=url.replace("devnet.","")
@@ -542,7 +578,7 @@ export async function share_token_wallet(vm:any,token: any,cost=0.0003) : Promis
     return null
   }
 
-    if(!vm.user.isConnected(true))await vm.user.login(vm,"","",true)
+  if(!vm.user.isConnected(true))await vm.user.login(vm,"","",true)
   if(vm.user.isConnected(true)){
     let url=""
     try{

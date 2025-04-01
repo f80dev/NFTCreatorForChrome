@@ -7,6 +7,7 @@ import {Injectable, OnInit} from '@angular/core';
 })
 export class EvmWalletServiceService {
   public ethereum;
+  
   constructor() {
     const {ethereum} = <any>window
     this.ethereum = ethereum
