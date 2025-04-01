@@ -130,11 +130,11 @@
     </mat-expansion-panel>
 
     <mat-expansion-panel *ngIf="showEmail || showGoogle || showAddress || showWebcam">
-      <mat-expansion-panel-header>Utiliser votre email ou adresse de wallet</mat-expansion-panel-header>
+      <mat-expansion-panel-header>Get your wallet address</mat-expansion-panel-header>
 
       <app-scanner *ngIf="enabled_webcam && showWebcam"
                    size="200px"
-                   title="Montrer le QRcode de votre wallet à cette caméra"
+                   title="Show the QRcode of your wallet"
                    (flash)="on_retreive_address($event)"
                    (cancel)="cancel_webcam()">
       </app-scanner>

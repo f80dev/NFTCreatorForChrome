@@ -1,4 +1,4 @@
-//Version 0.1
+//Version 0.2 - 01/04/2025
 import {Component, EventEmitter, Input, OnChanges,  OnInit, Output, SimpleChanges} from '@angular/core';
 import {NetworkService} from "../network.service";
 import { NativeAuthClient } from "@multiversx/sdk-native-auth-client";
@@ -25,7 +25,12 @@ import {InputComponent} from "../input/input.component";
 import {MatIcon} from "@angular/material/icon";
 import {UploadFileComponent} from "../upload-file/upload-file.component";
 import {MatButton} from "@angular/material/button";
-import {XALIAS_PROVIDER_DEVNET, XALIAS_PROVIDER_MAINNET} from "@multiversx/sdk-web-wallet-provider/out";
+import {
+  WALLET_PROVIDER_TESTNET,
+  XALIAS_PROVIDER_DEVNET,
+  XALIAS_PROVIDER_MAINNET,
+  XALIAS_PROVIDER_TESTNET
+} from "@multiversx/sdk-web-wallet-provider/out";
 import {QRCodeComponent} from 'angularx-qrcode';
 import {settings} from '../../environments/settings';
 import {HourglassComponent, wait_message} from "../hourglass/hourglass.component";
@@ -185,17 +190,6 @@ export class AuthentComponent implements OnInit,OnChanges {
         if(this.showWalletConnect && this.directShowQRCode)this.open_wallet_connect()
       });
 
-      // this.provider.init().then((b: boolean) => {
-      //   if (this.provider) {
-      //     this.provider.login().then((s: string) => {
-      //       this.qrcode = this.api.server_nfluent + "/api/qrcode/" + encodeURIComponent(s);
-      //     });
-      //   }
-      // });
-
-      // if (isLocal(settings.appli) && this.showAccesCode && this.autoconnect_for_localhost) {
-      //   this.onauthent.emit({address: ADDR_ADMIN,provider:this.provider,strong:true,encrypted:"",url_direct_xportal_connect:this.url_xportal_direct_connect});
-      // }
     }
 
 
@@ -477,7 +471,8 @@ export class AuthentComponent implements OnInit,OnChanges {
   }
 
   async createNativeAuthInitialPart() {
-    const url=this.network.indexOf("devnet")>-1 ? "https://devnet-api.multiversx.com" : "https://api.multiversx.com"
+    let url=this.network.indexOf("devnet")>-1 ? "https://devnet-api.multiversx.com" : "https://api.multiversx.com"
+    if (this.network.indexOf("testnet")>-1) url="https://testnet-api.multiversx.com"
     const client = new NativeAuthClient({apiUrl: url, expirySeconds: 7200,});
     return client.initialize();
   }
@@ -510,15 +505,21 @@ export class AuthentComponent implements OnInit,OnChanges {
   async open_web_wallet(service="standard"){
     //tag webwallet open_webwallet
     //https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-signing-providers/#the-web-wallet-provider
-    let connexion_mode=this.network.indexOf("devnet")>-1 ? WALLET_PROVIDER_DEVNET : WALLET_PROVIDER_MAINNET
-    if(service=="xAlias")connexion_mode=this.network.indexOf("devnet")>-1 ? XALIAS_PROVIDER_DEVNET : XALIAS_PROVIDER_MAINNET
+    let connexion_mode=WALLET_PROVIDER_MAINNET
+    if(this.network.indexOf("devnet")>-1)connexion_mode=WALLET_PROVIDER_DEVNET
+    if(this.network.indexOf("testnet")>-1)connexion_mode=WALLET_PROVIDER_TESTNET
+    if(service=="xAlias"){
+      connexion_mode=XALIAS_PROVIDER_MAINNET
+      if(this.network.indexOf("devnet")>-1)connexion_mode=XALIAS_PROVIDER_DEVNET
+      if(this.network.indexOf("testnet")>-1)connexion_mode=XALIAS_PROVIDER_TESTNET
+    }
 
     this.provider=new WalletProvider(connexion_mode)
     this.provider.redirectDelayMilliseconds=30000
 
-    const callback_url = this.callback=="" ? encodeURIComponent(this._location.path(true)) : encodeURIComponent(this.callback)
+    let current_url=document.location.href
+    const callback_url = this.callback=="" ? encodeURIComponent(current_url) : encodeURIComponent(this.callback)
     try{
-
       let address=await this.provider.login({callback_url,token:await this.createNativeAuthInitialPart()})
 
       this.strong=address.length>0;
@@ -628,7 +629,7 @@ export class AuthentComponent implements OnInit,OnChanges {
   }
 
   on_retreive_address($event: any) {
-    this.address=$event.data;
+    this.address=$event.data.replace("multiversx:","")
     this.enabled_webcam=false;
     this.strong=false;
     this.validate(this.address)

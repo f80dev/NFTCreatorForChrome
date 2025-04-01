@@ -10,8 +10,14 @@ import {InputComponent} from "../input/input.component";
 import {MatExpansionPanel, MatExpansionPanelHeader} from "@angular/material/expansion";
 import {Clipboard, ClipboardModule} from "@angular/cdk/clipboard";
 import {MatSnackBar} from "@angular/material/snack-bar";
-import {view_nft} from "../mvx";
+import {get_nft, share_token_wallet, view_nft} from "../mvx";
 import {UserService} from "../user.service";
+import {environment} from "../../environments/environment";
+import {url_shorter} from "../../main";
+import {_prompt} from "../prompt/prompt.component";
+import {ApiService} from "../api.service";
+import {HourglassComponent, wait_message} from "../hourglass/hourglass.component";
+import {MatDialog} from "@angular/material/dialog";
 
 @Component({
   selector: 'app-shareform',
@@ -22,7 +28,7 @@ import {UserService} from "../user.service";
     NgIf,
     QRCodeComponent,
     InputComponent,
-    MatExpansionPanel,MatExpansionPanelHeader
+    MatExpansionPanel, MatExpansionPanelHeader, HourglassComponent
   ],
   templateUrl: './shareform.component.html',
   standalone: true,
@@ -30,31 +36,40 @@ import {UserService} from "../user.service";
 })
 export class ShareformComponent implements OnInit {
 
-  async ngOnInit() {
-    let params:any=await getParams(this.routes)
-    this.url=params.url || ""
-    this.name=params.name || ""
-    this.amount=Number(params.amount || "0")
-    this.visual=params.visual || ""
-    this.identifier=params.identifier
-  }
 
-  @Input() url: string=""
-  @Input() name: string=""
-  @Input() amount=0
+  url=""
+  content:any
   @Output() onshare=new EventEmitter()
 
+  api=inject(ApiService)
   routes=inject(ActivatedRoute)
   shareService=inject(ShareService)
   clipboard=inject(Clipboard)
   _location=inject(Location)
   toast=inject(MatSnackBar)
+  dialog=inject(MatDialog)
   qrcode=""
   visual=""
   user=inject(UserService)
   title="Get this NFT"
   description="Open this link to catch an NFT in your wallet"
   identifier=""
+  message: string=""
+
+
+  async ngOnInit() {
+    let params:any=await getParams(this.routes)
+    this.content=await get_nft(params.identifier,this.api,this.user.network)
+    this.visual=params.visual
+  }
+
+
+  async transfer() {
+      let obj=await share_token_wallet(this,this.content,environment.share_cost)
+      this.url=await url_shorter(obj!.url)
+      wait_message(this)
+  }
+
 
   async on_share(){
     await this.shareService.share(

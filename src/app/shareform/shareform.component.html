@@ -1,57 +1,61 @@
-<div class="mainform">
+<app-hourglass [message]="message"></app-hourglass>
+<div class="mainform" *ngIf="message==''">
 
-  <h4>Share this link to send this content to friends</h4>
 
-  <div style="display: inline-block;background-color: #021b1b;border:solid #353535 2px;text-align: center;padding:15px;">
-    <div style="font-size: x-large;">
-      {{amount}}
-      {{name}}
+  <br>
+  <img *ngIf="visual.length>0"
+       [srcset]="visual"
+       [title]="visual"
+       style="width: 100px;height: 100px;">
+
+  <br><br>
+  <div style="font-size: large;">
+    {{content.name}} minted !
+  </div>
+
+
+  <br>
+
+  <div *ngIf="url!=''">
+    <h4 style="margin-top: 60px;">Share this link to send this content to friends</h4>
+    <div style="padding: 15px;margin-bottom:40px;border: grey solid 2px;border-radius: 15px;font-size:clamp(15px, 2.2vw,30px);text-wrap: pretty; display: inline-block;width: 50%;max-width:550px;">
+      {{url}}
+      <mat-icon style="margin-bottom: -5px;margin-left:10px;"
+                title="Copy this link"
+                (click)="copy_url()">content_copy</mat-icon>
     </div>
-    <br>
-    <img *ngIf="visual.length>0"
-         [srcset]="visual"
-         [title]="visual"
-         style="width: 200px;height: 200px;">
-  </div>
 
-  <br>
-  <br>
+    <mat-expansion-panel style="max-width:600px;display: inline-block;width:90%;">
+      <mat-expansion-panel-header>Advanced settings</mat-expansion-panel-header>
 
-  <div style="padding: 15px;border: grey solid 2px;border-radius: 15px;font-size:clamp(15px, 2.2vw,30px);text-wrap: pretty; display: inline-block;margin:10px;width: 50%;max-width:550px;">
-    {{url}}
-    <mat-icon style="margin-bottom: -5px;margin-left:10px;"
-              title="Copy this link"
-              (click)="copy_url()">content_copy</mat-icon>
-  </div>
+      <qrcode [qrdata]="url"
+              *ngIf="url.length>0"
+              [width]="200" [errorCorrectionLevel]="'M'"></qrcode>
+      <p>This QR code corresponds to the sharing link of your NFT to be distributed</p>
 
-  <br>
-  <br>
-
-  <mat-expansion-panel style="max-width:600px;display: inline-block;width:90%;">
-    <mat-expansion-panel-header>Advanced settings</mat-expansion-panel-header>
-
-    <qrcode [qrdata]="url"
-            *ngIf="url.length>0"
-            [width]="200" [errorCorrectionLevel]="'M'"></qrcode>
-    <p>This QR code corresponds to the sharing link of your NFT to be distributed</p>
+      <br>
+      <app-input value_type="text" [value]="title" (valueChange)="title=$event" label="Title of share"></app-input>
+      <app-input value_type="text" [value]="description" (valueChange)="description=$event" label="Description / Introduction"></app-input>
+    </mat-expansion-panel>
 
     <br>
-    <app-input value_type="text" [value]="title" (valueChange)="title=$event" label="Title of share"></app-input>
-    <app-input value_type="text" [value]="description" (valueChange)="description=$event" label="Description / Introduction"></app-input>
-  </mat-expansion-panel>
+    <button mat-raised-button (click)="on_share()">
+      <mat-icon>share</mat-icon>Share
+    </button>
+  </div>
 
 
-  <div style="position: absolute;width:100%;text-align: center;bottom:20px;left:0;">
+
+  <div style="width:100%;text-align:center;margin-top:20px;">
     <button mat-raised-button (click)="sell()">
       <mat-icon>paid</mat-icon>Sell
     </button>
-    <button mat-raised-button (click)="on_share()">
-      <mat-icon>share</mat-icon>Send
+    <button mat-raised-button (click)="transfer()">
+      <mat-icon>share</mat-icon>Share
     </button>
     <button mat-raised-button (click)="quit()">
       <mat-icon>close</mat-icon>Close
     </button>
-
   </div>
 
 </div>
