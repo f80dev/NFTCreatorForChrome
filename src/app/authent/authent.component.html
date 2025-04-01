@@ -49,7 +49,10 @@
                 [width]="175" [errorCorrectionLevel]="'M'"></qrcode>
         <br>
 
-        <app-xportal-switch [uri]="url_xportal_direct_connect" style="margin-top: -20px;" *ngIf="showDirectConnect && showWalletConnect && url_xportal_direct_connect!=''"></app-xportal-switch>
+        <app-xportal-switch [uri]="url_xportal_direct_connect"
+                            style="margin-top: -20px;"
+                            *ngIf="showDirectConnect && showWalletConnect && url_xportal_direct_connect!=''">
+        </app-xportal-switch>
 
       </div>
 

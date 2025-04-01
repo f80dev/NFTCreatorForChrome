@@ -35,6 +35,7 @@ import {settings} from '../../environments/settings';
 import {HourglassComponent, wait_message} from "../hourglass/hourglass.component";
 import {UserService} from "../user.service";
 import {XportalSwitchComponent} from "../xportal-switch/xportal-switch.component";
+import {walletConnectDeepLink} from "../mvx";
 
 //Installation de @multiversx/sdk-wallet-connect-provider via yarn add @multiversx/sdk-wallet-connect-provider
 
@@ -52,7 +53,7 @@ enum Wallet_Operation {
 
 export function eval_direct_url_xportal(uri:string) : string {
   let rc="https://xportal.com/?wallet-connect="+uri; //"+this.provider.?relay-protocol%3Dirn&symKey=2a0e80dd8b982dac05eef5ce071fbe541d390fc302666d09856ae379416bfa6e"
-  return "https://maiar.page.link/?apn=com.elrond.maiar.wallet&isi=1519405832&ibi=com.elrond.maiar.wallet&link="+encodeURIComponent(rc);
+  return walletConnectDeepLink+encodeURIComponent(uri);
 }
 
 
@@ -134,7 +135,7 @@ export class AuthentComponent implements OnInit,OnChanges {
   @Input() showWebWallet:boolean=false;
   @Input() showDirectConnect:boolean=true;      //Utilisation pour lancer xPortal sur le device (possible sur Android / IPhone)
   @Input() showExtensionWallet:boolean=false;
-  @Input() walletConnect_ProjectId="ea9073e2f07f3d98fea76d4f26f789fe"
+  @Input() walletConnect_ProjectId=environment.wallet_connect_project_id   //voir https://cloud.walletconnect.com/app
   @Input() showAddress=false;
   @Input() showNetwork=false;
   @Input() showPrivateKey=false;
