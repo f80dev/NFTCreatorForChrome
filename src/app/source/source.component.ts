@@ -157,10 +157,7 @@ export class SourceComponent implements OnDestroy {
 
   share_coin(content:any) {
     this.router.navigate(["share"],{queryParams:{
-        url:content.url,
-        visual:"",
-        content:content.token,
-        amount:content.amount/1e18
+        url:content.url
     }})
   }
 }

@@ -61,6 +61,7 @@ export class ShareformComponent implements OnInit {
   async ngOnInit() {
     let params:any=await getParams(this.routes)
     await this.user.login(this,"","",false)
+    this.url=params.url || ""
     this.content=params.content
     this.visual=params.visual || this.content.media[0].originalUrl
   }
