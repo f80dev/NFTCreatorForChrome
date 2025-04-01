@@ -27,7 +27,7 @@ import {wait_message} from "./hourglass/hourglass.component";
 export const DEVNET="https://devnet-api.multiversx.com"
 export const MAINNET="https://api.multiversx.com"
 
-export const walletConnectDeepLink = 'https://maiar.page.link/?apn=com.elrond.maiar.wallet&isi=1519405832&ibi=com.elrond.maiar.wallet.dev&link=https://maiar.com/';
+export const walletConnectDeepLink = 'https://xportal.com/?wallet-connect=';
 
 
 export async function mvx_api(url:string,params:string,api:any,network="devnet"): Promise<any[]> {
