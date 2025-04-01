@@ -1,5 +1,11 @@
 <div style="width:100%;text-align: center;">
-  <h5 *ngIf="message.length>0">{{message}}</h5>
+  <h5 *ngIf="intro_message.length>0">{{intro_message}}</h5>
+
+  <div *ngIf="message!=''">
+    <app-hourglass [message]="message" ></app-hourglass>
+    <app-xportal-switch [uri]="user.uri_to_xportal"></app-xportal-switch>
+  </div>
+
   <div style="width: 100%;text-align: center;">
     <h4 *ngIf="tokens.length>0">
       Your coins
@@ -19,14 +25,13 @@
             {{user.tokens[k].name}}
           </td>
           <td style="text-align: right;width:50%;">{{user.tokens[k].balance/1e18 | number:"1.0-4"}}</td>
-          <td>
+          <td *ngIf="message==''">
             <mat-icon class="icon-button" style="font-size: small;margin-bottom: -12px;" (click)="send_coin(k)" title="Show your coin">send</mat-icon>
           </td>
         </tr>
       </table>
 
     </div>
-
   </div>
 
   <h4 *ngIf="show.indexOf('nft')>-1 && nfts.length>0">

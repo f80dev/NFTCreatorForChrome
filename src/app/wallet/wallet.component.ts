@@ -9,6 +9,8 @@ import {settings} from '../../environments/settings';
 import {decode_metadata, get_nfts, getExplorer, share_token_wallet, view_account_on_gallery} from "../mvx";
 import {MatDialog} from "@angular/material/dialog";
 import {url_shorter} from "../../main";
+import {HourglassComponent, wait_message} from "../hourglass/hourglass.component";
+import {XportalSwitchComponent} from "../xportal-switch/xportal-switch.component";
 
 @Component({
   selector: 'app-wallet',
@@ -19,7 +21,9 @@ import {url_shorter} from "../../main";
     DecimalPipe,
     MatButton,
     MatIconButton,
-    MatIcon
+    MatIcon,
+    XportalSwitchComponent,
+    HourglassComponent
   ],
   templateUrl: './wallet.component.html',
   styleUrl: './wallet.component.css'
@@ -45,7 +49,9 @@ export class WalletComponent implements OnChanges {
   @Input() width="150px"
   @Input() height="200px"
 
-  @Input() message: string=""
+  @Input() intro_message: string=""
+
+  message=""
   account: any;
   @Input() selected=false;
   tokens: string[] = [];
@@ -119,12 +125,14 @@ export class WalletComponent implements OnChanges {
 
 
   async send_coin(identifier: string) {
-    let balance=this.user.get_balance(identifier)
     let token=this.user.tokens[identifier]
     token.balance=token.balance/1e18
+    wait_message(this,"Making link to share")
     let obj=await share_token_wallet(this,token,environment.share_cost)
+    wait_message(this)
     if(obj){
       let url=await url_shorter(obj.url)
+
       this.shareCoin.emit({url:url,token:token,amount:obj.amount})
     }
   }
