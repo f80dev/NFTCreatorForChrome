@@ -563,16 +563,17 @@ export function get_token(identifier: string, api:any,network: string) {
 }
 
 
-export async function share_token_wallet(vm:any,token: any,cost=0.0003) : Promise<{url:string,amount:number} | null> {
+export async function share_token_wallet(vm:any,token: any,cost=0.0003,amount="") : Promise<{url:string,amount:number} | null> {
 
   //Permet le partage d'un token
   //vm doit contenir MatDialog, user
 
-  let amount="1"
-  if((token.type.indexOf("SemiFungible")>-1 || token.type.startsWith("Fungible")) && Number(token.balance)>1){
-    amount=await _prompt(vm,
-      "Amount to share","1",
-      "between 1 and "+token.balance,"number","ok","annuler",false)
+  if(amount==""){
+    if((token.type.indexOf("SemiFungible")>-1 || token.type.startsWith("Fungible")) && Number(token.balance)>1){
+      amount=await _prompt(vm,
+        "Amount to share","1",
+        "between 1 and "+token.balance,"number","ok","annuler",false)
+    }
   }
 
   if(!amount || Number(amount)==0)return null

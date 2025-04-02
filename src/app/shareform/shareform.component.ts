@@ -56,6 +56,7 @@ export class ShareformComponent implements OnInit {
   description="Open this link to catch an NFT in your wallet"
   identifier=""
   message: string=""
+  amount: number=1
 
 
   async ngOnInit() {
@@ -68,7 +69,7 @@ export class ShareformComponent implements OnInit {
 
 
   async transfer() {
-    let obj=await share_token_wallet(this,this.content,environment.share_cost)
+    let obj=await share_token_wallet(this,this.content,environment.share_cost,this.amount.toString())
     this.url=await url_shorter(obj!.url)
     wait_message(this)
   }

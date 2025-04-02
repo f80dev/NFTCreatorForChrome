@@ -18,6 +18,14 @@
     </div>
     <br>
 
+    <div *ngIf="content.type.startsWith('Semi') || content.type.startsWith('Fungible')"
+         style="margin:20px;display: inline-block;max-width: 300px;">
+      <app-input label="Amount to share"
+                 [value]="amount" (valueChange)="amount=$event" [min]="1" [max]="content.balance"></app-input>
+
+    </div>
+
+
   </div>
 
 
