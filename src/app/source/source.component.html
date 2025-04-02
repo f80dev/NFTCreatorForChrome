@@ -62,8 +62,9 @@
     <br>
 
     <mat-expansion-panel >
-      <mat-expansion-panel-header>Wallet</mat-expansion-panel-header>
+      <mat-expansion-panel-header>My wallet</mat-expansion-panel-header>
 
+      <p>Connect to your MultiversX wallet to show your NFTs and tokens</p>
       <button mat-raised-button *ngIf="user.isConnected(false)" (click)="user.logout(true)">Log out</button>
       <button mat-raised-button *ngIf="!user.isConnected(false)" (click)="login()">Log in</button>
       <br>

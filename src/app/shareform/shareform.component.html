@@ -1,8 +1,11 @@
 
 <div class="mainform">
 
-  <app-hourglass [message]="message" ></app-hourglass>
-  <app-xportal-switch *ngIf="url==''" [uri]="user.uri_to_xportal"></app-xportal-switch>
+  <div *ngIf="message!=''">
+    <app-hourglass [message]="message" ></app-hourglass><br>
+    <app-xportal-switch  [uri]="user.uri_to_xportal"></app-xportal-switch>
+  </div>
+
   <br>
 
   <div *ngIf="url===''">
@@ -17,26 +20,20 @@
       {{content.balance}} {{content.name}}(s) available to share !
     </div>
     <br>
-
-    <div *ngIf="content.type.startsWith('Semi') || content.type.startsWith('Fungible')"
+    <div *ngIf="(content.type.startsWith('Semi') || content.type.startsWith('Fungible')) && content.balance>1"
          style="margin:20px;display: inline-block;max-width: 300px;">
       <app-input label="Amount to share"
                  [value]="amount" (valueChange)="amount=$event" [min]="1" [max]="content.balance"></app-input>
-
     </div>
-
-
   </div>
 
-
-  <br>
 
   <div *ngIf="url!=''">
     <p>
       Now, your content is in a vault accessible with this link:
     </p>
     <br>
-    <div style="padding: 15px;margin-bottom:40px;border: grey solid 2px;border-radius: 15px;font-size:clamp(15px, 2.2vw,30px);text-wrap: pretty; display: inline-block;width: 50%;max-width:550px;">
+    <div class="link_zone">
       {{url}}
       <mat-icon style="margin-bottom: -5px;margin-left:10px;"
                 title="Copy this link"
@@ -53,6 +50,7 @@
       <qrcode [qrdata]="url"
               *ngIf="url.length>0"
               [width]="200" [errorCorrectionLevel]="'M'"></qrcode>
+
       <p>This QR code corresponds to the sharing link of your NFT to be distributed</p>
 
       <br>
