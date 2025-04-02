@@ -13,7 +13,7 @@
   <mat-accordion style="margin: 10px;display: block;text-align: center;" [style.pointer-events]="message=='' ? 'all' : 'none'" [style.opacity]="message=='' ? 1 : 0.3">
     <mat-expansion-panel [expanded]="show_source">
       <mat-expansion-panel-header>Sources</mat-expansion-panel-header>
-      <h3>To make a NFT,<br>you must start from a picture</h3>
+      <p>To make a NFT, you must start from a picture</p>
       <br>
       <div *ngIf="!show_scanner">
         <app-upload-file (start)="on_start_upload()"
@@ -47,11 +47,13 @@
     </mat-expansion-panel>
 
     <br>
-    <mat-expansion-panel *ngIf="!show_scanner && message==''" (afterExpand)="paste()">
+    <mat-expansion-panel *ngIf="!show_scanner && message==''" (afterExpand)="paste('')">
       <mat-expansion-panel-header>Gallery and AI Generators</mat-expansion-panel-header>
-      <div style="font-weight: lighter;font-size: small;margin:20px;">
+      <p>
         Once generated, copy the image with the right click and close the window
-      </div>
+      </p>
+
+
       <button *ngFor="let generator of generators"
               mat-raised-button (click)="open_generator(generator)">
         {{generator.label}}

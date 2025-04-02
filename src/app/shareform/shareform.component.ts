@@ -94,6 +94,10 @@ export class ShareformComponent implements OnInit {
   }
 
   sell() {
-    view_nft(this.user,this.identifier)
+    view_nft(this.user,this.content.identifier)
+  }
+
+  see_url() {
+    open(this.url,"preview")
   }
 }

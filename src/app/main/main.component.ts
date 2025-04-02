@@ -8,7 +8,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {MatDialog} from "@angular/material/dialog";
 import {MatList, MatListItem} from "@angular/material/list";
 import {UploadFileComponent} from "../upload-file/upload-file.component";
-import {$$, getParams, showError, showMessage} from "../../tools";
+import {$$, getParams, setParams, showError, showMessage} from "../../tools";
 import {
   create_collection, execute_transaction,
   get_collections, get_nft,
@@ -220,9 +220,11 @@ export class MainComponent implements OnInit {
             $$("Visibilité du NFT sur "+getExplorer(identifier,this.user.network,"nfts"))
 
             let nft=await get_nft(identifier,this.api,this.user.network)
+
             nft.balance=nft.supply
+            nft.identifier=identifier
             this.router.navigate(["share"],{
-              queryParams:{type:nft.type,visual:this.visual,identifier:nft.identifier}
+              queryParams:{p:setParams({visual:this.visual,content:nft},"","")}
             })
 
 

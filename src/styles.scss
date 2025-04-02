@@ -6,6 +6,12 @@
 html, body { height: 100vh; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
+p {
+  font-weight: lighter;
+  line-height: 85%;
+  margin:20px;
+}
+
 .mainform {
   width:100vw;
   margin:0;

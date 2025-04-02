@@ -68,9 +68,9 @@ export class SourceComponent implements OnDestroy {
 
 
 
-  async paste() {
+  async paste(message="Nothing in the clipboard") {
     try{
-      let content=await analyse_clipboard(this,environment.share_appli,true)
+      let content=await analyse_clipboard(this,environment.share_appli,true,message)
       if(content)this.update_visual.emit(content)
     }catch (e:any){
      $$("Impossible de récupérer le clipboard",e)

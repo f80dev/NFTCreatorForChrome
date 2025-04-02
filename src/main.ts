@@ -41,7 +41,7 @@ export function url_shorter(url_to_short:string) : Promise<string> {
 
 
 
-export async function analyse_clipboard(vm:any,share_appli=environment.share_appli,force=false) {
+export async function analyse_clipboard(vm:any,share_appli=environment.share_appli,force=false,message="Nothing in the clipboard") {
   try{
     let obj:any={name:'clipboard-read'}
     if(force || (await navigator.permissions.query(obj)).state === 'granted' ){
@@ -55,13 +55,9 @@ export async function analyse_clipboard(vm:any,share_appli=environment.share_app
           if(content.startsWith("data:"))return content
         }
       }
-
     }
+  }catch(e:any){}
 
-  }catch(e:any){
-
-  }
-
-  if(force)showMessage(vm,"Nothing in the clipboard",1000)
+  if(force)showMessage(vm,message,1000)
   return ""
 }

@@ -2,7 +2,7 @@
 <div class="mainform">
 
   <app-hourglass [message]="message" ></app-hourglass>
-  <app-xportal-switch [uri]="user.uri_to_xportal"></app-xportal-switch>
+  <app-xportal-switch *ngIf="url==''" [uri]="user.uri_to_xportal"></app-xportal-switch>
   <br>
 
   <div *ngIf="url===''">
@@ -14,7 +14,7 @@
 
     <br><br>
     <div style="font-size: large;">
-      {{content.balance}} {{content.name}} available to share !
+      {{content.balance}} {{content.name}}(s) available to share !
     </div>
     <br>
 
@@ -24,12 +24,18 @@
   <br>
 
   <div *ngIf="url!=''">
-    <h4 style="margin-top: 60px;">Share this link to send this content to friends</h4>
+    <p>
+      Now, your content is in a vault accessible with this link:
+    </p>
+    <br>
     <div style="padding: 15px;margin-bottom:40px;border: grey solid 2px;border-radius: 15px;font-size:clamp(15px, 2.2vw,30px);text-wrap: pretty; display: inline-block;width: 50%;max-width:550px;">
       {{url}}
       <mat-icon style="margin-bottom: -5px;margin-left:10px;"
                 title="Copy this link"
                 (click)="copy_url()">content_copy</mat-icon>
+      <mat-icon style="margin-bottom: -5px;margin-left:10px;"
+                title="See the vault"
+                (click)="see_url()">visibility</mat-icon>
     </div>
     <br>
 
@@ -54,7 +60,7 @@
 
   <div style="width:100%;text-align:center;margin-top:20px;" *ngIf="message==''">
     <div *ngIf="url===''" style="display: inline-block;">
-      <button mat-raised-button (click)="sell()">
+      <button mat-raised-button (click)="sell()" *ngIf="!content!.type.startsWith('Fungible')">
         <mat-icon>paid</mat-icon>Sell
       </button>
       <button mat-raised-button (click)="transfer()">
