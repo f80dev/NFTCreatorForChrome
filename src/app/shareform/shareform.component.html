@@ -20,8 +20,11 @@
 
     <div *ngIf="content.type.startsWith('Semi') || content.type.startsWith('Fungible')"
          style="margin:20px;display: inline-block;max-width: 300px;">
-      <app-input label="Amount to share"
+      <app-input label="Amount to share per user"
                  [value]="amount" (valueChange)="amount=$event" [min]="1" [max]="content.balance"></app-input>
+
+      <app-input label="how many users"
+                 [value]="nb_users" (valueChange)="nb_users=$event"></app-input>
 
     </div>
 

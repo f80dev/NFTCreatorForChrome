@@ -119,7 +119,7 @@ export class AuthentComponent implements OnInit,OnChanges {
 
   @Input() explain_message:string="Adresse de votre wallet ou votre email si vous n'en avez pas encore";
   @Input() autoconnect_for_localhost=false;   //Connection automatique sur le localhost
-  @Input() prompt="Votre email ou adresse de wallet";   //Connection automatique sur le localhost
+  @Input() prompt="Your wallet address";   //Connection automatique sur le localhost
 
   @Output('authent') onauthent: EventEmitter<{pem_wallet:any,strong:boolean,address:string,provider:any,encrypted:string,url_direct_xportal_connect:string}>=new EventEmitter();
   @Output('invalid') oninvalid: EventEmitter<any>=new EventEmitter();

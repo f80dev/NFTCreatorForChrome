@@ -57,6 +57,7 @@ export class ShareformComponent implements OnInit {
   identifier=""
   message: string=""
   amount: number=1
+  nb_users=1;
 
 
   async ngOnInit() {
