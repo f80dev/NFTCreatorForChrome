@@ -1,4 +1,4 @@
-//Version official 0.8 - 01/04/2025
+//Version official 0.9 - 03/04/2025
 
 import {
   Address,
@@ -9,10 +9,10 @@ import {
   Transaction,
   TransactionComputer,
   TransactionOnNetwork,
-  TransactionsFactoryConfig
+  TransactionsFactoryConfig, U64Value
 } from "@multiversx/sdk-core/out";
 import { UserSigner } from "@multiversx/sdk-wallet";
-import { AbiRegistry,SmartContractQuery,SmartContractTransactionsOutcomeParser,DevnetEntrypoint,MainnetEntrypoint,SmartContractQueryResponse} from "@multiversx/sdk-core";
+import { AbiRegistry,SmartContractQuery,SmartContractTransactionsOutcomeParser,DevnetEntrypoint,MainnetEntrypoint} from "@multiversx/sdk-core";
 import { ApiNetworkProvider } from "@multiversx/sdk-network-providers";
 import {AccountOnNetwork} from "@multiversx/sdk-network-providers/out";
 import {ApiService} from "./api.service";
@@ -23,6 +23,7 @@ import {abi, settings} from '../environments/settings';
 import {environment} from "../environments/environment";
 import {_prompt} from "./prompt/prompt.component";
 import {wait_message} from "./hourglass/hourglass.component";
+import {cat} from "@helia/unixfs/commands/cat";
 
 export const DEVNET="https://devnet-api.multiversx.com"
 export const MAINNET="https://api.multiversx.com"
@@ -194,21 +195,9 @@ export function get_transactions(api:ApiService,smartcontract_addr:string,abi=nu
 
 
 export function getExplorer(addr = "", network = "elrond-devnet",service="accounts", tools = "xspotlight",suffixe=""): string {
-  let url = ""
-  let isMain: boolean = (network.indexOf("devnet") == -1)
-  if (network.indexOf("elrond") > -1) {
-    if (tools == "xspotlight") url = "https://" + (isMain ? "" : "devnet.") + "xspotlight.com/" + addr+suffixe;
-    if (tools == "explorer") url = "https://" + (isMain ? "" : "devnet-") + "explorer.multiversx.com/"+service+"/" + addr+suffixe;
-  }
-
-  if (network.indexOf("polygon") > -1) {
-    if (isMain) {
-      url = "https://polygonscan.com/accounts/" + addr;
-    } else {
-      url = "https://polygon.testnets-nftically.com/marketplace?search=" + addr + "&chain[]=80001"
-    }
-  }
-  return url
+  let prefixe= network.indexOf("devnet") > -1 ? "devnet" : network.indexOf("testnet") > -1 ? "testnet" : ""
+  prefixe=prefixe+(tools=="explorer" ? "-" : ".")
+  return "https://" + prefixe  + tools+".multiversx.com/" + service+"/"+addr+suffixe;
 }
 
 
@@ -539,19 +528,25 @@ export async function query(function_name:string,args:any[],sc_address:string,ne
 }
 
 
-export async function share_token(user:UserService,collection:string,nonce:number,amount=1,cost=0.001,decimals=0) {
+export async function share_token(user:UserService,collection:string,nonce:number,amount=1,nb_user=1,cost=0.001,decimals=0) {
 
   let opt:any={identifier:collection}
   if(nonce)opt.nonce=BigInt(nonce)
 
   let token=new TokenTransfer({
     token:new Token(opt),
-    amount:BigInt(amount)
+    amount:BigInt(amount*nb_user)
   })
-  let t=await create_transaction("upload",[],user,[token],user.get_sc_address(),abi,4078541n,cost)
-  let t_signed=await signTransaction(t,user)
-  let rc=await execute_transaction(t_signed,user,"upload")
-  return rc
+
+  try{
+    let t=await create_transaction("upload",[new U64Value(amount)],user,[token],user.get_sc_address(),abi,4078541n,cost)
+    let t_signed=await signTransaction(t,user)
+    let rc=await execute_transaction(t_signed,user,"upload")
+    return rc
+  }catch (e:any){
+    $$("Erreur ",e)
+  }
+  return null
 }
 
 
@@ -563,7 +558,7 @@ export function get_token(identifier: string, api:any,network: string) {
 }
 
 
-export async function share_token_wallet(vm:any,token: any,cost=0.0003,amount="") : Promise<{url:string,amount:number} | null> {
+export async function share_token_wallet(vm:any,token: any,cost=0.0003,amount="",nb_user=1) : Promise<{url:string,amount:number} | null> {
 
   //Permet le partage d'un token
   //vm doit contenir MatDialog, user
@@ -577,7 +572,7 @@ export async function share_token_wallet(vm:any,token: any,cost=0.0003,amount=""
   }
 
   if(!amount || Number(amount)==0)return null
-  if(Number(amount)>Number(token.balance)){
+  if(Number(amount)*nb_user>Number(token.balance)){
     showMessage(vm,"You have not enought token to send this amount")
     return null
   }
@@ -592,14 +587,17 @@ export async function share_token_wallet(vm:any,token: any,cost=0.0003,amount=""
         amount=(Number(amount)*1e18).toString()
         token.collection=token.identifier
       }
-      let rc=await share_token(vm.user,token.collection,token.nonce,Number(amount),cost)
       let id =""
 
-      for(let v of rc.values){
-        if(v.startsWith("@6f6b")){
-          id=v.split("@")[2]
-          break
+      let rc=await share_token(vm.user,token.collection,token.nonce,Number(amount),nb_user,cost)
+      if(rc){
+        for(let v of rc.values){
+          if(v.startsWith("@6f6b")){
+            id=v.split("@")[2]
+            break
+          }
         }
+
       }
 
       if(id==""){

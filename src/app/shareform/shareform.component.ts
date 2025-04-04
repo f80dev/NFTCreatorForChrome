@@ -70,7 +70,7 @@ export class ShareformComponent implements OnInit {
 
 
   async transfer() {
-    let obj=await share_token_wallet(this,this.content,environment.share_cost,this.amount.toString())
+    let obj=await share_token_wallet(this,this.content,environment.share_cost,this.amount.toString(),this.nb_users)
     this.url=await url_shorter(obj!.url)
     wait_message(this)
   }
