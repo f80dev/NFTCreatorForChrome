@@ -98,6 +98,6 @@ export const environment = {
   nft_viewer_old: "https://devnet.xspotlight.com/nfts/%identifier%",
   account_viewer: "https://devnet.xspotlight.com/%address%",
   share_appli: "https://devnet.vault.af10.fr",
-  share_cost:0.0003,
+  share_cost:0.00025,
   wallet_connect_project_id: "9b1a9564f91cb659ffe21b73d5c4e2d8"
 }
