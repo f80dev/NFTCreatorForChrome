@@ -77,7 +77,7 @@ export class ShareformComponent implements OnInit {
     let r=await _prompt(this,"Send the contents to a vault and give access via a shared link ?","",
       "0.004 par destinataire sont requis pour payer les frais de réseau","yesno","Ok","Cancel",true)
     if(r==="yes"){
-      let obj=await share_token_wallet(this,this.content,environment.share_cost,this.amount.toString(),this.nb_users)
+      let obj=await share_token_wallet(this,this.content,environment.share_cost*this.nb_users,this.amount.toString(),this.nb_users)
       this.url=await url_shorter(obj!.url)
       wait_message(this)
     }
