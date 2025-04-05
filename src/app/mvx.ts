@@ -23,7 +23,6 @@ import {abi, settings} from '../environments/settings';
 import {environment} from "../environments/environment";
 import {_prompt} from "./prompt/prompt.component";
 import {wait_message} from "./hourglass/hourglass.component";
-import {cat} from "@helia/unixfs/commands/cat";
 
 export const DEVNET="https://devnet-api.multiversx.com"
 export const MAINNET="https://api.multiversx.com"
@@ -607,7 +606,7 @@ export async function share_token_wallet(vm:any,token: any,cost=0.0003,amount=""
 
       $$("Id du vault "+id)
       url=environment.share_appli+"?p="+setParams({vault:id,hash:"hash"+id},"","")
-      if(vm.user.isTestnet())url=url.replace("devnet.","tesnet.")
+      if(vm.user.isTestnet())url=url.replace("devnet.","testnet.")
       if(vm.user.isMainnet())url=url.replace("devnet.","")
 
       $$("url de partage "+url)
