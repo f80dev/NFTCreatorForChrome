@@ -211,7 +211,6 @@ export function create_transaction(function_name:string,args:any[],
     if(contract_addr=="")contract_addr=user.get_sc_address()
     let nonce=await entrypoint.recallAccountNonce(Address.newFromBech32(user.address))
 
-    debugger
     let option:ContractExecuteInput={
       contract: Address.newFromBech32(contract_addr),
       function: function_name,
@@ -540,7 +539,6 @@ export async function share_token(user:UserService,collection:string,nonce:numbe
 
   try{
     let value=new U64Value(Math.round(amount))
-    debugger
     let t=await create_transaction("upload",[value], user,[token],user.get_sc_address(),abi,4078541n,cost)
     let t_signed=await signTransaction(t,user)
     let rc=await execute_transaction(t_signed,user,"upload")

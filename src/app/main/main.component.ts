@@ -409,7 +409,6 @@ export class MainComponent implements OnInit {
   async add_files($event:any) {
     wait_message(this,"Uploading")
     try{
-      debugger
       let result=await this.imageUploader.upload(this.imageUploader.b64_to_blob($event.file,$event.type),$event.filename,1)
       this.uris.push(result.url)
     }catch (e){
