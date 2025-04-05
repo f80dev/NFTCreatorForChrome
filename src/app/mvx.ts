@@ -534,7 +534,7 @@ export async function share_token(user:UserService,collection:string,nonce:numbe
 
   let token=new TokenTransfer({
     token:new Token(opt),
-    amount:BigInt(amount*nb_user)
+    amount:BigInt(Math.round(amount*Number(nb_user)))
   })
 
   try{
@@ -571,7 +571,7 @@ export async function share_token_wallet(vm:any,token: any,cost=0.0003,amount=""
   }
 
   if(!amount || Number(amount)==0)return null
-  if(Number(amount)*nb_user>Number(token.balance)){
+  if(Number(amount)*Number(nb_user)>Number(token.balance)){
     showMessage(vm,"You have not enought token to send this amount")
     return null
   }
