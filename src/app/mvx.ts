@@ -211,12 +211,13 @@ export function create_transaction(function_name:string,args:any[],
     if(contract_addr=="")contract_addr=user.get_sc_address()
     let nonce=await entrypoint.recallAccountNonce(Address.newFromBech32(user.address))
 
+    debugger
     let option:ContractExecuteInput={
       contract: Address.newFromBech32(contract_addr),
       function: function_name,
       gasLimit: gasLimit,
       arguments: args,
-      nativeTransferAmount:BigInt(cost*1e18),
+      nativeTransferAmount:BigInt(Math.round(cost*1e18)),
     }
     if(tokens_to_transfer.length>0){
       option.tokenTransfers=tokens_to_transfer
@@ -538,7 +539,9 @@ export async function share_token(user:UserService,collection:string,nonce:numbe
   })
 
   try{
-    let t=await create_transaction("upload",[new U64Value(amount)],user,[token],user.get_sc_address(),abi,4078541n,cost)
+    let value=new U64Value(Math.round(amount))
+    debugger
+    let t=await create_transaction("upload",[value], user,[token],user.get_sc_address(),abi,4078541n,cost)
     let t_signed=await signTransaction(t,user)
     let rc=await execute_transaction(t_signed,user,"upload")
     return rc
@@ -596,7 +599,9 @@ export async function share_token_wallet(vm:any,token: any,cost=0.0003,amount=""
             break
           }
         }
-
+      }else{
+        showMessage(vm,"Transfer fail, retry")
+        wait_message(vm)
       }
 
       if(id==""){
