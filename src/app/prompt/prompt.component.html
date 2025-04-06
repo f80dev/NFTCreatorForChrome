@@ -1,6 +1,6 @@
 <div class="app-prompt">
   <div mat-dialog-title style="margin-bottom: 10px !important;width:100%;text-align: center;">{{data.title}}</div>
-  <div mat-dialog-content style="width: 100%;">
+  <div mat-dialog-content style="width: 100%;overflow: hidden;">
     <p *ngIf="_type!='list' && data && data.question &&  !data.question?.startsWith('http') && !data.question?.startsWith('./') && !data.question?.startsWith('html:')"
        style="font-size: medium;width:100%;text-align: center;color: darkgray">
       {{data.question}}

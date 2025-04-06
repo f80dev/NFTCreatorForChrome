@@ -130,6 +130,7 @@ export class UserService {
           let k=new KeyPair(provider.secretKey)
           this.pem_account=Account.newFromKeypair(k)
 
+
           let r={
             address:provider.getAddress().bech32(),
             provider:null,
@@ -142,6 +143,7 @@ export class UserService {
 
           showMessage(vm,"Identification ok")
         } else {
+
           try{
             if(this.device.isMobile()){
               $$("Impossible de trouver l'extended wallet en version mobile")
@@ -193,13 +195,15 @@ export class UserService {
         await this.refresh()
         let tokens=await api._service("accounts/"+this.address+"/tokens","",this.get_domain())
         let egld_prefix=this.isTestnet() || this.isDevnet() ? "x" : ""
-        tokens.push({
-          identifier:egld_prefix+"EGLD",
-          name:egld_prefix+"EGLD",
-          type:"FungibleESDT",
-          balance:Number(this.account!.balance)
-        })
-        this.balance=Number(this.account!.balance)/1e18
+        if(this.account){
+          tokens.push({
+            identifier:egld_prefix+"EGLD",
+            name:egld_prefix+"EGLD",
+            type:"FungibleESDT",
+            balance:Number(this.account!.balance)
+          })
+          this.balance=Number(this.account!.balance)/1e18
+        }
 
         for(let t of tokens){
           this.tokens[t.identifier]=t

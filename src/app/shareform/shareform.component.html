@@ -5,7 +5,7 @@
   <app-xportal-switch *ngIf="url==''" [uri]="user.uri_to_xportal"></app-xportal-switch>
   <br>
 
-  <div *ngIf="url===''">
+  <div *ngIf="content && url===''">
     <br>
     <img *ngIf="visual.length>0"
          [srcset]="visual"
@@ -14,14 +14,14 @@
 
     <br><br>
     <div style="font-size: large;">
-      {{content.balance}} {{content.name}}(s) available to share !
+      {{content!.balance}} {{content!.name}}(s) available to share !
     </div>
     <br>
 
-    <div *ngIf="(content.type.startsWith('Semi') || content.type.startsWith('Fungible')) && content.balance>1"
+    <div *ngIf="(content.type.startsWith('Semi') || content.type.startsWith('Fungible')) && content!.balance>1"
          style="margin:20px;display: inline-block;max-width: 300px;" >
       <app-input label="Amount to share per user"
-                 [value]="amount" (valueChange)="amount=$event" [min]="1" [max]="content.balance"></app-input>
+                 [value]="amount" (valueChange)="amount=$event" [min]="1" [max]="content!.balance"></app-input>
 
       <app-input label="how many users"
                  [value]="nb_users" (valueChange)="nb_users=$event"></app-input>
@@ -69,7 +69,7 @@
 
 
 
-  <div style="width:100%;text-align:center;margin-top:20px;" *ngIf="message==''">
+  <div style="width:100%;text-align:center;margin-top:20px;" *ngIf="content && message==''">
     <div *ngIf="url===''" style="display: inline-block;">
       <button mat-raised-button (click)="sell()" *ngIf="!content!.type.startsWith('Fungible')">
         <mat-icon>paid</mat-icon>Sell

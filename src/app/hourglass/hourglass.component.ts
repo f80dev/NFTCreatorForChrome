@@ -18,7 +18,7 @@ export function wait_message(vm:any,message="",modal=false,duration=1000000,dela
     },delay)
   }else{
     vm.message=message;
-    $$("Affichage de "+message)
+    if(message)$$("Affichage de "+message)
   }
 
   setTimeout(()=>{vm.message=""},duration);

@@ -70,7 +70,7 @@ export class ShareformComponent implements OnInit {
 
 
   async transfer() {
-    if(this.content.balance<this.nb_users*this.amount){
+    if(this.content && this.content.balance<this.nb_users*this.amount){
       showMessage(this,"You don't have enought token")
       return
     }
@@ -78,7 +78,9 @@ export class ShareformComponent implements OnInit {
       "0.004 eGld per recipient are required to pay network fees","yesno","Ok","Cancel",true)
     if(r==="yes"){
       let obj=await share_token_wallet(this,this.content,environment.share_cost*this.nb_users,this.amount.toString(),this.nb_users)
-      this.url=await url_shorter(obj!.url)
+      if(obj){
+        this.url=await url_shorter(obj!.url)
+      }
       wait_message(this)
     }
 
