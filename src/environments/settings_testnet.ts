@@ -1,7 +1,7 @@
 export const settings={
-  contract_addr:"erd1qqqqqqqqqqqqqpgqzgl73876mr2e6vj80ctng2nxuku79pye835sydx762",
+  contract_addr:"erd1qqqqqqqqqqqqqpgqe9na5sggl6nk0smp6gaynr0ppsz0cxtw835sny5alz",
   ihm_level:2,
-  version: "0.91",
+  version: "0.981",
   appname: "NFTNow Testnet",
   appli:"https://devnet.nftnow.af10.fr",
   network: "elrond-testnet",
@@ -55,7 +55,7 @@ export const abi=
         "inputs": [
           {
             "name": "amount_per_address",
-            "type": "u64"
+            "type": "BigUint"
           }
         ],
         "outputs": [

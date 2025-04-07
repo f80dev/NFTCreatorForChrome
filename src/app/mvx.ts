@@ -1,7 +1,7 @@
 //Version official 0.95 - 07/04/2025
 
 import {
-  Address,
+  Address, BigUIntValue,
   BytesValue, ContractExecuteInput,
   SmartContractTransactionsFactory, TestnetEntrypoint, Token, TokenComputer,
   TokenManagementTransactionsOutcomeParser,
@@ -540,7 +540,8 @@ export async function share_token(user:UserService,collection:string,nonce:numbe
   })
 
   try{
-    let value=new U64Value(Math.round(amount))
+    //let value=new U64Value(Math.round(amount))
+    let value=new BigUIntValue(Math.round(amount))
     let t=await create_transaction("upload",[value], user,[token],user.get_sc_address(),abi,4078541n,cost)
     let t_signed=await signTransaction(t,user)
     let rc=await execute_transaction(t_signed,user,"upload")
@@ -560,21 +561,29 @@ export function get_token(identifier: string, api:any,network: string) {
 }
 
 
-export async function share_token_wallet(vm:any,token: any,cost=0.0003,amount="",nb_user=1) : Promise<{url:string,amount:number} | null> {
+export async function share_token_wallet(vm:any,token: any,cost=0.0003,str_amount="",nb_user=1) : Promise<{url:string,amount:number} | null> {
 
   //Permet le partage d'un token
   //vm doit contenir MatDialog, user
+  let max=token.type.startsWith("Fungible") ? token.balance/(10**token.decimals) : token.balance
 
-  if(amount==""){
+  if(str_amount==""){
     if((token.type.indexOf("SemiFungible")>-1 || token.type.startsWith("Fungible")) && Number(token.balance)>1){
-      amount=await _prompt(vm,
+      str_amount=await _prompt(vm,
         "Amount to share","1",
-        "between 1 and "+token.balance,"number","ok","annuler",false)
+        "between 1 and "+max,"number","ok","annuler",false)
     }
   }
 
-  if(!amount || Number(amount)==0)return null
-  if(Number(amount)*Number(nb_user)>Number(token.balance)){
+  if(!str_amount || Number(str_amount)==0)return null
+  let amount=Number(str_amount)
+  if(token.type.startsWith("Fungible")){
+    amount=amount*(10**token.decimals)
+    token.collection=token.identifier
+    max=max*(10**token.decimals)
+  }
+
+  if(amount*Number(nb_user)>max){
     showMessage(vm,"You have not enought token to send this amount")
     return null
   }
@@ -584,14 +593,9 @@ export async function share_token_wallet(vm:any,token: any,cost=0.0003,amount=""
     let url=""
     try{
       wait_message(vm,"Sharing link building")
-      if(token.type.startsWith("Fungible")){
-        token.decimals=18
-        amount=(Number(amount)*1e18).toString()
-        token.collection=token.identifier
-      }
       let id =""
 
-      let rc=await share_token(vm.user,token.collection,token.nonce,Number(amount),nb_user,cost)
+      let rc=await share_token(vm.user,token.collection,token.nonce,amount,nb_user,cost)
       if(rc){
         for(let v of rc.values){
           if(v.startsWith("@6f6b")){

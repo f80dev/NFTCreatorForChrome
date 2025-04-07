@@ -20,6 +20,7 @@ import {settings} from "../../environments/settings";
 import {ShareService} from "../share.service";
 import {ShareformComponent} from "../shareform/shareform.component";
 import {analyse_clipboard, url_shorter} from "../../main";
+import {_prompt} from "../prompt/prompt.component";
 
 @Component({
   selector: 'app-source',
@@ -73,7 +74,7 @@ export class SourceComponent implements OnDestroy {
       let content=await analyse_clipboard(this,environment.share_appli,true,message)
       if(content)this.update_visual.emit(content)
     }catch (e:any){
-     $$("Impossible de récupérer le clipboard",e)
+      $$("Impossible de récupérer le clipboard",e)
     }
   }
 
@@ -155,9 +156,25 @@ export class SourceComponent implements OnDestroy {
     this.router.navigate(["share"],{queryParams:{p:setParams({visual:$event.visual,content:$event},"","")}})
   }
 
-  share_coin(content:any) {
-    this.router.navigate(["share"],{queryParams:{
-        url:content.url
-    }})
+  async share_coin(content:any) {
+    let token=content.token
+    wait_message(this,"Making link to share")
+    try{
+      let nb_user=await _prompt(this,"How many users can receive this coin","1","","number","Ok","Cancel",false)
+      if(nb_user){
+        let result=await share_token_wallet(this,token, environment.share_cost,"",Number(nb_user))
+        if(result) {
+          this.router.navigate(["share"], {
+            queryParams: {
+              url: await url_shorter(result.url),
+              content: token
+            }
+          })
+        }
+      }
+    }catch (e:any){
+      showMessage(this,"Retry")
+    }
+    wait_message(this)
   }
 }

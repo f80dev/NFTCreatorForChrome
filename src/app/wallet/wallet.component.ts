@@ -42,7 +42,7 @@ export class WalletComponent implements OnChanges {
   @Input() strong_token=""
   @Input() network=settings.network || "elrond-devnet"
   @Output() selectChanged = new EventEmitter()
-  @Output() shareCoin = new EventEmitter()
+  @Output() selectCoin = new EventEmitter()
   @Output() onCancel = new EventEmitter()
   @Output() listChanged = new EventEmitter()
 
@@ -124,16 +124,9 @@ export class WalletComponent implements OnChanges {
 
 
 
-  async send_coin(identifier: string) {
-    let token=this.user.tokens[identifier]
-    token.balance=token.balance/1e18
-    wait_message(this,"Making link to share")
-    let obj=await share_token_wallet(this,token,environment.share_cost)
-    wait_message(this)
-    if(obj){
-      let url=await url_shorter(obj.url)
 
-      this.shareCoin.emit({url:url,token:token,amount:obj.amount})
-    }
+  select_coin(k: string) {
+    let token=this.user.tokens[k]
+    this.selectCoin.emit({token:token})
   }
 }

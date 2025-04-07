@@ -70,7 +70,7 @@
       <br>
       <div *ngIf="user.isConnected(false)">
         <app-wallet [address]="user.address" show="coin"
-                    (shareCoin)="share_coin($event)"
+                    (selectCoin)="share_coin($event)"
                     [network]="user.network"></app-wallet>
 
 

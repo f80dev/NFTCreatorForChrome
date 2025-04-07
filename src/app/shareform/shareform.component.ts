@@ -8,9 +8,9 @@ import {Location, NgIf} from "@angular/common";
 import {QRCodeComponent} from "angularx-qrcode";
 import {InputComponent} from "../input/input.component";
 import {MatExpansionPanel, MatExpansionPanelHeader} from "@angular/material/expansion";
-import {Clipboard, ClipboardModule} from "@angular/cdk/clipboard";
+import {Clipboard} from "@angular/cdk/clipboard";
 import {MatSnackBar} from "@angular/material/snack-bar";
-import {get_nft, share_token_wallet, view_nft} from "../mvx";
+import {share_token_wallet, view_nft} from "../mvx";
 import {UserService} from "../user.service";
 import {environment} from "../../environments/environment";
 import {url_shorter} from "../../main";
@@ -123,7 +123,6 @@ export class ShareformComponent implements OnInit {
       let obj=JSON.parse(JSON.stringify(this.content))
       obj.urls=this.user.data.urls
       obj.metadata=this.user.data.metadata
-
       localStorage.setItem("save_parameters",JSON.stringify(obj))
     }else{
       localStorage.removeItem("save_parameters")

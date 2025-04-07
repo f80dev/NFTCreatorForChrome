@@ -26,7 +26,7 @@
           </td>
           <td style="text-align: right;width:50%;">{{user.tokens[k].balance/1e18 | number:"1.0-4"}}</td>
           <td *ngIf="message==''">
-            <mat-icon class="icon-button" style="font-size: small;margin-bottom: -12px;" (click)="send_coin(k)" title="Show your coin">send</mat-icon>
+            <mat-icon class="icon-button" style="font-size: small;margin-bottom: -12px;" (click)="select_coin(k)" title="Show your coin">send</mat-icon>
           </td>
         </tr>
       </table>

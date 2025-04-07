@@ -1,7 +1,7 @@
 
 <div class="mainform">
 
-  <app-hourglass [message]="message" ></app-hourglass>
+  <app-hourglass [message]="message" style="margin-top: 20px;"></app-hourglass>
   <app-xportal-switch *ngIf="url==''" [uri]="user.uri_to_xportal"></app-xportal-switch>
   <br>
 
@@ -10,7 +10,7 @@
     <img *ngIf="visual.length>0"
          [srcset]="visual"
          [title]="visual"
-         style="width: 100px;height: 100px;">
+         style="width: 150px;height: 150px;border: solid white 2px;">
 
     <br><br>
     <div style="font-size: large;">
@@ -19,7 +19,7 @@
     <br>
 
     <div *ngIf="(content.type.startsWith('Semi') || content.type.startsWith('Fungible')) && content!.balance>1"
-         style="margin:20px;display: inline-block;max-width: 300px;" >
+         style="margin:40px;display: inline-block;max-width: 300px;" >
       <app-input label="Amount to share per user"
                  [value]="amount" (valueChange)="amount=$event" [min]="1" [max]="content!.balance"></app-input>
 
@@ -41,12 +41,15 @@
     <br>
     <div style="padding: 15px;margin-bottom:40px;border: grey solid 2px;border-radius: 15px;font-size:clamp(15px, 2.2vw,30px);text-wrap: pretty; display: inline-block;width: 50%;max-width:550px;">
       {{url}}
-      <mat-icon style="margin-bottom: -5px;margin-left:10px;"
+      <mat-icon style="margin-bottom: -5px;margin-left:30px;"
                 title="Copy this link"
                 (click)="copy_url()">content_copy</mat-icon>
       <mat-icon style="margin-bottom: -5px;margin-left:10px;"
-                title="See the vault"
+                title="See this vault"
                 (click)="see_url()">visibility</mat-icon>
+      <mat-icon style="margin-bottom: -5px;margin-left:10px;"
+                title="Share this vault"
+                (click)="on_share()">share</mat-icon>
     </div>
     <br>
 
@@ -64,12 +67,17 @@
     </mat-expansion-panel>
 
     <br>
-
   </div>
 
 
   <mat-slide-toggle [(ngModel)]="keep_parameters"
-                    (change)="update_keeping()">Keep parameters of the NFT in this devices</mat-slide-toggle><br><br>
+                    style="margin-top: 20px;"
+                    *ngIf="url=='' && content && content.type && !content.type!.startsWith('Fungible')"
+                    title="Saved the previous parameters for a the next NFT"
+                    (change)="update_keeping()">
+    <div style="text-align: left;margin-left:5px;width: 200px;line-height: 85%;">Keep parameters of this NFT for the next one</div>
+  </mat-slide-toggle><br><br>
+
 
 
   <div style="width:100%;text-align:center;margin-top:20px;" *ngIf="content && message==''">
