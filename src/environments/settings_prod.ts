@@ -1,5 +1,5 @@
 export const settings={
-  contract_addr:"erd1qqqqqqqqqqqqqpgqt54xwdjqm4keu0n7zjas2659sg2cntgl835smthcge",
+  contract_addr:"erd1qqqqqqqqqqqqqpgqxjuyp9afnqttjzzy0v37phuuz7326tgpwhps2yzjd0",
   ihm_level:1,
   appname: "NFTNow",
   version: "0.981",
@@ -56,7 +56,7 @@ export const abi=
         "inputs": [
           {
             "name": "amount_per_address",
-            "type": "u64"
+            "type": "BigUint"
           }
         ],
         "outputs": [
