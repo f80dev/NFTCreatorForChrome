@@ -1,4 +1,4 @@
-//Version official 0.9 - 03/04/2025
+//Version official 0.95 - 07/04/2025
 
 import {
   Address,
