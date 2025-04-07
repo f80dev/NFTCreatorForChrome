@@ -447,9 +447,11 @@ export async function decode_metadata(nfts:any[],api:ApiService) : Promise<any[]
   return rc
 }
 
+
 export function view_nft(user:UserService,identifier:string,explorer=environment.nft_viewer) {
   let url=explorer.replace("%identifier%",identifier)
-  if(!user.isDevnet())url=url.replace("devnet.","")
+  if(user.isMainnet())url=url.replace("devnet.","")
+  if(user.isTestnet())url=url.replace("devnet.","testnet.")
   open(url,"Gallery")
 }
 
@@ -625,9 +627,15 @@ export async function share_token_wallet(vm:any,token: any,cost=0.0003,amount=""
 }
 
 
+export function get_chain_id(user:UserService) {
+  if(user.isMainnet())return "1"
+  if(user.isDevnet())return "D"
+  return "T"
+}
+
 
 export async function deploy(user:UserService,code:BytesValue) {
-  const factoryConfig = new TransactionsFactoryConfig({ chainID:user.get_chain_id() });
+  const factoryConfig = new TransactionsFactoryConfig({ chainID:get_chain_id(user) });
   let factory = new SmartContractTransactionsFactory({
     config: factoryConfig,
     abi: await create_abi(abi)

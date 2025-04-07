@@ -65,7 +65,7 @@ import {analyse_clipboard, url_shorter} from "../../main";
 })
 export class MainComponent implements OnInit {
   @ViewChild('img', { static: false }) img!: ElementRef;
-  name= "MyNFT"
+  name= ""
   description=""
   visual= ""
   quantity= 1
@@ -131,10 +131,12 @@ export class MainComponent implements OnInit {
       this.visual=await analyse_clipboard(this,environment.share_appli)
     }
 
-
-  //transformation du visual
+    //transformation du visual
     if(this.visual.length>0 && params.self_storage)await this.convert_to_base64("image/webp")
     if(params.hasOwnProperty("source") && params.source!=this.visual)this.properties.push({name:"Sources",value:params.source})
+
+    this.initParams()
+
   }
 
 
@@ -195,6 +197,7 @@ export class MainComponent implements OnInit {
         //const blob = new Blob([JSON.stringify(obj)], { type: 'application/json'})
         //let metadata=await this.imageUploader.upload(blob,"infos.json",0)
 
+        this.user.data.metadata=obj
         let metadata=await this.pinata.uploadJSONToIPFS({name:"metadata_"+this.user.address+".json",content:obj})
 
         $$("metadata ",metadata)
@@ -206,6 +209,7 @@ export class MainComponent implements OnInit {
         $$("Consultation des metadata https://ipfs.io/ipfs/"+metadata.hash)
       }
 
+      this.user.data.urls=this.uris
       let quantity=col.subType.startsWith("NonFungible") ? 1 : this.quantity
       try{
 
@@ -226,9 +230,6 @@ export class MainComponent implements OnInit {
             this.router.navigate(["share"],{
               queryParams:{p:setParams({visual:this.visual,content:nft},"","")}
             })
-
-
-
 
           }catch (e:any){
 
@@ -445,4 +446,22 @@ export class MainComponent implements OnInit {
   }
 
   protected readonly view_account_on_gallery = view_account_on_gallery;
+
+
+  private initParams() {
+    if(localStorage.getItem("save_parameters")){
+      let saved:any=JSON.parse(localStorage.getItem("save_parameters")!)
+      let metadata=saved.metadata
+      this.name=this.name || saved.name || ""
+      this.description=metadata.description
+      this.quantity=Number(saved.supply)
+      this.royalties=Number(saved.royalties)
+      this.tags=saved.tags.join(" ")
+      this.uris=saved.urls || []
+      for(let attr of metadata.attributes){
+        this.properties.push({name:attr.trait_type,value:attr.value})
+      }
+    }
+
+  }
 }

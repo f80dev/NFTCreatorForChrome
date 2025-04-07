@@ -35,7 +35,7 @@ import {settings} from '../../environments/settings';
 import {HourglassComponent, wait_message} from "../hourglass/hourglass.component";
 import {UserService} from "../user.service";
 import {XportalSwitchComponent} from "../xportal-switch/xportal-switch.component";
-import {walletConnectDeepLink} from "../mvx";
+import {get_chain_id, walletConnectDeepLink} from "../mvx";
 
 //Installation de @multiversx/sdk-wallet-connect-provider via yarn add @multiversx/sdk-wallet-connect-provider
 
@@ -549,14 +549,14 @@ export class AuthentComponent implements OnInit,OnChanges {
 
     const callbacks:any ={
       onClientLogin: async ()=> {
-        $$("Connexion wallet connect ")
+        $$("Connexion wallet connect sur chainid="+get_chain_id(this.user))
         this.address=await this.provider.getAddress();
       },
       onClientLogout: ()=> {
         $$("Déconnexion de wallet connect")
       },
     }
-    this.provider = new WalletConnectV2Provider(callbacks, this.user.get_chain_id(), this.relayUrl, this.walletConnect_ProjectId);
+    this.provider = new WalletConnectV2Provider(callbacks, get_chain_id(this.user), this.relayUrl, this.walletConnect_ProjectId);
 
     try{
       wait_message(this,"Connexion")

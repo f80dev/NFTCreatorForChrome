@@ -53,6 +53,7 @@ export class UserService {
   action_after_mint: string=""
   params: any={}
   uri_to_xportal=""
+  data: any={}
 
   constructor() { }
 
@@ -84,11 +85,6 @@ export class UserService {
 
 
 
-  get_chain_id(){
-    let rc=this.network.indexOf("devnet")>-1 ? "D" : "1"
-    $$("Utilisation de la chaine chainid="+rc)
-    return rc
-  }
 
   logout(strong=false) {
     if(strong){

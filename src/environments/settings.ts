@@ -1,10 +1,10 @@
 export const settings={
-  contract_addr:"erd1qqqqqqqqqqqqqpgqmyng4kkckl0xw7eggnhhwf6lyye0alxv835sgc6ysd",
-  ihm_level:1,
-  version: "0.98",
-  appname: "NFTNow Devnet",
+  contract_addr:"erd1qqqqqqqqqqqqqpgqzgl73876mr2e6vj80ctng2nxuku79pye835sydx762",
+  ihm_level:2,
+  version: "0.91",
+  appname: "NFTNow Testnet",
   appli:"https://devnet.nftnow.af10.fr",
-  network: "elrond-devnet",
+  network: "elrond-testnet",
   intro: "Create your NFT on the devnet network in one minute"
 }
 
@@ -38,30 +38,13 @@ export const abi=
     },
     "endpoints": [
       {
-        "name": "documents",
-        "mutability": "readonly",
-        "inputs": [
-          {
-            "name": "key",
-            "type": "u32"
-          }
+        "name": "fund",
+        "mutability": "mutable",
+        "payableInTokens": [
+          "*"
         ],
-        "outputs": [
-          {
-            "type": "Document"
-          }
-        ]
-      },
-      {
-        "name": "withdraw",
-        "mutability": "readonly",
         "inputs": [],
-        "outputs": [
-          {
-            "type": "variadic<u32>",
-            "multi_result": true
-          }
-        ]
+        "outputs": []
       },
       {
         "name": "upload",
@@ -69,7 +52,12 @@ export const abi=
         "payableInTokens": [
           "*"
         ],
-        "inputs": [],
+        "inputs": [
+          {
+            "name": "amount_per_address",
+            "type": "u64"
+          }
+        ],
         "outputs": [
           {
             "type": "u32"
@@ -125,9 +113,12 @@ export const abi=
           {
             "name": "amount",
             "type": "BigUint"
+          },
+          {
+            "name": "amount_per_address",
+            "type": "BigUint"
           }
         ]
       }
     }
   }
-

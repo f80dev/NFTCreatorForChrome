@@ -68,6 +68,9 @@
   </div>
 
 
+  <mat-slide-toggle [(ngModel)]="keep_parameters"
+                    (change)="update_keeping()">Keep parameters of the NFT in this devices</mat-slide-toggle><br><br>
+
 
   <div style="width:100%;text-align:center;margin-top:20px;" *ngIf="content && message==''">
     <div *ngIf="url===''" style="display: inline-block;">

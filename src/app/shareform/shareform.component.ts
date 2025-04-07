@@ -19,6 +19,8 @@ import {ApiService} from "../api.service";
 import {HourglassComponent, wait_message} from "../hourglass/hourglass.component";
 import {MatDialog} from "@angular/material/dialog";
 import {XportalSwitchComponent} from "../xportal-switch/xportal-switch.component";
+import {MatSlideToggle} from "@angular/material/slide-toggle";
+import {FormsModule} from "@angular/forms";
 
 @Component({
   selector: 'app-shareform',
@@ -29,7 +31,7 @@ import {XportalSwitchComponent} from "../xportal-switch/xportal-switch.component
     NgIf,
     QRCodeComponent,
     InputComponent,
-    MatExpansionPanel, MatExpansionPanelHeader, HourglassComponent, XportalSwitchComponent
+    MatExpansionPanel, MatExpansionPanelHeader, HourglassComponent, XportalSwitchComponent, MatSlideToggle, FormsModule
   ],
   templateUrl: './shareform.component.html',
   standalone: true,
@@ -57,7 +59,8 @@ export class ShareformComponent implements OnInit {
   identifier=""
   message: string=""
   amount: number=1
-  nb_users=1;
+  nb_users=1
+  keep_parameters=false
 
 
   async ngOnInit() {
@@ -97,6 +100,7 @@ export class ShareformComponent implements OnInit {
     this.onshare.emit(true)
   }
 
+
   quit() {
     this._location.back()
   }
@@ -112,5 +116,17 @@ export class ShareformComponent implements OnInit {
 
   see_url() {
     open(this.url,"preview")
+  }
+
+  update_keeping() {
+    if(this.keep_parameters){
+      let obj=JSON.parse(JSON.stringify(this.content))
+      obj.urls=this.user.data.urls
+      obj.metadata=this.user.data.metadata
+
+      localStorage.setItem("save_parameters",JSON.stringify(obj))
+    }else{
+      localStorage.removeItem("save_parameters")
+    }
   }
 }
