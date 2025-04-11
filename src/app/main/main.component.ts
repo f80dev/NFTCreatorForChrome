@@ -10,12 +10,11 @@ import {MatList, MatListItem} from "@angular/material/list";
 import {UploadFileComponent} from "../upload-file/upload-file.component";
 import {$$, getParams, setParams, showError, showMessage} from "../../tools";
 import {
-  create_collection, execute_transaction,
+  create_collection,
   get_collections, get_nft,
   getExplorer,
   level, makeNFTTransaction,
-  set_roles_to_collection, share_token, share_token_wallet, signTransaction, view_account_on_gallery,
-  view_nft
+  set_roles_to_collection, view_account_on_gallery
 } from "../mvx";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
 import {MatIcon} from "@angular/material/icon";
