@@ -22,13 +22,10 @@
          style="margin:40px;display: inline-block;max-width: 300px;" >
       <app-input label="Amount to share per user"
                  [value]="amount" (valueChange)="amount=$event" [min]="1" [max]="content!.balance"></app-input>
-
       <app-input label="how many users"
                  [value]="nb_users" (valueChange)="nb_users=$event"></app-input>
 
     </div>
-
-
   </div>
 
 
@@ -38,8 +35,7 @@
     <p>
       Now, your content is in a vault accessible with this link:
     </p>
-    <br>
-    <div style="padding: 15px;margin-bottom:40px;border: grey solid 2px;border-radius: 15px;font-size:clamp(15px, 2.2vw,30px);text-wrap: pretty; display: inline-block;width: 50%;max-width:550px;">
+    <div style="padding: 15px;border: grey solid 2px;border-radius: 15px;font-size:clamp(15px, 2.2vw,30px);text-wrap: pretty; display: inline-block;width: 50%;max-width:550px;">
       {{url}}
       <mat-icon style="margin-bottom: -5px;margin-left:30px;"
                 title="Copy this link"
@@ -52,6 +48,12 @@
                 (click)="on_share()">share</mat-icon>
     </div>
     <br>
+    <div style="font-size:small;margin: 10px;opacity: 0.8;color:red;display: inline-flex; align-items: center;">
+      <mat-icon>warning</mat-icon>
+      Don't forget this link, it's the only way to recover the content
+    </div>
+
+    <br><br>
 
     <mat-expansion-panel style="max-width:600px;display: inline-block;width:90%;margin-top:40px;">
       <mat-expansion-panel-header>Advanced settings</mat-expansion-panel-header>

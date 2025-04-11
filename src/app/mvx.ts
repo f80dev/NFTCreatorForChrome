@@ -589,7 +589,15 @@ export async function share_token_wallet(vm:any,token: any,cost=0.0003,str_amoun
     return null
   }
 
-  if(!vm.user.isConnected(true))await vm.user.login(vm,"","",true)
+  if(!vm.user.isConnected(true)){
+    let addr=vm.user.address
+    await vm.user.login(vm,"","",true)
+    if(vm.user.address!=addr){
+      showMessage(vm,"You change the address since last login")
+      vm.user.logout()
+      return null
+    }
+  }
   if(vm.user.isConnected(true)){
     let url=""
     try{
