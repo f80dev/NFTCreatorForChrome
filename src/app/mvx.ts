@@ -489,6 +489,7 @@ export async function makeNFTTransaction(identifier:string,name:string,visual:st
     })
   transaction.gasLimit=environment.max_gaz
 
+  debugger
   transaction.nonce=await entrypoint.recallAccountNonce(Address.newFromBech32(user.address))
   transaction=await signTransaction(transaction,user)
   const transactionOnNetwork =await entrypoint.awaitCompletedTransaction(await entrypoint.sendTransaction(transaction))
