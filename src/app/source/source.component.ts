@@ -167,7 +167,7 @@ export class SourceComponent implements OnDestroy {
           this.router.navigate(["share"], {
             queryParams: {
               url: await url_shorter(result.url),
-              content: token
+              content: JSON.stringify(token)
             }
           })
         }
