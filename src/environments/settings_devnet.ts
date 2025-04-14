@@ -1,5 +1,5 @@
 export const settings={
-  contract_addr:"erd1qqqqqqqqqqqqqpgqnsjt0rgwc72x24llf455an4a7k982awg835sq633wh",
+  contract_addr:"erd1qqqqqqqqqqqqqpgqeuvm5zj59khx45f06xduymmstrv8twtc835svvlh8y",
   ihm_level:1,
   version: "0.981",
   appname: "NFTNow Devnet",

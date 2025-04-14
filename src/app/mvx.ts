@@ -533,19 +533,21 @@ export async function query(function_name:string,args:any[],sc_address:string,ne
 
 
 export async function share_token(user:UserService,collection:string,nonce:number,amount=1,nb_user=1,cost=0.001,decimals=0) {
-
   let opt:any={identifier:collection}
   if(nonce)opt.nonce=BigInt(nonce)
 
+  let total_amount=BigInt(Math.round(amount*Number(nb_user)))
   let token=new TokenTransfer({
     token:new Token(opt),
-    amount:BigInt(Math.round(amount*Number(nb_user)))
+    amount:total_amount
   })
+  $$("Amount of "+collection+" transfered "+Number(token.amount))
+  $$("Egld transfered "+Number(cost*nb_user))
 
   try{
     //let value=new U64Value(Math.round(amount))
     let value=new BigUIntValue(Math.round(amount))
-    let t=await create_transaction("upload",[value], user,[token],user.get_sc_address(),abi,4078541n,cost)
+    let t=await create_transaction("upload",[value], user,[token],user.get_sc_address(),abi,4078541n,cost*nb_user)
     let t_signed=await signTransaction(t,user)
     let rc=await execute_transaction(t_signed,user,"upload")
     return rc
