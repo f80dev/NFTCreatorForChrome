@@ -6,10 +6,9 @@ import {UserService} from '../user.service';
 import {environment} from '../../environments/environment';
 import {MatIcon} from '@angular/material/icon';
 import {settings} from '../../environments/settings';
-import {decode_metadata, get_nfts, getExplorer, share_token_wallet, view_account_on_gallery} from "../mvx";
+import {decode_metadata, get_nfts, getExplorer,  view_account_on_gallery} from "../mvx";
 import {MatDialog} from "@angular/material/dialog";
-import {url_shorter} from "../../main";
-import {HourglassComponent, wait_message} from "../hourglass/hourglass.component";
+import {HourglassComponent} from "../hourglass/hourglass.component";
 import {XportalSwitchComponent} from "../xportal-switch/xportal-switch.component";
 
 @Component({
@@ -104,6 +103,8 @@ export class WalletComponent implements OnChanges {
     this.onCancel.emit()
   }
 
+
+
   create_coin() {
     let url="https://devnet.usewarp.to/create-token"
     if(this.user.isTestnet())url=url.replace("devnet","testnet")
@@ -113,16 +114,12 @@ export class WalletComponent implements OnChanges {
 
 
 
-
   protected readonly view_account_on_gallery = view_account_on_gallery;
-
 
 
   show_account() {
     open(getExplorer(this.user.address,this.user.network,"accounts","explorer"),"Account")
   }
-
-
 
 
   select_coin(k: string) {

@@ -161,8 +161,8 @@ export class SourceComponent implements OnDestroy {
     wait_message(this,"Making link to share")
     try{
       let nb_user=await _prompt(this,"How many users can receive this coin","1","","number","Ok","Cancel",false)
-      if(nb_user){
-        let result=await share_token_wallet(this,token, environment.share_cost,"",Number(nb_user))
+      if(nb_user && Number(nb_user)>0){
+        let result=await share_token_wallet(this,token, environment.share_cost*Number(nb_user),"",Number(nb_user))
         if(result) {
           this.router.navigate(["share"], {
             queryParams: {
