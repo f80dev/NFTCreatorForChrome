@@ -451,15 +451,18 @@ export class MainComponent implements OnInit {
     if(localStorage.getItem("save_parameters")){
       let saved:any=JSON.parse(localStorage.getItem("save_parameters")!)
       let metadata=saved.metadata
-      this.name=this.name || saved.name || ""
-      this.description=metadata.description
-      this.quantity=Number(saved.supply)
-      this.royalties=Number(saved.royalties)
-      this.tags=saved.tags.join(" ")
-      this.uris=saved.urls || []
-      for(let attr of metadata.attributes){
-        this.properties.push({name:attr.trait_type,value:attr.value})
+      if(metadata){
+        this.description=metadata.description
+        for(let attr of metadata.attributes) {
+          this.properties.push({name: attr.trait_type, value: attr.value})
+        }
       }
+      this.name=this.name || saved.name || ""
+      this.quantity=Number(saved.supply || "0")
+      this.royalties=Number(saved.royalties || "5")
+      this.tags=saved.tags ? saved.tags.join(" ") : ""
+      this.uris=saved.urls || []
+
     }
 
   }
