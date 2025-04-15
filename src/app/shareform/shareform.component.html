@@ -9,6 +9,7 @@
     <br>
     <img *ngIf="visual.length>0"
          [srcset]="visual"
+         alt="Loading image ..."
          [title]="visual"
          style="width: 150px;height: 150px;border: solid white 2px;">
 
@@ -23,6 +24,7 @@
       <app-input label="Amount to share per user"
                  [value]="amount" (valueChange)="amount=$event" [min]="1" [max]="content!.balance"></app-input>
       <app-input label="how many users"
+                 [help]="'Cost '+environment.share_cost*Number(nb_users)+' egld to pay fees'"
                  [value]="nb_users" (valueChange)="nb_users=$event"></app-input>
 
     </div>

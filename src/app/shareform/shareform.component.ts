@@ -77,10 +77,10 @@ export class ShareformComponent implements OnInit {
       showMessage(this,"You don't have enought token")
       return
     }
-    let r=await _prompt(this,"Send the contents to a vault and give access via a shared link ?","",
-      "0.004 eGld per recipient are required to pay network fees","yesno","Ok","Cancel",true)
+    let r=await _prompt(this,"Send the contents to a vault and give a free access via shared link ?","",
+      environment.share_cost*this.nb_users+" eGld are required to pay network fees for receivers","yesno","Ok","Cancel",true)
     if(r==="yes"){
-      let obj=await share_token_wallet(this,this.content,environment.share_cost*this.nb_users,this.amount.toString(),this.nb_users)
+      let obj=await share_token_wallet(this,this.content,environment.share_cost,this.amount.toString(),this.nb_users)
       if(obj){
         this.url=await url_shorter(obj!.url)
       }
@@ -128,4 +128,7 @@ export class ShareformComponent implements OnInit {
       localStorage.removeItem("save_parameters")
     }
   }
+
+  protected readonly environment = environment;
+  protected readonly Number = Number;
 }
