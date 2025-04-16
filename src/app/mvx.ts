@@ -196,8 +196,13 @@ export function get_transactions(api:ApiService,smartcontract_addr:string,abi=nu
 
 export function getExplorer(addr = "", network = "elrond-devnet",service="accounts", tools = "xspotlight",suffixe=""): string {
   let prefixe= network.indexOf("devnet") > -1 ? "devnet" : network.indexOf("testnet") > -1 ? "testnet" : ""
-  if(tools=="explorer")tools="explorer.multiversx"
-  prefixe=prefixe+(tools=="explorer" ? "-" : ".")
+  if(tools=="explorer"){
+    tools="explorer.multiversx"
+    prefixe=prefixe+"-"
+  }else{
+    prefixe=prefixe+"."
+  }
+
   return "https://" + prefixe  + tools+".com/" + service+"/"+addr+suffixe;
 }
 

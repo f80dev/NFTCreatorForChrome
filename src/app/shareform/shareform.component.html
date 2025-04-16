@@ -1,106 +1,109 @@
-
 <div class="mainform">
 
   <app-hourglass [message]="message" style="margin-top: 20px;"></app-hourglass>
   <app-xportal-switch *ngIf="url==''" [uri]="user.uri_to_xportal"></app-xportal-switch>
   <br>
 
-  <div *ngIf="content && url===''">
+  <div [style.pointer-events]="message=='' ? 'all' : 'none'" [style.opacity]="message=='' ? 1 : 0.3">
+
+    <div *ngIf="content && url===''">
+      <br>
+      <img *ngIf="visual.length>0"
+           [srcset]="visual"
+           alt="Loading image ..."
+           [title]="visual"
+           style="width: 150px;height: 150px;border: solid white 2px;">
+
+      <br><br>
+      <div style="font-size: large;">
+        {{content!.balance}} {{content!.name}}(s) available to share !
+      </div>
+      <br>
+
+      <div *ngIf="(content.type.startsWith('Semi') || content.type.startsWith('Fungible')) && content!.balance>1"
+           style="margin:40px;display: inline-block;max-width: 300px;" >
+        <app-input label="Amount to share per user"
+                   [value]="amount" (valueChange)="amount=$event" [min]="1" [max]="content!.balance"></app-input>
+        <app-input label="how many users"
+                   [help]="'Cost '+environment.share_cost*Number(nb_users)+' egld to pay fees'"
+                   [value]="nb_users" (valueChange)="nb_users=$event"></app-input>
+
+      </div>
+    </div>
+
+
     <br>
-    <img *ngIf="visual.length>0"
-         [srcset]="visual"
-         alt="Loading image ..."
-         [title]="visual"
-         style="width: 150px;height: 150px;border: solid white 2px;">
 
-    <br><br>
-    <div style="font-size: large;">
-      {{content!.balance}} {{content!.name}}(s) available to share !
-    </div>
-    <br>
+    <div *ngIf="url!=''" [style.pointer-events]="message=='' ? 'all' : 'none'" [style.opacity]="message=='' ? 1 : 0.3">
+      <p>
+        Now, your content is in a vault accessible with this link:
+      </p>
+      <div style="padding: 15px;border: grey solid 2px;border-radius: 15px;font-size:clamp(15px, 2.2vw,30px);text-wrap: pretty; display: inline-block;width: 50%;max-width:550px;">
+        {{url}}
+        <mat-icon style="margin-bottom: -5px;margin-left:30px;"
+                  title="Copy this link"
+                  (click)="copy_url()">content_copy</mat-icon>
+        <mat-icon style="margin-bottom: -5px;margin-left:10px;"
+                  title="See this vault"
+                  (click)="see_url()">visibility</mat-icon>
+        <mat-icon style="margin-bottom: -5px;margin-left:10px;"
+                  title="Share this vault"
+                  (click)="on_share()">share</mat-icon>
+      </div>
+      <br>
+      <div style="font-size:small;margin: 10px;opacity: 0.8;color:red;display: inline-flex; align-items: center;">
+        <mat-icon>warning</mat-icon>
+        Don't forget this link, it's the only way to recover the content
+      </div>
 
-    <div *ngIf="(content.type.startsWith('Semi') || content.type.startsWith('Fungible')) && content!.balance>1"
-         style="margin:40px;display: inline-block;max-width: 300px;" >
-      <app-input label="Amount to share per user"
-                 [value]="amount" (valueChange)="amount=$event" [min]="1" [max]="content!.balance"></app-input>
-      <app-input label="how many users"
-                 [help]="'Cost '+environment.share_cost*Number(nb_users)+' egld to pay fees'"
-                 [value]="nb_users" (valueChange)="nb_users=$event"></app-input>
+      <br><br>
 
-    </div>
-  </div>
+      <mat-expansion-panel style="max-width:600px;display: inline-block;width:90%;margin-top:40px;">
+        <mat-expansion-panel-header>Advanced settings</mat-expansion-panel-header>
 
+        <qrcode [qrdata]="url"
+                *ngIf="url.length>0"
+                [width]="200" [errorCorrectionLevel]="'M'"></qrcode>
+        <p>This QR code corresponds to the sharing link of your NFT to be distributed</p>
 
-  <br>
-
-  <div *ngIf="url!=''">
-    <p>
-      Now, your content is in a vault accessible with this link:
-    </p>
-    <div style="padding: 15px;border: grey solid 2px;border-radius: 15px;font-size:clamp(15px, 2.2vw,30px);text-wrap: pretty; display: inline-block;width: 50%;max-width:550px;">
-      {{url}}
-      <mat-icon style="margin-bottom: -5px;margin-left:30px;"
-                title="Copy this link"
-                (click)="copy_url()">content_copy</mat-icon>
-      <mat-icon style="margin-bottom: -5px;margin-left:10px;"
-                title="See this vault"
-                (click)="see_url()">visibility</mat-icon>
-      <mat-icon style="margin-bottom: -5px;margin-left:10px;"
-                title="Share this vault"
-                (click)="on_share()">share</mat-icon>
-    </div>
-    <br>
-    <div style="font-size:small;margin: 10px;opacity: 0.8;color:red;display: inline-flex; align-items: center;">
-      <mat-icon>warning</mat-icon>
-      Don't forget this link, it's the only way to recover the content
-    </div>
-
-    <br><br>
-
-    <mat-expansion-panel style="max-width:600px;display: inline-block;width:90%;margin-top:40px;">
-      <mat-expansion-panel-header>Advanced settings</mat-expansion-panel-header>
-
-      <qrcode [qrdata]="url"
-              *ngIf="url.length>0"
-              [width]="200" [errorCorrectionLevel]="'M'"></qrcode>
-      <p>This QR code corresponds to the sharing link of your NFT to be distributed</p>
+        <br>
+        <app-input value_type="text" [value]="title" (valueChange)="title=$event" label="Title of share"></app-input>
+        <app-input value_type="text" [value]="description" (valueChange)="description=$event" label="Description / Introduction"></app-input>
+      </mat-expansion-panel>
 
       <br>
-      <app-input value_type="text" [value]="title" (valueChange)="title=$event" label="Title of share"></app-input>
-      <app-input value_type="text" [value]="description" (valueChange)="description=$event" label="Description / Introduction"></app-input>
-    </mat-expansion-panel>
-
-    <br>
-  </div>
-
-
-  <mat-slide-toggle [(ngModel)]="keep_parameters"
-                    style="margin-top: 20px;"
-                    *ngIf="url=='' && content && content.type && !content.type!.startsWith('Fungible')"
-                    title="Saved the previous parameters for a the next NFT"
-                    (change)="update_keeping()">
-    <div style="text-align: left;margin-left:5px;width: 200px;line-height: 85%;">Keep parameters of this NFT for the next one</div>
-  </mat-slide-toggle><br><br>
-
-
-
-  <div style="width:100%;text-align:center;margin-top:20px;" *ngIf="content && message==''">
-    <div *ngIf="url===''" style="display: inline-block;">
-      <button mat-raised-button (click)="sell()" *ngIf="!content!.type.startsWith('Fungible')">
-        <mat-icon>paid</mat-icon>Sell
-      </button>
-      <button mat-raised-button (click)="transfer()">
-        <mat-icon>link</mat-icon>Link to share
-      </button>
     </div>
 
-    <button mat-raised-button *ngIf="url!=''" (click)="on_share()">
-      <mat-icon>share</mat-icon>Share
-    </button>
-    <button mat-raised-button (click)="quit()">
-      <mat-icon>close</mat-icon>Close
-    </button>
+
+    <mat-slide-toggle [(ngModel)]="keep_parameters"
+                      style="margin-top: 20px;"
+                      *ngIf="url=='' && content && content.type && !content.type!.startsWith('Fungible')"
+                      title="Saved the previous parameters for a the next NFT"
+                      (change)="update_keeping()">
+      <div style="text-align: left;margin-left:5px;width: 200px;line-height: 85%;">Keep parameters of this NFT for the next one</div>
+    </mat-slide-toggle><br><br>
+
+
+
+    <div style="width:100%;text-align:center;margin-top:20px;" *ngIf="content">
+      <div *ngIf="url===''" style="display: inline-block;">
+        <button mat-raised-button (click)="sell()" *ngIf="!content!.type.startsWith('Fungible')">
+          <mat-icon>paid</mat-icon>Sell
+        </button>
+        <button mat-raised-button (click)="transfer()">
+          <mat-icon>link</mat-icon>Link to share
+        </button>
+      </div>
+
+      <button mat-raised-button *ngIf="url!=''" (click)="on_share()">
+        <mat-icon>share</mat-icon>Share
+      </button>
+      <button mat-raised-button (click)="quit()">
+        <mat-icon>close</mat-icon>Close
+      </button>
+    </div>
   </div>
+
 
 </div>
 
