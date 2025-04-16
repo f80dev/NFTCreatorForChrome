@@ -72,8 +72,14 @@ export class SourceComponent implements OnDestroy {
   async paste(message="Nothing in the clipboard") {
     try{
       let content=await analyse_clipboard(this,environment.share_appli,true,message)
-      if(content)this.update_visual.emit(content)
+      if(content){
+        this.update_visual.emit(content)
+        return true
+      }else{
+        return false
+      }
     }catch (e:any){
+      return false
       $$("Impossible de récupérer le clipboard",e)
     }
   }
@@ -90,20 +96,30 @@ export class SourceComponent implements OnDestroy {
     let obj:any={name:'clipboard-read'}
     if ((await navigator.permissions.query(obj)).state === 'granted') {
       clearInterval(this.clipboard_handle)
-      this.clipboard_handle=setInterval(()=>{
+      this.clipboard_handle=setInterval(async ()=>{
         $$("analyse du clipboard")
-        this.paste()
+        this.paste("")
       },1000)
     }
     let occ=Number(localStorage.getItem(settings.appname) || "0")
     if(occ<3){
-      showMessage(this,"Right-click on the image you want to use, copy it and return to NFT Now",2600)
+      showMessage(this,"Right-click on the image you want to use, copy it and return to NFT Now",2000)
       setTimeout(()=>{
         localStorage.setItem(settings.appname,(occ+1).toString())
-        open(generator.value,"Images")
+        if(generator.iframe){
+          let obj={url:generator.value,intro:'use right click to copy image in the clipboard'}
+          this.router.navigate(["editor"],{queryParams:{p:setParams(obj,"","")}})
+        }else{
+          open(generator.value,"Images")
+        }
       },3000)
     }else{
-      open(generator.value,"Images")
+      if(generator.iframe){
+        let obj={url:generator.value,intro:'use right click to copy image in the clipboard'}
+        this.router.navigate(["editor"],{queryParams:{p:setParams(obj,"","")}})
+      }else{
+        open(generator.value,"Images")
+      }
     }
   }
 
@@ -177,4 +193,11 @@ export class SourceComponent implements OnDestroy {
     }
     wait_message(this)
   }
+
+
+  end_test_clipboard() {
+    clearInterval(this.clipboard_handle)
+  }
+
+
 }

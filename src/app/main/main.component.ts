@@ -165,6 +165,11 @@ export class MainComponent implements OnInit {
       return
     }
 
+    if(this.user.balance<0.01){
+      showMessage(this,"You have not enought egold to mint the NFT, reload your account")
+      return
+    }
+
     if(this.sel_collection){
       let address_change=await this.user.login(this,"",localStorage.getItem("pem") || "",true)
       if(address_change){

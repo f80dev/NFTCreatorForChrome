@@ -1,9 +1,9 @@
 <div class="mainform">
-    To transfer as NFT, use menu : "Edit" > "Copy to clipboard", or CTRL+C :
+    {{intro_message}} :
    <button mat-raised-button (click)="_cancel()">Cancel</button>
   <iframe style="margin-left:2%;width:96%;height:90%;display: inline-block;"
           id="miniPaint"
-          src="https://viliusle.github.io/miniPaint/"
+          [src]="editor_url | safe"
           allow="camera;clipboard-read;clipboard-write">
   </iframe>
 

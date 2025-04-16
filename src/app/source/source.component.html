@@ -47,7 +47,7 @@
     </mat-expansion-panel>
 
     <br>
-    <mat-expansion-panel *ngIf="!show_scanner && message==''" (afterExpand)="paste('')">
+    <mat-expansion-panel *ngIf="!show_scanner && message==''" (afterCollapse)="end_test_clipboard()" (afterExpand)="paste('')">
       <mat-expansion-panel-header>Gallery and AI Generators</mat-expansion-panel-header>
       <p>
         Once generated, copy the image with the right click and close the window
