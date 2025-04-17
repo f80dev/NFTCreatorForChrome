@@ -67,6 +67,7 @@
         <mat-expansion-panel-header>Metadata & Ressources</mat-expansion-panel-header>
 
         <app-input label="Tags" [value]="tags"
+                   help="Separate words with a blank"
                    value_type="text" (valueChange)="tags=$event"></app-input>
         <br>
 
@@ -93,7 +94,7 @@
           <button mat-raised-button (click)="add_uri()" title="Link your NFT to some urls">
             <mat-icon>add</mat-icon>Ressources
           </button>
-          <div style="display: block;width:100px;height:20px;margin-top:-13px;" *ngIf="level(2)">
+          <div style="display: block;width:100px;height:20px;margin-top:-13px;" *ngIf="level(1)">
             <app-upload-file (uploaded)="add_files($event)" title="Uploading file to link to your NFT">
               <mat-icon style="margin-bottom: -5px;margin-left: -10px;">add</mat-icon>Files
             </app-upload-file>
@@ -144,7 +145,7 @@
     <mat-expansion-panel *ngIf="user.isConnected(false)" [expanded]="true">
       <mat-expansion-panel-header>
         Your Wallet
-        &nbsp;({{user.network}})
+        &nbsp;({{user.network.replace("elrond-","MultiversX ")}})
 
       </mat-expansion-panel-header>
       <div style="display: inline-flex;align-items: center;justify-content: center;" >

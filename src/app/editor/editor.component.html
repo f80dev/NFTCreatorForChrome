@@ -1,6 +1,9 @@
 <div class="mainform">
-    {{intro_message}} :
-   <button mat-raised-button (click)="_cancel()">Cancel</button>
+  <div style="width: 100%;display: inline-flex;align-items: center;justify-content: space-between;">
+    <small>{{intro_message}}</small>&nbsp;
+    <button mat-raised-button (click)="_cancel()">Cancel</button>
+  </div>
+
   <iframe style="margin-left:2%;width:96%;height:90%;display: inline-block;"
           id="miniPaint"
           [src]="editor_url | safe"
