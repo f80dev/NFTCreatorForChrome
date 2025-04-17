@@ -33,6 +33,8 @@
         <app-input label="Quantity" [value]="quantity" style="width: 144px;"
                    *ngIf="!sel_collection || sel_collection.value.subType=='SemiFungibleESDT'"
                    value_type="number" (valueChange)="quantity=$event"></app-input>
+
+        <button mat-icon-button style="width:40px;" (click)="load_config()"><mat-icon>save</mat-icon></button>
         <br>
 
         <div class="vignette">
@@ -63,7 +65,7 @@
       </mat-expansion-panel>
 
       <br>
-      <mat-expansion-panel>
+      <mat-expansion-panel >
         <mat-expansion-panel-header>Metadata & Ressources</mat-expansion-panel-header>
 
         <app-input label="Tags" [value]="tags"
@@ -103,25 +105,19 @@
 
 
         <br>
-        <table style="width: 100%;">
-          <tr *ngFor="let uri of uris" style="width: 100%;">
-            <td style="width: 80%;text-align: left;">{{uri}}</td>
-            <td style="width: 10%;text-align: right;">
+
+          <div *ngFor="let uri of uris"
+               style="width: 100%;text-align: left;display: inline-flex;align-content: center;text-wrap: nowrap;overflow: hidden;">
+
               <mat-icon (click)="update_uri(uri)">edit</mat-icon>
               <mat-icon (click)="delete_uri(uri)">cancel</mat-icon>
-            </td>
-          </tr>
-        </table>
-        <br>
+            &nbsp;
+            <div style="text-overflow: ellipsis; width: 80%;">
+              {{uri.substring(0,100)}}
+            </div>
 
-        <mat-slide-toggle [(ngModel)]="keep_parameters"
-                          style="margin-top: 20px;"
 
-                          title="Saved the previous parameters for a the next NFT"
-                          (change)="update_keeping()">
-          <div style="text-align: left;margin-left:5px;width: 200px;line-height: 85%;">Keep parameters of this NFT for the next one</div>
-        </mat-slide-toggle><br><br>
-
+          </div>
 
       </mat-expansion-panel>
 
@@ -138,7 +134,7 @@
   </div>
 
   <div *ngIf="visual.length>0">
-    <button *ngIf="sel_collection && visual!=''" mat-raised-button
+    <button *ngIf="sel_collection && visual!='' && quantity>0" mat-raised-button
             style="width:200px;height:70px;margin-top:-5px;margin-bottom: 15px;"
             (click)="Create_NFT()">
       <div style="font-size: medium;margin-bottom: -10px;">

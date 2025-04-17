@@ -23,6 +23,7 @@
         <button mat-raised-button *ngIf="level(1)" title="Open the camera of your device to take a photo" (click)="open_photo()">From camera</button>
         <button mat-raised-button *ngIf="level(1)" title="Get the content clipboard" (click)="paste()">From clipboard</button>
         <button mat-raised-button *ngIf="level(1)" title="Image editor" (click)="go_editor()">From editor</button>
+        <button mat-raised-button *ngIf="level(1)" title="Create NFT from last visual" (click)="go_from_last()">From last</button>
 
       </div>
 
@@ -52,14 +53,13 @@
       <p>
         Once generated, copy the image with the right click and close the window
       </p>
-
-
       <button *ngFor="let generator of generators"
               mat-raised-button (click)="open_generator(generator)">
         {{generator.label}}
       </button>
     </mat-expansion-panel>
     <br>
+
 
     <mat-expansion-panel >
       <mat-expansion-panel-header>My wallet</mat-expansion-panel-header>

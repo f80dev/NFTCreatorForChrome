@@ -1,4 +1,4 @@
-import {Component, ElementRef, inject, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {Location, NgForOf, NgIf} from "@angular/common";
 import {InputComponent} from "../input/input.component";
@@ -39,6 +39,7 @@ import {settings} from "../../environments/settings";
 import {ShareService} from "../share.service";
 import {analyse_clipboard, url_shorter} from "../../main";
 import {FormsModule} from "@angular/forms";
+import local = chrome.storage.local;
 
 @Component({
   selector: 'app-main',
@@ -64,7 +65,8 @@ import {FormsModule} from "@angular/forms";
   templateUrl: './main.component.html',
   styleUrl: './main.component.scss'
 })
-export class MainComponent implements OnInit {
+export class MainComponent implements OnInit,OnDestroy {
+
   @ViewChild('img', { static: false }) img!: ElementRef;
   name= ""
   description=""
@@ -73,6 +75,8 @@ export class MainComponent implements OnInit {
   royalties=5
   content:any
 
+  imageProcessor=inject(ImageProcessorService)
+  imageUploader=inject(UploaderService)
   pinata=inject(PinataService)
   location=inject(Location)
   user=inject(UserService)
@@ -84,7 +88,6 @@ export class MainComponent implements OnInit {
   http=inject(HttpClient)
   shareService=inject(ShareService)
 
-  keep_parameters=false
   collections: {label:string,value:any}[]=[]
   sel_collection:{label:string,value:any} | undefined
 
@@ -100,7 +103,27 @@ export class MainComponent implements OnInit {
   filename: string="image.webp"
   clipboard=inject(ClipboardService)
   private after: string="new"
-  public  share_url="";
+
+
+  save_config() {
+    let content={
+      name:this.name,
+      quantity:this.quantity,
+      visual:this.visual,
+      royalties:this.royalties,
+      properties:this.properties,
+      description:this.description,
+      uris:this.uris,
+      tags:this.tags
+    }
+    let obj=JSON.parse(JSON.stringify(content))
+
+    obj.metadata=this.user.data.metadata
+    localStorage.setItem("save_parameters",JSON.stringify(obj))
+
+  }
+
+
 
   normalize(text:string) : string {
     return text.replace(/[^a-z0-9 A-Z]/gi, '');
@@ -108,31 +131,28 @@ export class MainComponent implements OnInit {
 
 
 
-  update_keeping() {
-    if(this.keep_parameters){
-      let content={name:this.name,quantity:this.quantity}
-      let obj=JSON.parse(JSON.stringify(content))
-      obj.urls=this.user.data.urls
-      obj.metadata=this.user.data.metadata
-      localStorage.setItem("save_parameters",JSON.stringify(obj))
-    }else{
-      localStorage.removeItem("save_parameters")
-    }
-  }
-
   async ngOnInit() {
+
     let params:any=await getParams(this.routes)
     this.user.network=params.network || settings.network || "elrond-devnet"
     $$("Lecture des paramètres ",params)
     this.user.action_after_mint=params.action || params.action_after_mint || ""
-    this.visual=params.url || localStorage.getItem("image") || ""
+
+    if(params.fromlast){
+      this.load_config()
+    }else{
+      this.visual=params.url || localStorage.getItem("image") || ""
+    }
+
+
     if(params.intro)localStorage.removeItem(settings.appname)
+
     await this.user.login(this,"","",false,0.003,"",true)
     await this.refresh_collection()
     if(params.hasOwnProperty("uri"))this.uris.push(params.uri)
 
     if(params.hasOwnProperty("collection")){
-     //TODO compléter avec la possibilité de selectionner par défaut une collection
+      //TODO compléter avec la possibilité de selectionner par défaut une collection
     }
     if(params.hasOwnProperty("description"))this.description=this.normalize(params.description)
     if(params.hasOwnProperty("name"))this.name=this.normalize(params.name.split(".")[0])
@@ -147,9 +167,6 @@ export class MainComponent implements OnInit {
     //transformation du visual
     if(this.visual.length>0 && params.self_storage)await this.convert_to_base64("image/webp")
     if(params.hasOwnProperty("source") && params.source!=this.visual)this.properties.push({name:"Sources",value:params.source})
-
-    this.initParams()
-
   }
 
 
@@ -170,8 +187,9 @@ export class MainComponent implements OnInit {
     await this.refresh_collection()
   }
 
-  imageProcessor=inject(ImageProcessorService)
-  imageUploader=inject(UploaderService)
+
+
+
   async Create_NFT() {
     //voir https://docs.multiversx.com/tokens/nft-tokens/#creation-of-an-nft
     if(this.name.length<3 || this.name.length>50){
@@ -304,8 +322,8 @@ export class MainComponent implements OnInit {
   }
 
   update_visual(src:string){
-    this.visual=src
-    this.self_storage=(!src.startsWith("http"))
+      this.visual=src
+      this.self_storage=(!src.startsWith("http"))
   }
 
   async update_uri(uri: string) {
@@ -392,14 +410,14 @@ export class MainComponent implements OnInit {
 
 
   async set_roles_to_collection(collection_id:string) {
-      await this.user.login(this,"","",true)
-      wait_message(this,"Setting roles to the collection")
-      try{
-        await set_roles_to_collection(collection_id,this.user)
-      }catch (e:any){
-        showMessage(this,"Problem to setting the collection, retry")
-      }
-      wait_message(this)
+    await this.user.login(this,"","",true)
+    wait_message(this,"Setting roles to the collection")
+    try{
+      await set_roles_to_collection(collection_id,this.user)
+    }catch (e:any){
+      showMessage(this,"Problem to setting the collection, retry")
+    }
+    wait_message(this)
   }
 
 
@@ -466,23 +484,30 @@ export class MainComponent implements OnInit {
   protected readonly view_account_on_gallery = view_account_on_gallery;
 
 
-  private initParams() {
+  protected load_config() {
     if(localStorage.getItem("save_parameters")){
       let saved:any=JSON.parse(localStorage.getItem("save_parameters")!)
+
       let metadata=saved.metadata
       if(metadata){
         this.description=metadata.description
         for(let attr of metadata.attributes) {
           this.properties.push({name: attr.trait_type, value: attr.value})
         }
+      } else {
+        this.properties=saved.properties
+        this.tags=saved.tags || ""
+        this.uris=saved.uris || []
       }
+
       this.name=this.name || saved.name || ""
       this.quantity=Number(saved.supply || "0")
       this.royalties=Number(saved.royalties || "5")
-      this.tags=saved.tags ? saved.tags.join(" ") : ""
-      this.uris=saved.urls || []
-
     }
-
   }
+
+  ngOnDestroy(): void {
+    this.save_config()
+  }
+
 }

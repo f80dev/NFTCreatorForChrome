@@ -200,4 +200,10 @@ export class SourceComponent implements OnDestroy {
   }
 
 
+  go_from_last() {
+    let data:any=JSON.parse(localStorage.getItem("save_parameters") || "{}")
+    if(data.hasOwnProperty("visual")) {
+      this.update_visual.emit(data.visual)
+    }
+  }
 }
