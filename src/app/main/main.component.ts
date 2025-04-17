@@ -38,6 +38,7 @@ import {ClipboardService} from "../clipboard.service";
 import {settings} from "../../environments/settings";
 import {ShareService} from "../share.service";
 import {analyse_clipboard, url_shorter} from "../../main";
+import {FormsModule} from "@angular/forms";
 
 @Component({
   selector: 'app-main',
@@ -56,6 +57,7 @@ import {analyse_clipboard, url_shorter} from "../../main";
     HourglassComponent,
     MatIconButton,
     MatExpansionPanel, MatExpansionPanelHeader,
+    MatSlideToggle, FormsModule,
     JsonEditorComponent, MatAccordion, MatCard, IntroComponent, SourceComponent, CropperComponent
   ],
   standalone:true,
@@ -69,6 +71,7 @@ export class MainComponent implements OnInit {
   visual= ""
   quantity= 1
   royalties=5
+  content:any
 
   pinata=inject(PinataService)
   location=inject(Location)
@@ -81,7 +84,7 @@ export class MainComponent implements OnInit {
   http=inject(HttpClient)
   shareService=inject(ShareService)
 
-
+  keep_parameters=false
   collections: {label:string,value:any}[]=[]
   sel_collection:{label:string,value:any} | undefined
 
@@ -105,6 +108,17 @@ export class MainComponent implements OnInit {
 
 
 
+  update_keeping() {
+    if(this.keep_parameters){
+      let content={name:this.name,quantity:this.quantity}
+      let obj=JSON.parse(JSON.stringify(content))
+      obj.urls=this.user.data.urls
+      obj.metadata=this.user.data.metadata
+      localStorage.setItem("save_parameters",JSON.stringify(obj))
+    }else{
+      localStorage.removeItem("save_parameters")
+    }
+  }
 
   async ngOnInit() {
     let params:any=await getParams(this.routes)

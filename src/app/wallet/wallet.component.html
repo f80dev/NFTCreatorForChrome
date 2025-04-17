@@ -26,7 +26,8 @@
           </td>
           <td style="text-align: right;width:50%;">{{user.tokens[k].balance/1e18 | number:"1.0-4"}}</td>
           <td *ngIf="message==''">
-            <mat-icon class="icon-button" style="font-size: small;margin-bottom: -12px;" (click)="select_coin(k)" title="Show your coin">send</mat-icon>
+            <mat-icon class="icon-button" style="font-size: small;margin-bottom: -12px;" (click)="select_coin(k)"
+                      title="Show your coin">send</mat-icon>
           </td>
         </tr>
       </table>
@@ -50,7 +51,7 @@
          [style.width]="width"
          (dblclick)="select(nft)">
   </div>
-  <p *ngIf="help.length>0">{{help}}</p>
+  <p *ngIf="help.length>0" style="font-size: small;">{{help}}</p>
 
   <button mat-raised-button *ngIf="selected" (click)="cancel()">Cancel</button>
 

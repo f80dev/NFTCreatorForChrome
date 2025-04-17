@@ -114,6 +114,15 @@
         </table>
         <br>
 
+        <mat-slide-toggle [(ngModel)]="keep_parameters"
+                          style="margin-top: 20px;"
+
+                          title="Saved the previous parameters for a the next NFT"
+                          (change)="update_keeping()">
+          <div style="text-align: left;margin-left:5px;width: 200px;line-height: 85%;">Keep parameters of this NFT for the next one</div>
+        </mat-slide-toggle><br><br>
+
+
       </mat-expansion-panel>
 
     </mat-accordion>

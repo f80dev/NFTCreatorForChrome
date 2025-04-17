@@ -31,7 +31,7 @@ import {FormsModule} from "@angular/forms";
     NgIf,
     QRCodeComponent,
     InputComponent,
-    MatExpansionPanel, MatExpansionPanelHeader, HourglassComponent, XportalSwitchComponent, MatSlideToggle, FormsModule
+    MatExpansionPanel, MatExpansionPanelHeader, HourglassComponent, XportalSwitchComponent
   ],
   templateUrl: './shareform.component.html',
   standalone: true,
@@ -41,8 +41,10 @@ export class ShareformComponent implements OnInit {
 
 
   url=""
-  content:any
+
   @Output() onshare=new EventEmitter()
+  
+  content:any
 
   api=inject(ApiService)
   routes=inject(ActivatedRoute)
@@ -60,7 +62,6 @@ export class ShareformComponent implements OnInit {
   message: string=""
   amount: number=1
   nb_users=1
-  keep_parameters=false
 
 
   async ngOnInit() {
@@ -118,16 +119,7 @@ export class ShareformComponent implements OnInit {
     open(this.url,"preview")
   }
 
-  update_keeping() {
-    if(this.keep_parameters){
-      let obj=JSON.parse(JSON.stringify(this.content))
-      obj.urls=this.user.data.urls
-      obj.metadata=this.user.data.metadata
-      localStorage.setItem("save_parameters",JSON.stringify(obj))
-    }else{
-      localStorage.removeItem("save_parameters")
-    }
-  }
+
 
   protected readonly environment = environment;
   protected readonly Number = Number;
