@@ -8,7 +8,6 @@ import {environment} from "../../environments/environment";
 import {Location, NgIf} from "@angular/common";
 
 import {Connexion, Operation} from "../../operation";
-
 import {DeviceService} from "../device.service";
 import { WalletConnectV2Provider } from "@multiversx/sdk-wallet-connect-provider";
 import { ExtensionProvider } from "@multiversx/sdk-extension-provider";
@@ -168,6 +167,8 @@ export class AuthentComponent implements OnInit,OnChanges {
   url_xportal_direct_connect: string="";
   @Input() walletconnect_open=true;
   message: string=""
+  nativeAuthToken: string=""
+  private nativeAuthInitialPart: string=""
 
   constructor(
     public api:NetworkService,
@@ -545,17 +546,29 @@ export class AuthentComponent implements OnInit,OnChanges {
   }
 
   async open_wallet_connect() {
-    //https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-signing-providers/#the-wallet-connect-provider
+    //https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-signing-providers/#the-walletconnect-provider
 
     const callbacks:any ={
       onClientLogin: async ()=> {
         $$("Connexion wallet connect sur chainid="+get_chain_id(this.user))
         this.address=await this.provider.getAddress();
+        this.nativeAuthToken=nativeAuthClient.getToken(this.address, this.nativeAuthInitialPart, await this.provider.getSignature());
+          //this.init_wallet.emit({provider:this.provider,address:this.address});
+          this.strong=true;
+          this.validate(this.address);
       },
-      onClientLogout: ()=> {
+      onClientLogout: async ()=> {
         $$("Déconnexion de wallet connect")
+        this.user.logout(true)
       },
+      onClientEvent: async (event:any)=> {
+        console.log("onClientEvent=", event);
+      }
     }
+
+    const nativeAuthClient = new NativeAuthClient();
+
+
     this.provider = new WalletConnectV2Provider(callbacks, get_chain_id(this.user), this.relayUrl, this.walletConnect_ProjectId);
 
     try{
@@ -564,16 +577,12 @@ export class AuthentComponent implements OnInit,OnChanges {
       const { uri, approval } = await this.provider.connect();
       this.qrcode=uri
       wait_message(this)
-
+      this.nativeAuthInitialPart = await nativeAuthClient.initialize();
       this.url_xportal_direct_connect=eval_direct_url_xportal(uri)
-      let address=await this.provider.login({approval});
-      if(address){
-        //this.init_wallet.emit({provider:this.provider,address:this.address});
-        this.strong=true;
-        this.validate(address);
-      } else {
-        this.oncancel.emit();
-      }
+      this.provider.login({approval,token:this.nativeAuthInitialPart});
+
+
+
     }catch (e){
       showError(this,"Impossible d'utiliser wallet connect pour l'instant. Utiliser une autre méthode pour accéder à votre wallet")
     }

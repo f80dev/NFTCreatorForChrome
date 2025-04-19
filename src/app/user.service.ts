@@ -93,7 +93,8 @@ export class UserService {
     }
     this.address=""
     this.idx=0
-    this.provider=null;
+    this.provider.logout()
+    this.provider=null
 
   }
 
