@@ -58,7 +58,7 @@ export function eval_direct_url_xportal(uri:string) : string {
 }
 //https://maiar.page.link/?apn=com.elrond.maiar.wallet&isi=1519405832&ibi=com.elrond.maiar.wallet&link=https://maiar.com/?wallet-connect=wc%3Aa093c06fa53b3a8e226c27b16f1a6c3f735ed97012ac1dde69c294c7ea4892df%402%3Frelay-protocol%3Dirn%26symKey%3D1cc9dbc136ffa3cdf3370359d16a43346ae3dc45cbc799892fc9bf565a1701a0%26expiryTimestamp%3D1743544892
 //https://maiar.page.link/?apn=com.elrond.maiar.wallet&isi=1519405832&ibi=com.elrond.maiar.wallet&link=https://maiar.com/?wallet-connect=wc%3A47d070b33052413aecb6ae0698c3dad1b207f36111611caafee3ed1f0a1d7550%402%3FexpiryTimestamp%3D1743544759%26relay-protocol%3Dirn%26symKey%3D03faea9e23a1e06038e26067d00f0054ca5da5a4feb62d354c72163383acede2
-
+//https://maiar.page.link/?apn=com.elrond.maiar.wallet&isi=1519405832&ibi=com.elrond.maiar.wallet&link=https://maiar.com/?wallet-connect=wc%3A34a8885b44470bf47e31a8562594b6c21ac6618b8ee6747a28dfd17f202838f3%402%3FexpiryTimestamp%3D1745169246%26relay-protocol%3Dirn%26symKey%3Dea38b42ebc60cb19aabaa1962c6899bc4727921cffb651cb063620a96bed675a
 
 interface IExtensionAccount {
   address: string;
@@ -567,8 +567,6 @@ export class AuthentComponent implements OnInit,OnChanges {
     }
 
     const nativeAuthClient = new NativeAuthClient();
-
-
     this.provider = new WalletConnectV2Provider(callbacks, get_chain_id(this.user), this.relayUrl, this.walletConnect_ProjectId);
 
     try{
@@ -576,17 +574,17 @@ export class AuthentComponent implements OnInit,OnChanges {
       await this.provider.init()
       const { uri, approval } = await this.provider.connect();
       this.qrcode=uri
-      wait_message(this)
+      debugger
+      //https://maiar.page.link/?apn=com.elrond.maiar.wallet&isi=1519405832&ibi=com.elrond.maiar.wallet&link=https://maiar.com/?wallet-connect=wc%3A34a8885b44470bf47e31a8562594b6c21ac6618b8ee6747a28dfd17f202838f3%402%3FexpiryTimestamp%3D1745169246%26relay-protocol%3Dirn%26symKey%3Dea38b42ebc60cb19aabaa1962c6899bc4727921cffb651cb063620a96bed675a
+
+        wait_message(this)
       this.nativeAuthInitialPart = await nativeAuthClient.initialize();
       this.url_xportal_direct_connect=eval_direct_url_xportal(uri)
       this.provider.login({approval,token:this.nativeAuthInitialPart});
 
-
-
     }catch (e){
       showError(this,"Impossible d'utiliser wallet connect pour l'instant. Utiliser une autre méthode pour accéder à votre wallet")
     }
-
 
 
   }
@@ -597,9 +595,6 @@ export class AuthentComponent implements OnInit,OnChanges {
     if(this.address!="")this.success();
   }
 
-  open_xportal() {
-    open(this.url_xportal_direct_connect)
-  }
 
   cancel() {
     this.address="";
