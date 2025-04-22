@@ -2,14 +2,17 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {inject, Injectable} from '@angular/core';
 import {firstValueFrom, map, throwError} from 'rxjs';
 import { environment } from 'src/environments/environment';
+import {Tusky} from "@tusky-io/ts-sdk";
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class PinataService {
+export class StorageService {
 
   http=inject(HttpClient)
+
+  service : "pinata" | "walrus" ="pinata"
 
   api_call(service:string,body:any,contentType:string="") : Promise<{url:string,hash:string}>{
     const url = environment.PINATA_BASE_URL+"pinning/"+service;
@@ -41,15 +44,29 @@ export class PinataService {
 
 
 
-  uploadFileToIPFS(image: File) {
+  async uploadFileToIPFS(image: File) {
     if (!image) {return throwError(() => new Error('Image not found'))}
 
-    let formData: any = new FormData();
-    formData.append('file', image, image.name);
-    formData.append('pinataMetadata', JSON.stringify({name: image.name,}));
-    formData.append('pinataOptions',JSON.stringify({cidVersion: 1}));
+    if(this.service=="pinata"){
+      let formData: any = new FormData();
+      formData.append('file', image, image.name);
+      formData.append('pinataMetadata', JSON.stringify({name: image.name,}));
+      formData.append('pinataOptions',JSON.stringify({cidVersion: 1}));
 
-    return this.api_call("pinFileToIPFS", formData,"");
+      this.api_call("pinFileToIPFS", formData,"");
+    }
+
+    if(this.service=="walrus"){
+      const tusky = await Tusky.init({ apiKey: "a672c0be-b907-4380-b7d8-ae4440871ee5" })
+
+      const { id: vaultId } = await tusky.vault.create("My personal vault");
+
+      let id=await tusky.file.upload(vaultId, image.webkitRelativePath);
+      return {url:id,hash:id}
+
+    }
+
+    return ""
   };
 
 

@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { PinataService } from './pinata.service';
+import { StorageService } from './storage.service';
 
 describe('PinataService', () => {
-  let service: PinataService;
+  let service: StorageService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(PinataService);
+    service = TestBed.inject(StorageService);
   });
 
   it('should be created', () => {

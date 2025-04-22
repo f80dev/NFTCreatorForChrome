@@ -32,7 +32,7 @@ import {IntroComponent} from "../intro/intro.component";
 import {SourceComponent} from "../source/source.component";
 import {HttpClient} from "@angular/common/http";
 import {CropperComponent} from "../cropper/cropper.component";
-import {PinataService} from "../pinata.service";
+import {StorageService} from "../storage.service";
 import {environment} from "../../environments/environment";
 import {ClipboardService} from "../clipboard.service";
 import {settings} from "../../environments/settings";
@@ -77,7 +77,7 @@ export class MainComponent implements OnInit,OnDestroy {
 
   imageProcessor=inject(ImageProcessorService)
   imageUploader=inject(UploaderService)
-  pinata=inject(PinataService)
+  storage=inject(StorageService)
   location=inject(Location)
   user=inject(UserService)
   api=inject(ApiService)
@@ -132,6 +132,8 @@ export class MainComponent implements OnInit,OnDestroy {
 
 
   async ngOnInit() {
+
+    this.storage.service="walrus"
 
     let params:any=await getParams(this.routes)
     this.user.network=params.network || settings.network || "elrond-devnet"
@@ -216,7 +218,7 @@ export class MainComponent implements OnInit,OnDestroy {
       let hash=""
       if(this.visual.startsWith("data:")){
         let img=await this.imageUploader.b64_to_file(this.visual,"img_"+this.user.address+".webp")
-        let result:any=await this.pinata.uploadFileToIPFS(img)
+        let result:any=await this.storage.uploadFileToIPFS(img)
         this.visual=result.url
         hash=result.hash
         $$("Consultation du visuel https://ipfs.io/ipfs/"+hash)
@@ -234,7 +236,7 @@ export class MainComponent implements OnInit,OnDestroy {
         //let metadata=await this.imageUploader.upload(blob,"infos.json",0)
 
         this.user.data.metadata=obj
-        let metadata=await this.pinata.uploadJSONToIPFS({name:"metadata_"+this.user.address+".json",content:obj})
+        let metadata=await this.storage.uploadJSONToIPFS({name:"metadata_"+this.user.address+".json",content:obj})
 
         $$("metadata ",metadata)
         for(let i=0;i<10;i++){

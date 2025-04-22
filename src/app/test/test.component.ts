@@ -3,7 +3,7 @@ import {UploaderService} from "../uploader.service";
 import {NgForOf} from "@angular/common";
 import {$$} from "../../tools";
 import {ImageProcessorService} from "../image-processor.service";
-import {PinataService} from "../pinata.service";
+import {StorageService} from "../storage.service";
 import {UserService} from "../user.service";
 import {MatDialog} from "@angular/material/dialog";
 import {share_token} from "../mvx";

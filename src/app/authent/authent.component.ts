@@ -550,6 +550,7 @@ export class AuthentComponent implements OnInit,OnChanges {
 
     const callbacks:any ={
       onClientLogin: async ()=> {
+        debugger
         $$("Connexion wallet connect sur chainid="+get_chain_id(this.user))
         this.address=await this.provider.getAddress();
         this.nativeAuthToken=nativeAuthClient.getToken(this.address, this.nativeAuthInitialPart, await this.provider.getSignature());
@@ -574,10 +575,8 @@ export class AuthentComponent implements OnInit,OnChanges {
       await this.provider.init()
       const { uri, approval } = await this.provider.connect();
       this.qrcode=uri
-      debugger
       //https://maiar.page.link/?apn=com.elrond.maiar.wallet&isi=1519405832&ibi=com.elrond.maiar.wallet&link=https://maiar.com/?wallet-connect=wc%3A34a8885b44470bf47e31a8562594b6c21ac6618b8ee6747a28dfd17f202838f3%402%3FexpiryTimestamp%3D1745169246%26relay-protocol%3Dirn%26symKey%3Dea38b42ebc60cb19aabaa1962c6899bc4727921cffb651cb063620a96bed675a
-
-        wait_message(this)
+      wait_message(this)
       this.nativeAuthInitialPart = await nativeAuthClient.initialize();
       this.url_xportal_direct_connect=eval_direct_url_xportal(uri)
       this.provider.login({approval,token:this.nativeAuthInitialPart});
