@@ -2,7 +2,7 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {inject, Injectable} from '@angular/core';
 import {firstValueFrom, map, throwError} from 'rxjs';
 import { environment } from 'src/environments/environment';
-import {Tusky} from "@tusky-io/ts-sdk";
+//import {Tusky} from "@tusky-io/ts-sdk";
 
 
 @Injectable({
@@ -56,15 +56,15 @@ export class StorageService {
       this.api_call("pinFileToIPFS", formData,"");
     }
 
-    if(this.service=="walrus"){
-      const tusky = await Tusky.init({ apiKey: "a672c0be-b907-4380-b7d8-ae4440871ee5" })
-
-      const { id: vaultId } = await tusky.vault.create("My personal vault");
-
-      let id=await tusky.file.upload(vaultId, image.webkitRelativePath);
-      return {url:id,hash:id}
-
-    }
+    // if(this.service=="walrus"){
+    //   const tusky = await Tusky.init({ apiKey: "a672c0be-b907-4380-b7d8-ae4440871ee5" })
+    //
+    //   const { id: vaultId } = await tusky.vault.create("My personal vault");
+    //
+    //   let id=await tusky.file.upload(vaultId, image.webkitRelativePath);
+    //   return {url:id,hash:id}
+    //
+    // }
 
     return ""
   };
