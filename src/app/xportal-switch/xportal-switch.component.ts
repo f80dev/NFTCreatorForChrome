@@ -20,6 +20,6 @@ export class XportalSwitchComponent {
   @Input() uri=""
 
   open_xportal() {
-    open(eval_direct_url_xportal(this.uri))
+    open(eval_direct_url_xportal(this.uri),"xportal")
   }
 }
