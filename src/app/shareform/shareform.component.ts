@@ -43,7 +43,7 @@ export class ShareformComponent implements OnInit {
   url=""
 
   @Output() onshare=new EventEmitter()
-  
+
   content:any
 
   api=inject(ApiService)
@@ -81,10 +81,16 @@ export class ShareformComponent implements OnInit {
     let r=await _prompt(this,"Send the contents to a vault and give a free access via shared link ?","",
       environment.share_cost*this.nb_users+" eGld are required to pay network fees for receivers","yesno","Ok","Cancel",true)
     if(r==="yes"){
-      let obj=await share_token_wallet(this,this.content,environment.share_cost,this.amount.toString(),this.nb_users)
-      if(obj){
-        this.url=await url_shorter(obj!.url)
+      if (!await this.user.login(this,"","",true)){
+        let obj=await share_token_wallet(this,this.content,environment.share_cost,this.amount.toString(),this.nb_users)
+        if(obj){
+          this.url=await url_shorter(obj!.url)
+        }
+      }else{
+        this.user.logout(true)
+        this._location.back()
       }
+
       wait_message(this)
     }
 
