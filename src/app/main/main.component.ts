@@ -133,7 +133,7 @@ export class MainComponent implements OnInit,OnDestroy {
 
   async ngOnInit() {
 
-    this.storage.service="walrus"
+    this.storage.service="pinata"
 
     let params:any=await getParams(this.routes)
     this.user.network=params.network || settings.network || "elrond-devnet"

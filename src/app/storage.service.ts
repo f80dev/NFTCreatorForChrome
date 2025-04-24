@@ -12,7 +12,8 @@ export class StorageService {
 
   http=inject(HttpClient)
 
-  service : "pinata" | "walrus" ="pinata"
+  service : "pinata" | "walrus" = "pinata"
+
 
   api_call(service:string,body:any,contentType:string="") : Promise<{url:string,hash:string}>{
     const url = environment.PINATA_BASE_URL+"pinning/"+service;
@@ -53,7 +54,7 @@ export class StorageService {
       formData.append('pinataMetadata', JSON.stringify({name: image.name,}));
       formData.append('pinataOptions',JSON.stringify({cidVersion: 1}));
 
-      this.api_call("pinFileToIPFS", formData,"");
+      return await this.api_call("pinFileToIPFS", formData,"");
     }
 
     // if(this.service=="walrus"){
