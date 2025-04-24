@@ -552,12 +552,12 @@ export class AuthentComponent implements OnInit,OnChanges {
           this.user.logout(true)
           resolve(true)
         },
-        onClientError: async (event:any)=> {
-          debugger
+        onClientError: async (error:any)=> {
+          $$("OnclientError=",error)
           reject()
         },
         onClientEvent: async (event:any)=> {
-          console.log("onClientEvent=", event);
+          $$("onClientEvent=", event);
         }
       }
 

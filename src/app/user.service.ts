@@ -148,7 +148,7 @@ export class UserService {
             }
             let r:any=await _ask_for_authent(vm,"Authentification",subtitle,this.network,this.connexion)
 
-            this.uri_to_xportal=r.url_direct_xportal_connect
+            this.uri_to_xportal=r.qrcode
             let address_change=await this.authent(r,required_balance,message_balance)
 
             resolve(address_change)
