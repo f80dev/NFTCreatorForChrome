@@ -568,14 +568,12 @@ export class AuthentComponent implements OnInit,OnChanges {
         wait_message(this,"Connexion waiting ...")
         await this.provider.init()
         const { uri, approval } = await this.provider.connect();
+
         $$("Récupération de l'url de connexion ",uri)
-        $$("Récupération de l'approval ",approval)
+        //$$("Récupération de l'approval ",approval)
         this.qrcode=uri
         this.nativeAuthInitialPart = await nativeAuthClient.initialize();
-        await this.provider.login({approval,token:this.nativeAuthInitialPart});
-        wait_message(this)
-
-        debugger
+        this.provider.login({approval,token:this.nativeAuthInitialPart});
       }catch (e){
         showError(this,"Impossible d'utiliser wallet connect pour l'instant. Utiliser une autre méthode pour accéder à votre wallet")
         reject()
