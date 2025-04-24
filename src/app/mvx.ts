@@ -478,9 +478,9 @@ export async function makeNFTTransaction(identifier:string,name:string,visual:st
   const entrypoint=getEntrypoint(user.network)
   //if(metadata_url.length>0)uris.unshift(metadata_url)
   if(uris.length==0 || uris[0]!=visual)uris.unshift(visual)
+  if(metadata=="")metadata=JSON.stringify({description:""})
 
   let factory = entrypoint.createTokenManagementTransactionsFactory()
-
 
   let transaction=factory.createTransactionForCreatingNFT(
     Address.newFromBech32(user.address),

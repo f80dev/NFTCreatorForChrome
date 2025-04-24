@@ -290,9 +290,9 @@ export class MainComponent implements OnInit,OnDestroy {
   }
 
 
-  reset_image() {
+  async reset_image() {
     this.uris=[]
-    this.clipboard.clear()
+    await this.clipboard.clear()
     localStorage.removeItem("image")
     this.visual=""
     this.uncrop=""
@@ -326,6 +326,11 @@ export class MainComponent implements OnInit,OnDestroy {
   update_visual(src:string){
       this.visual=src
       this.self_storage=(!src.startsWith("http"))
+      setTimeout(()=>{
+        if(this.img.nativeElement.naturalWidth==0 && this.img.nativeElement.naturalWidth==0){
+            this.reset_image()
+        }
+      },500)
   }
 
   async update_uri(uri: string) {
@@ -479,8 +484,11 @@ export class MainComponent implements OnInit,OnDestroy {
   }
 
   eval_size(visual: string) {
-    if(visual.startsWith("http"))return visual
-    return Math.round(visual.length/1000) + " Ko"
+    if(visual){
+      if(visual.startsWith("http"))return visual
+      return Math.round(visual.length/1000) + " Ko"
+    }
+    return ""
   }
 
   protected readonly view_account_on_gallery = view_account_on_gallery;

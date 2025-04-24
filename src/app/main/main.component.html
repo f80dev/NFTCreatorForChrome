@@ -24,7 +24,7 @@
   <div *ngIf="visual!=''">
 
     <mat-accordion>
-      <mat-expansion-panel [expanded]="true">
+      <mat-expansion-panel [expanded]="true" *ngIf="visual">
         <mat-expansion-panel-header>Main</mat-expansion-panel-header>
 
         <app-input label="NFT Name" [value]="name" style="width: 160px;"
@@ -37,7 +37,8 @@
         <br>
 
         <div class="vignette">
-          <img [src]="visual" class="all-image" #img
+          <img [src]="visual" class="all-image"
+               #img
                [title]="eval_size(visual)">
         </div>
         <br>
@@ -112,7 +113,7 @@
               <mat-icon (click)="update_uri(uri)">edit</mat-icon>
               <mat-icon (click)="delete_uri(uri)">cancel</mat-icon>
             &nbsp;
-            <div style="text-overflow: ellipsis; width: 80%;">
+            <div style="text-overflow: ellipsis; width: 80%;" *ngIf="uri">
               {{uri.substring(0,100)}}
             </div>
 
@@ -133,7 +134,7 @@
                      (uploaded)="upload_pem($event)">Your PEM file</app-upload-file>
   </div>
 
-  <div *ngIf="visual.length>0">
+  <div *ngIf="visual && visual.length>0">
     <button *ngIf="sel_collection && visual!='' && quantity>0" mat-raised-button
             style="width:200px;height:70px;margin-top:-5px;margin-bottom: 15px;"
             (click)="Create_NFT()">
