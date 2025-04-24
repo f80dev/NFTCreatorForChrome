@@ -1,4 +1,4 @@
-import {Component, EventEmitter, inject, Input, OnDestroy, Output} from '@angular/core';
+import {Component, EventEmitter, inject, Input, OnChanges, OnDestroy, Output, SimpleChanges} from '@angular/core';
 import {level, share_token, share_token_wallet} from "../mvx";
 import {UploadFileComponent} from "../upload-file/upload-file.component";
 import {MatButton} from "@angular/material/button";
@@ -38,7 +38,7 @@ import {_prompt} from "../prompt/prompt.component";
   standalone: true,
   styleUrl: './source.component.scss'
 })
-export class SourceComponent implements OnDestroy {
+export class SourceComponent implements OnDestroy, OnChanges {
 
   toast=inject(MatSnackBar)
 
@@ -59,13 +59,18 @@ export class SourceComponent implements OnDestroy {
   dialog=inject(MatDialog)
   show_source=true
   url: string=""
-  nft: any;
+  nft: any
+  data:any
+
+
+  ngOnChanges(changes: SimpleChanges): void {
+    this.data=JSON.parse(localStorage.getItem("save_parameters") || "{}")
+  }
 
 
   capture_image(img: WebcamImage) {
     this.image=img
   }
-
 
 
 
@@ -201,9 +206,6 @@ export class SourceComponent implements OnDestroy {
 
 
   go_from_last() {
-    let data:any=JSON.parse(localStorage.getItem("save_parameters") || "{}")
-    if(data.hasOwnProperty("visual")) {
-      this.update_visual.emit(data.visual)
-    }
+      this.update_visual.emit(this.data.visual)
   }
 }

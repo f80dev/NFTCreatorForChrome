@@ -23,7 +23,7 @@
         <button mat-raised-button *ngIf="level(1)" title="Open the camera of your device to take a photo" (click)="open_photo()">From camera</button>
         <button mat-raised-button *ngIf="level(1)" title="Get the content clipboard" (click)="paste()">From clipboard</button>
         <button mat-raised-button *ngIf="level(1)" title="Image editor" (click)="go_editor()">From editor</button>
-        <button mat-raised-button *ngIf="level(1)" title="Create NFT from last visual" (click)="go_from_last()">From last</button>
+        <button mat-raised-button *ngIf="data && data.visual!='' && level(1)" title="Create NFT from last visual" (click)="go_from_last()">From last</button>
 
       </div>
 
