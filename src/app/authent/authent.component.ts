@@ -53,8 +53,8 @@ enum Wallet_Operation {
 export function eval_direct_url_xportal(uri:string) : string {
   //voir https://github.com/multiversx/mx-sdk-dapp/blob/03966c45f2e1f12e8f6cbc44b7590d683ac61877/src/constants/network.ts#L57
   //CE qui est envoyé par le wallet : https://xportal.com/?wallet-connect=wc:ce6de4b726ef7c3f60957fb50af0fe61616d7deba376b3e0cdd5aa61bf94be5b@2?expiryTimestamp%3D1745482118&relay-protocol=irn&symKey=993f613b23e71af335be1d3c6b1dca3c442472dcf4f2abe1e4eb0a2ba4e407a0
-  //let url=walletConnectDeepLink+"/?wallet-connect="+encodeURIComponent(uri)
-  let url="https://xportal.com/?wallet-connect="+uri
+  let url=walletConnectDeepLink+"/?wallet-connect="+encodeURIComponent(uri)
+  //let url="https://xportal.com/?wallet-connect="+uri
   $$("url de connexion "+url+" en partant de uri="+uri)
   return url
 }
