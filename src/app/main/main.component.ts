@@ -384,7 +384,7 @@ export class MainComponent implements OnInit,OnDestroy {
 
 
   async build_collection() {
-    debugger
+    await this.user.init_balance(this.api)
     if(this.user.balance<0.051){
       showMessage(this,"You have not enought egold to create a collection")
     }else{
