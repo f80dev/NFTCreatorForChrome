@@ -25,6 +25,7 @@ import {_prompt} from "./prompt/prompt.component";
 import {wait_message} from "./hourglass/hourglass.component";
 
 export const DEVNET="https://devnet-api.multiversx.com"
+export const TESTNET="https://testnet-api.multiversx.com"
 export const MAINNET="https://api.multiversx.com"
 
 export const walletConnectDeepLink = 'https://maiar.page.link/?apn=com.elrond.maiar.wallet&isi=1519405832&ibi=com.elrond.maiar.wallet&link=';
@@ -142,7 +143,7 @@ export function toAccount(addr:string,network:string="elrond-devnet") : Promise<
   //voir https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook-v13/#synchronizing-an-account-object
   return new Promise(async (resolve, reject) => {
     try{
-      network=network.indexOf("devnet")>-1 ? DEVNET : MAINNET
+      network=network.indexOf("devnet")>-1 ? DEVNET : (network.indexOf("testnet")>-1 ? TESTNET : MAINNET)
       if(network.endsWith("/"))network=network.substring(0,network.length-1)
       resolve(await new ApiNetworkProvider(network).getAccount(toAddress(addr)))
     }catch (e) {
