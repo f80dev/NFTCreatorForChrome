@@ -1,10 +1,10 @@
 export const settings={
-  contract_addr:"erd1qqqqqqqqqqqqqpgqgmwgcv8n9cajywqws6sq3f3ld0ldyyen835swxnp3f",
-  ihm_level:1,
-  version: "0.997",
-  appname: "NFTNow Devnet",
+  contract_addr:"erd1qqqqqqqqqqqqqpgqz8ymv29zzdjh4kf30w77tp89c3dzwsrf835s3dkqe8",
+  ihm_level:2,
+  version: "0.99",
+  appname: "NFTNow Testnet",
   appli:"https://devnet.nftnow.af10.fr",
-  network: "elrond-devnet",
+  network: "elrond-testnet",
   intro: "Create your NFT on the devnet network in one minute"
 }
 

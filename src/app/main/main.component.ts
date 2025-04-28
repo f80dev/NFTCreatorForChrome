@@ -384,24 +384,29 @@ export class MainComponent implements OnInit,OnDestroy {
 
 
   async build_collection() {
-    let r=await _prompt(this,"Collection name","","must be inferieur to 20 characters","text","Create","Cancel",false)
-    if(r){
-      let collection_type: any=await _prompt(this,"Collection for NFT or SFT","","","list","Ok","Cancel",false,
-        [{label:"NFT",value:"NFT"},{label:"SFT",value:"SFT"}])
-      await this.user.login(this,"You need a strong authentification to create a collection","",true)
-      try{
-        wait_message(this,"Collection building")
-        let rc=await create_collection(r,this.user,this,collection_type.value)
-        setTimeout(async ()=>{
-          await this.set_roles_to_collection(rc.collection_id)
-          this.open_collection(rc.collection_id)
-        },2500)
-      }catch (e:any){
-        showMessage(this,"Collection not created")
-        wait_message(this)
-      }
+    if(this.user.balance<0.051){
+      showMessage(this,"You have not enought egold to create a collection")
+    }else{
+      let r=await _prompt(this,"Collection name","","must be inferieur to 20 characters","text","Create","Cancel",false)
+      if(r){
+        let collection_type: any=await _prompt(this,"Collection for NFT or SFT","","","list","Ok","Cancel",false,
+          [{label:"NFT",value:"NFT"},{label:"SFT",value:"SFT"}])
+        await this.user.login(this,"You need a strong authentification to create a collection","",true)
+        try{
+          wait_message(this,"Collection building")
+          let rc=await create_collection(r,this.user,this,collection_type.value)
+          setTimeout(async ()=>{
+            await this.set_roles_to_collection(rc.collection_id)
+            this.open_collection(rc.collection_id)
+          },2500)
+        }catch (e:any){
+          showMessage(this,"Collection not created")
+          wait_message(this)
+        }
 
+      }
     }
+
   }
 
 
