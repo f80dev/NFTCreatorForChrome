@@ -1,0 +1,14 @@
+<div class="mainform">
+
+  <app-upload-file extensions=".pem"
+                   title="Charger le fichier PEM de signature"
+                   [zone]="true"
+                   width="100%"
+                   height="60px"
+                   (uploaded)="upload_pem($event)">
+    Faites glisser le fichier PEM ici
+  </app-upload-file>
+
+  <app-hourglass [message]="message"></app-hourglass>
+
+</div>

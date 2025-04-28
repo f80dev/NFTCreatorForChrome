@@ -48,6 +48,18 @@ export const abi=
         "outputs": []
       },
       {
+        "name": "fundback",
+        "onlyOwner": true,
+        "mutability": "mutable",
+        "inputs": [
+          {
+            "name": "dest",
+            "type": "Address"
+          }
+        ],
+        "outputs": []
+      },
+      {
         "name": "upload",
         "mutability": "mutable",
         "payableInTokens": [

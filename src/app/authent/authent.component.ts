@@ -157,7 +157,6 @@ export class AuthentComponent implements OnInit,OnChanges {
   @Input() walletconnect_open=true;
   message: string=""
   nativeAuthToken: string=""
-  private nativeAuthInitialPart: string=""
 
   constructor(
     public api:NetworkService,
@@ -511,11 +510,13 @@ export class AuthentComponent implements OnInit,OnChanges {
 
     this.provider=new WalletProvider(connexion_mode)
     this.provider.redirectDelayMilliseconds=30000
+    this.user.native_token=await this.createNativeAuthInitialPart()
+    localStorage.setItem("nativeAuthInitialPart",this.user.native_token)
 
     let current_url=document.location.href
     const callback_url = this.callback=="" ? encodeURIComponent(current_url) : encodeURIComponent(this.callback)
     try{
-      let address=await this.provider.login({callback_url,token:await this.createNativeAuthInitialPart()})
+      let address=await this.provider.login({callback_url,token:this.user.native_token})
 
       this.strong=address.length>0;
       if(this.strong){
@@ -542,7 +543,11 @@ export class AuthentComponent implements OnInit,OnChanges {
         onClientLogin: async ()=> {
           $$("Connexion wallet connect sur chainid="+get_chain_id(this.user))
           this.address=await this.provider.getAddress();
-          this.nativeAuthToken=nativeAuthClient.getToken(this.address, this.nativeAuthInitialPart, await this.provider.getSignature());
+          this.nativeAuthToken=nativeAuthClient.getToken(
+            this.address,
+            localStorage.getItem("nativeAuthInitialPart") || "",
+            await this.provider.getSignature()
+          );
           this.strong=true;
           this.validate(this.address);
           resolve(true)
@@ -562,6 +567,7 @@ export class AuthentComponent implements OnInit,OnChanges {
       }
 
       const nativeAuthClient = new NativeAuthClient();
+      localStorage.setItem("nativeAuthInitialPart",await nativeAuthClient.initialize())
       this.provider = new WalletConnectV2Provider(callbacks, get_chain_id(this.user), this.relayUrl, this.walletConnect_ProjectId);
 
       try{
@@ -572,8 +578,8 @@ export class AuthentComponent implements OnInit,OnChanges {
         $$("Récupération de l'url de connexion ",uri)
         //$$("Récupération de l'approval ",approval)
         this.qrcode=uri.replace("@2","")
-        this.nativeAuthInitialPart = await nativeAuthClient.initialize();
-        this.provider.login({approval,token:this.nativeAuthInitialPart});
+        this.user.native_token = await nativeAuthClient.initialize();
+        this.provider.login({approval,token:this.user.native_token});
       }catch (e){
         showError(this,"Impossible d'utiliser wallet connect pour l'instant. Utiliser une autre méthode pour accéder à votre wallet")
         reject()

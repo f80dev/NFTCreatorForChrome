@@ -1,7 +1,7 @@
 import {inject, Injectable} from '@angular/core';
 import {Subject} from "rxjs";
 import {_ask_for_authent} from "./authent-dialog/authent-dialog.component";
-import {query, toAccount, usersigner_from_pem} from "./mvx";
+import {query, toAccount} from "./mvx";
 import {$$, showMessage} from "../tools";
 import {ApiService} from './api.service';
 import {DeviceService} from './device.service';
@@ -17,6 +17,7 @@ import {Router} from "@angular/router";
 })
 export class UserService {
   address: string=""
+  native_token:string=""
   signature:string=""
   provider: any
   strong: boolean=false
@@ -93,7 +94,7 @@ export class UserService {
     }
     this.address=""
     this.idx=0
-    this.provider.logout()
+    if(this.provider)this.provider.logout()
     this.provider=null
 
   }

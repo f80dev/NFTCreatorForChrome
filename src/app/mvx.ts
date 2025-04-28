@@ -11,6 +11,7 @@ import {
   TransactionOnNetwork,
   TransactionsFactoryConfig, U64Value
 } from "@multiversx/sdk-core/out";
+import { NativeAuthClient } from "@multiversx/sdk-native-auth-client";
 import { UserSigner } from "@multiversx/sdk-wallet";
 import { AbiRegistry,SmartContractQuery,SmartContractTransactionsOutcomeParser,DevnetEntrypoint,MainnetEntrypoint} from "@multiversx/sdk-core";
 import { ApiNetworkProvider } from "@multiversx/sdk-network-providers";
@@ -228,7 +229,6 @@ export function create_transaction(function_name:string,args:any[],
     if(tokens_to_transfer.length>0){
       option.tokenTransfers=tokens_to_transfer
     }
-
 
     let transaction
     if(!user.provider){
@@ -559,6 +559,16 @@ export async function share_token(user:UserService,collection:string,nonce:numbe
     $$("Erreur ",e)
   }
   return null
+}
+
+
+
+export async function init_user_for_web_wallet(user:UserService,addr:string,signature:string,network:string ){
+  //voir https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-signing-providers/#wallet-login-and-logout
+  const nativeAuthClient = new NativeAuthClient({apiUrl:user.get_domain()});
+  user.address=addr
+  user.signature=signature
+  return nativeAuthClient.getToken(addr, localStorage.getItem("nativeAuthInitialPart") || "", signature);
 }
 
 

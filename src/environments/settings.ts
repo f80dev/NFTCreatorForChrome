@@ -1,13 +1,12 @@
 export const settings={
-  contract_addr:"erd1qqqqqqqqqqqqqpgqxjuyp9afnqttjzzy0v37phuuz7326tgpwhps2yzjd0",
+  contract_addr:"erd1qqqqqqqqqqqqqpgqgmwgcv8n9cajywqws6sq3f3ld0ldyyen835swxnp3f",
   ihm_level:1,
-  appname: "NFTNow",
-  version: "0.981",
-  appli:"https://nftnow.af10.fr",
-  network: "elrond-mainnet",
-  intro: "Create your NFT in one minute"
+  version: "0.997",
+  appname: "NFTNow Devnet",
+  appli:"https://devnet.nftnow.af10.fr",
+  network: "elrond-devnet",
+  intro: "Create your NFT on the devnet network in one minute"
 }
-
 
 
 export const abi=
@@ -45,6 +44,18 @@ export const abi=
           "*"
         ],
         "inputs": [],
+        "outputs": []
+      },
+      {
+        "name": "fundback",
+        "onlyOwner": true,
+        "mutability": "mutable",
+        "inputs": [
+          {
+            "name": "dest",
+            "type": "Address"
+          }
+        ],
         "outputs": []
       },
       {
