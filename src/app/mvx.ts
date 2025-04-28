@@ -462,7 +462,7 @@ export function view_nft(user:UserService,identifier:string,explorer=environment
   open(url,"Gallery")
 }
 
-function getEntrypoint(network:string){
+export function getEntrypoint(network:string){
   if(network.indexOf("devnet")>-1)return new DevnetEntrypoint()
   if(network.indexOf("testnet")>-1)return new TestnetEntrypoint()
   return new MainnetEntrypoint()

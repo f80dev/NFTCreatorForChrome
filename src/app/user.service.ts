@@ -1,7 +1,7 @@
 import {inject, Injectable} from '@angular/core';
 import {Subject} from "rxjs";
 import {_ask_for_authent} from "./authent-dialog/authent-dialog.component";
-import {query, toAccount} from "./mvx";
+import {getEntrypoint, query, toAccount} from "./mvx";
 import {$$, showMessage} from "../tools";
 import {ApiService} from './api.service';
 import {DeviceService} from './device.service';
@@ -50,7 +50,6 @@ export class UserService {
   }
   preview: boolean = false;
   balance: number=0
-  pem_account: Account | undefined
   action_after_mint: string=""
   params: any={}
   uri_to_xportal=""
@@ -124,14 +123,11 @@ export class UserService {
       }else{
         if(pem_file.length>0){
           $$("On utilise un fichier PEM")
-          let provider=UserSigner.fromPem(pem_file)
-          let k=new KeyPair(provider.secretKey)
-          this.pem_account=Account.newFromKeypair(k)
-
+          let k=new KeyPair(UserSigner.fromPem(pem_file).secretKey)
 
           let r={
-            address:provider.getAddress().bech32(),
-            provider:null,
+            address:k.publicKey.toAddress().toBech32(),
+            provider:Account.newFromKeypair(k),
             strong: true,
             encrypted:"",
             url_direct_xportal_connect:""
@@ -243,6 +239,10 @@ export class UserService {
   }
 
   getAccount() {
-    return this.pem_account || this.provider.account
+    try{
+      return this.provider.account
+    }catch (e:any){
+      return this.provider
+    }
   }
 }
