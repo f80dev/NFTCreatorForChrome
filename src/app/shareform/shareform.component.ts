@@ -19,8 +19,6 @@ import {ApiService} from "../api.service";
 import {HourglassComponent, wait_message} from "../hourglass/hourglass.component";
 import {MatDialog} from "@angular/material/dialog";
 import {XportalSwitchComponent} from "../xportal-switch/xportal-switch.component";
-import {MatSlideToggle} from "@angular/material/slide-toggle";
-import {FormsModule} from "@angular/forms";
 
 @Component({
   selector: 'app-shareform',
@@ -41,6 +39,7 @@ export class ShareformComponent implements OnInit {
 
 
   url=""
+  intro_message: string=""
 
   @Output() onshare=new EventEmitter()
 
@@ -66,6 +65,7 @@ export class ShareformComponent implements OnInit {
 
   async ngOnInit() {
     let params:any=await getParams(this.routes)
+    this.intro_message=params.message || ""
     await this.user.login(this,"","",false)
     this.url=params.url || ""
     this.content=params.content
@@ -129,4 +129,5 @@ export class ShareformComponent implements OnInit {
 
   protected readonly environment = environment;
   protected readonly Number = Number;
+
 }

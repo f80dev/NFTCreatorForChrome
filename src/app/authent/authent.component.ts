@@ -571,7 +571,7 @@ export class AuthentComponent implements OnInit,OnChanges {
 
         $$("Récupération de l'url de connexion ",uri)
         //$$("Récupération de l'approval ",approval)
-        this.qrcode=uri
+        this.qrcode=uri.replace("@2","")
         this.nativeAuthInitialPart = await nativeAuthClient.initialize();
         this.provider.login({approval,token:this.nativeAuthInitialPart});
       }catch (e){

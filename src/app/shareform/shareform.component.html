@@ -1,5 +1,5 @@
 <div class="mainform">
-
+  <h4 *ngIf="intro_message!=''">{{intro_message}}</h4>
   <app-hourglass [message]="message" style="margin-top: 20px;"></app-hourglass>
   <app-xportal-switch *ngIf="url==''" [uri]="user.uri_to_xportal"></app-xportal-switch>
   <br>

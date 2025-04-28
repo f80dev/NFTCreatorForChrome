@@ -266,7 +266,11 @@ export class MainComponent implements OnInit,OnDestroy {
             nft.balance=nft.supply
             nft.identifier=identifier
             this.router.navigate(["share"],{
-              queryParams:{p:setParams({visual:this.visual,content:nft},"","")}
+              queryParams:{p:setParams({
+                  visual:this.visual,
+                  message:"Your NFT is in your wallet, you can send or sell it",
+                  content:nft
+                },"","")}
             })
 
           }catch (e:any){
