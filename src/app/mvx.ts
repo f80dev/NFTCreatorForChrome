@@ -334,6 +334,8 @@ export async function signTransaction(t:Transaction,user:UserService) : Promise<
   return await user.provider.signTransaction(t)
 }
 
+
+
 export async function set_roles_to_collection(collection_id:string, user:UserService,type_collection:string="SFT",burn=false,update=false) {
   const entrypoint=getEntrypoint(user.network)
   let factory = entrypoint.createTokenManagementTransactionsFactory();
@@ -660,6 +662,8 @@ export function get_chain_id(user:UserService) {
   if(user.isDevnet())return "D"
   return "T"
 }
+
+
 
 
 export async function deploy(user:UserService,code:BytesValue) {

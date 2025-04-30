@@ -1,6 +1,13 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {UserService} from "../user.service";
-import {create_transaction, execute_transaction, getExplorer, init_user_for_web_wallet, signTransaction} from "../mvx";
+import {
+  create_transaction,
+  execute_transaction,
+  getEntrypoint,
+  getExplorer,
+  init_user_for_web_wallet,
+  signTransaction
+} from "../mvx";
 import {abi, settings} from "../../environments/settings";
 import {ApiService} from "../api.service";
 import {MatDialog} from "@angular/material/dialog";
@@ -47,8 +54,8 @@ export class AdminComponent implements OnInit {
     let t=await create_transaction("fundback",[new AddressValue(Address.newFromBech32(this.user.address))],this.user,[],settings.contract_addr,abi)
 
     wait_message(this,"Fund transfering ... ")
-    let t_signed=await signTransaction(t,this.user)
-    let result=await execute_transaction(t_signed,this.user,"fundback")
+    await getEntrypoint(this.user.network).signTransaction(t,this.user.provider)
+    let result=await execute_transaction(t,this.user,"fundback")
     wait_message(this)
 
     showMessage(this,result.returnMessage)

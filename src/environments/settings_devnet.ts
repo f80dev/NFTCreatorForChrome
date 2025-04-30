@@ -1,5 +1,5 @@
 export const settings={
-  contract_addr:"erd1qqqqqqqqqqqqqpgqgmwgcv8n9cajywqws6sq3f3ld0ldyyen835swxnp3f",
+  contract_addr:"erd1qqqqqqqqqqqqqpgqhwvrxgqm00a3mwfz0uqhfmaenhm0yfa2835swh9dvz",
   ihm_level:1,
   version: "0.997",
   appname: "NFTNow Devnet",
@@ -51,6 +51,10 @@ export const abi=
         "onlyOwner": true,
         "mutability": "mutable",
         "inputs": [
+          {
+            "name": "amount",
+            "type": "BigUint"
+          },
           {
             "name": "dest",
             "type": "Address"

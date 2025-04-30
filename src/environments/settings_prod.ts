@@ -53,6 +53,10 @@ export const abi=
         "mutability": "mutable",
         "inputs": [
           {
+            "name": "amount",
+            "type": "BigUint"
+          },
+          {
             "name": "dest",
             "type": "Address"
           }
