@@ -1,4 +1,4 @@
-//Version official 0.95 - 07/04/2025
+//Version official 0.96 - 28/04/2025
 
 import {
   Address, BigUIntValue,
@@ -196,14 +196,15 @@ export function get_transactions(api:ApiService,smartcontract_addr:string,abi=nu
 
 
 export function getExplorer(addr = "", network = "elrond-devnet",service="accounts", tools = "xspotlight",suffixe=""): string {
-  let prefixe= network.indexOf("devnet") > -1 ? "devnet" : network.indexOf("testnet") > -1 ? "testnet" : ""
-  if(tools=="explorer"){
-    tools="explorer.multiversx"
-    prefixe=prefixe+"-"
-  }else{
-    prefixe=prefixe+"."
+  let prefixe= network.indexOf("devnet") > -1 ? "devnet" : (network.indexOf("testnet") > -1 ? "testnet" : "")
+  if(prefixe!=""){
+    if(tools=="explorer"){
+      tools="explorer.multiversx"
+      prefixe=prefixe+"-"
+    }else{
+      prefixe=prefixe+"."
+    }
   }
-
   return "https://" + prefixe  + tools+".com/" + service+"/"+addr+suffixe;
 }
 
@@ -258,6 +259,7 @@ export function level(lv=1) : boolean {
 //ExecuteTransaction
 export function execute_transaction(transaction:Transaction,user:UserService,function_name:string) : Promise<{ values: any[]; returnCode: string; returnMessage: string}> {
   return new Promise(async (resolve, reject) => {
+    debugger
     let transactionOnNetwork:TransactionOnNetwork | undefined=undefined
     try{
       const entrypoint = getEntrypoint(user.network)
@@ -296,7 +298,6 @@ export function execute_transaction(transaction:Transaction,user:UserService,fun
         }
       }
     }
-
   })
 }
 
@@ -330,12 +331,7 @@ export function toText(array:Uint8Array) : string {
 
 
 export async function signTransaction(t:Transaction,user:UserService) : Promise<Transaction>  {
-  debugger
-  try{
-    return await user.provider.signTransaction(t)
-  }catch(e){
-    return await user.provider.sign(t.serializeForSigning())
-  }
+  return await user.provider.signTransaction(t)
 }
 
 export async function set_roles_to_collection(collection_id:string, user:UserService,type_collection:string="SFT",burn=false,update=false) {

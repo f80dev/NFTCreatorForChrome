@@ -11,6 +11,7 @@ import {HourglassComponent, wait_message} from "../hourglass/hourglass.component
 import {NgIf} from "@angular/common";
 import {UploadFileComponent} from "../upload-file/upload-file.component";
 import {Router} from "@angular/router";
+import {Address, AddressValue} from "@multiversx/sdk-core/out";
 
 @Component({
   selector: 'app-admin',
@@ -24,7 +25,7 @@ import {Router} from "@angular/router";
   standalone: true,
   styleUrl: './admin.component.css'
 })
-export class AdminComponent {
+export class AdminComponent implements OnInit {
 
   user=inject(UserService)
   api=inject(ApiService)
@@ -34,12 +35,16 @@ export class AdminComponent {
   message: string=""
 
 
+  ngOnInit(): void {
+    this.user.network=settings.network
+  }
+
   async upload_pem($event: any) {
     if(this.user.isConnected(false))this.user.logout(true)
 
     let content=atob($event.file.split("base64,")[1])
     await this.user.login(this,"",content,true)
-    let t=await create_transaction("fundback",[this.user.address],this.user,[],settings.contract_addr,abi)
+    let t=await create_transaction("fundback",[new AddressValue(Address.newFromBech32(this.user.address))],this.user,[],settings.contract_addr,abi)
 
     wait_message(this,"Fund transfering ... ")
     let t_signed=await signTransaction(t,this.user)
@@ -50,11 +55,14 @@ export class AdminComponent {
 
   }
 
+
+
   open_sc() {
     open(getExplorer(settings.contract_addr,settings.network,"accounts","explorer"),"view")
   }
 
   protected readonly settings = settings;
+
 
   open_appli() {
     this.router.navigate(["main"])
