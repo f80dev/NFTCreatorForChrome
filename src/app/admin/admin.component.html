@@ -1,22 +1,40 @@
 <div class="mainform" *ngIf="message==''">
 
   <br>
-  Smart contract account : {{settings.contract_addr}} on {{settings.network}}<br>
+  Smart contract account : {{settings.contract_addr}} on <strong>{{settings.network}}</strong><br>
   <br>
   <button mat-raised-button (click)="open_sc()">Open</button>
   <br>
   <hr style="max-width: 600px;">
   <br>
 
-  <app-upload-file extensions=".pem"
-                   title="Charger le fichier PEM de signature"
-                   [zone]="true"
-                   width="100%"
-                   height="60px"
-                   (uploaded)="upload_pem($event)">
-    Load the owner SmartContract PEM File
-  </app-upload-file>
-  <br>
+  Available on the vault : {{balance/1e18 | number:"1.0-4" }} egld<br><br>
+
+
+  <div *ngIf="balance>0">
+    <app-input label="Amount to get" value_type="slide" [value]="amount"
+               (valueChange)="amount=$event" unity="egld"
+               style="max-width: 800px;display: inline-block;"
+               [min]="0.01" [max]="balance" [step]="0.01"></app-input>
+    <br>
+    <br>
+    <br>
+
+    <div>
+      <app-upload-file extensions=".pem"
+                       title="Charger le fichier PEM de signature"
+                       [zone]="true"
+                       width="100%"
+                       height="60px"
+                       (uploaded)="upload_pem($event)">
+        Load the owner SmartContract PEM File
+      </app-upload-file>
+    </div>
+
+    <br>
+
+  </div>
+
 
   <button mat-raised-button (click)="open_appli()">Close</button>
 

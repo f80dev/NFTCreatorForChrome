@@ -1,4 +1,4 @@
-//Version official 0.96 - 28/04/2025
+//Version official 0.97 - 30/04/2025
 
 import {
   Address, BigUIntValue,
@@ -334,6 +334,11 @@ export async function signTransaction(t:Transaction,user:UserService) : Promise<
   return await user.provider.signTransaction(t)
 }
 
+
+export async function get_sc_balance(addr:string,network:string)  {
+  let acc=await getEntrypoint(network).createNetworkProvider().getAccount(Address.newFromBech32(addr))
+  return Number(acc.balance)/1e18
+}
 
 
 export async function set_roles_to_collection(collection_id:string, user:UserService,type_collection:string="SFT",burn=false,update=false) {

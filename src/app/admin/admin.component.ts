@@ -2,7 +2,7 @@ import {Component, inject, OnInit} from '@angular/core';
 import {UserService} from "../user.service";
 import {
   create_transaction,
-  execute_transaction,
+  execute_transaction, get_sc_balance,
   getEntrypoint,
   getExplorer,
   init_user_for_web_wallet,
@@ -15,10 +15,11 @@ import {showMessage} from "../../tools";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {MatButton} from "@angular/material/button";
 import {HourglassComponent, wait_message} from "../hourglass/hourglass.component";
-import {NgIf} from "@angular/common";
+import {DecimalPipe, NgIf} from "@angular/common";
 import {UploadFileComponent} from "../upload-file/upload-file.component";
 import {Router} from "@angular/router";
-import {Address, AddressValue} from "@multiversx/sdk-core/out";
+import {Address, AddressValue, BigUIntValue} from "@multiversx/sdk-core/out";
+import {InputComponent} from "../input/input.component";
 
 @Component({
   selector: 'app-admin',
@@ -26,7 +27,9 @@ import {Address, AddressValue} from "@multiversx/sdk-core/out";
     MatButton,
     HourglassComponent,
     NgIf,
-    UploadFileComponent
+    UploadFileComponent,
+    InputComponent,
+    DecimalPipe
   ],
   templateUrl: './admin.component.html',
   standalone: true,
@@ -40,18 +43,23 @@ export class AdminComponent implements OnInit {
   router=inject(Router)
   toast=inject(MatSnackBar)
   message: string=""
+  protected balance: number=0
 
 
-  ngOnInit(): void {
+
+  async ngOnInit() {
     this.user.network=settings.network
+    this.balance=await get_sc_balance(settings.contract_addr,settings.network)
   }
+
 
   async upload_pem($event: any) {
     if(this.user.isConnected(false))this.user.logout(true)
 
     let content=atob($event.file.split("base64,")[1])
     await this.user.login(this,"",content,true)
-    let t=await create_transaction("fundback",[new AddressValue(Address.newFromBech32(this.user.address))],this.user,[],settings.contract_addr,abi)
+    let args=[new AddressValue(Address.newFromBech32(this.user.address)),new BigUIntValue(this.amount*1e18)]
+    let t=await create_transaction("fundback",args,this.user,[],settings.contract_addr,abi)
 
     wait_message(this,"Fund transfering ... ")
     await getEntrypoint(this.user.network).signTransaction(t,this.user.provider)
@@ -69,6 +77,7 @@ export class AdminComponent implements OnInit {
   }
 
   protected readonly settings = settings;
+  amount: number = 0.1;
 
 
   open_appli() {
