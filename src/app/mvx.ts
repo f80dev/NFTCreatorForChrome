@@ -330,6 +330,7 @@ export function toText(array:Uint8Array) : string {
 
 
 export async function signTransaction(t:Transaction,user:UserService) : Promise<Transaction>  {
+  debugger
   try{
     return await user.provider.signTransaction(t)
   }catch(e){
