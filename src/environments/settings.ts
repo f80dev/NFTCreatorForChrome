@@ -1,12 +1,13 @@
 export const settings={
-  contract_addr:"erd1qqqqqqqqqqqqqpgqgmwgcv8n9cajywqws6sq3f3ld0ldyyen835swxnp3f",
+  contract_addr:"erd1qqqqqqqqqqqqqpgqxjuyp9afnqttjzzy0v37phuuz7326tgpwhps2yzjd0",
   ihm_level:1,
-  version: "0.997",
-  appname: "NFTNow Devnet",
-  appli:"https://devnet.nftnow.af10.fr",
-  network: "elrond-devnet",
-  intro: "Create your NFT on the devnet network in one minute"
+  appname: "NFTNow",
+  version: "0.981",
+  appli:"https://nftnow.af10.fr",
+  network: "elrond-mainnet",
+  intro: "Create your NFT in one minute"
 }
+
 
 
 export const abi=
@@ -51,6 +52,10 @@ export const abi=
         "onlyOwner": true,
         "mutability": "mutable",
         "inputs": [
+          {
+            "name": "amount",
+            "type": "BigUint"
+          },
           {
             "name": "dest",
             "type": "Address"
