@@ -1,17 +1,19 @@
 <div class="mainform" *ngIf="message==''">
 
   <br>
-  Smart contract account : {{settings.contract_addr}} on <strong>{{settings.network}}</strong><br>
-  <br>
+  <p>Smart contract account:<br><br>
+  <strong>{{settings.contract_addr}}</strong> on <strong>{{settings.network}}</strong><br>
+  </p>
+
   <button mat-raised-button (click)="open_sc()">Open</button>
   <br>
   <hr style="max-width: 600px;">
   <br>
 
-  Available on the vault : {{balance/1e18 | number:"1.0-4" }} egld<br><br>
+  Available in vault : {{balance | number:"1.0-4" }} egld<br><br>
 
 
-  <div *ngIf="balance>0">
+  <div *ngIf="balance>0.1">
     <app-input label="Amount to get" value_type="slide" [value]="amount"
                (valueChange)="amount=$event" unity="egld"
                style="max-width: 800px;display: inline-block;"

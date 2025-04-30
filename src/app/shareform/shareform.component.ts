@@ -69,7 +69,7 @@ export class ShareformComponent implements OnInit {
     await this.user.login(this,"","",false)
     this.url=params.url || ""
     this.content=params.content
-    this.visual=params.visual || this.content.media[0].originalUrl
+    this.visual=params.visual || (this.content.media && this.content.media.length>0 ? this.content.media[0].originalUrl : "")
   }
 
 

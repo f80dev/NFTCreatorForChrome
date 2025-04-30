@@ -259,7 +259,6 @@ export function level(lv=1) : boolean {
 //ExecuteTransaction
 export function execute_transaction(transaction:Transaction,user:UserService,function_name:string) : Promise<{ values: any[]; returnCode: string; returnMessage: string}> {
   return new Promise(async (resolve, reject) => {
-    debugger
     let transactionOnNetwork:TransactionOnNetwork | undefined=undefined
     try{
       const entrypoint = getEntrypoint(user.network)
@@ -337,7 +336,8 @@ export async function signTransaction(t:Transaction,user:UserService) : Promise<
 
 export async function get_sc_balance(addr:string,network:string)  {
   let acc=await getEntrypoint(network).createNetworkProvider().getAccount(Address.newFromBech32(addr))
-  return Number(acc.balance)/1e18
+  let rc=Number(acc.balance)/1e18
+  return rc
 }
 
 

@@ -21,6 +21,7 @@ import {ShareService} from "../share.service";
 import {ShareformComponent} from "../shareform/shareform.component";
 import {analyse_clipboard, url_shorter} from "../../main";
 import {_prompt} from "../prompt/prompt.component";
+import {MatIcon} from "@angular/material/icon";
 
 @Component({
   selector: 'app-source',
@@ -32,7 +33,7 @@ import {_prompt} from "../prompt/prompt.component";
     WebcamModule,
     HourglassComponent,
     MatExpansionPanel, MatExpansionPanelHeader,
-    WalletComponent, MatAccordion, ShareformComponent
+    WalletComponent, MatAccordion, ShareformComponent, MatIcon
   ],
   templateUrl: './source.component.html',
   standalone: true,
@@ -207,5 +208,9 @@ export class SourceComponent implements OnDestroy, OnChanges {
 
   go_from_last() {
       this.update_visual.emit(this.data.visual)
+  }
+
+  open_appli(network: string) {
+    open("https://"+network+"nftnow.af10.fr")
   }
 }

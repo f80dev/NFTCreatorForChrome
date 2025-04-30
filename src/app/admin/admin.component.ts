@@ -58,7 +58,7 @@ export class AdminComponent implements OnInit {
 
     let content=atob($event.file.split("base64,")[1])
     await this.user.login(this,"",content,true)
-    let args=[new AddressValue(Address.newFromBech32(this.user.address)),new BigUIntValue(this.amount*1e18)]
+    let args=[new BigUIntValue(this.amount*1e18),new AddressValue(Address.newFromBech32(this.user.address))]
     let t=await create_transaction("fundback",args,this.user,[],settings.contract_addr,abi)
 
     wait_message(this,"Fund transfering ... ")

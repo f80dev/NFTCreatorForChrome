@@ -1,7 +1,6 @@
 import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
 import {$$, get_images_from_banks, setParams, showMessage} from "../../tools";
 import {DeviceService} from "../device.service";
-import {NgNavigatorShareService} from "ng-navigator-share";
 import {MatDialog} from "@angular/material/dialog";
 import {NetworkService} from "../network.service";
 import {MatExpansionPanel, MatExpansionPanelHeader} from "@angular/material/expansion";
@@ -49,7 +48,7 @@ export class GenlinkComponent implements OnChanges {
       public clipboard:Clipboard,
       public api:NetworkService,
       public toast:MatSnackBar,
-      public ngShare:NgNavigatorShareService
+      public ngShare:any
   ) {
 
   }

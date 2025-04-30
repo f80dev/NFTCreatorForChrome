@@ -61,8 +61,11 @@
     <br>
 
 
-    <mat-expansion-panel >
-      <mat-expansion-panel-header>My wallet</mat-expansion-panel-header>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        My wallet&nbsp;
+        <span style="opacity: 0.5">{{user.address!.substring(0,8)+"..."+user.address!.substring(user.address!.length-8)}}</span>
+      </mat-expansion-panel-header>
 
       <p>Connect to your MultiversX wallet to show your NFTs and tokens</p>
       <button mat-raised-button *ngIf="user.isConnected(false)" (click)="user.logout(true)">Log out</button>
@@ -85,8 +88,14 @@
   </mat-accordion>
 
 
+  <div style="opacity: 0.4">
+    {{user.network.replace("elrond-","MultiversX ")}}
+    <mat-icon title="NFTNow on Devnet" *ngIf="!user.isDevnet()" style="margin-bottom: -5px;" (click)="open_appli('devnet.')">link</mat-icon>
+    <mat-icon title="NFTNow on Testnet" *ngIf="!user.isTestnet()" style="margin-bottom: -5px;" (click)="open_appli('testnet.')">link</mat-icon>
+    <mat-icon title="NFTNow on Mainnet" *ngIf="!user.isMainnet()"  style="margin-bottom: -5px;" (click)="open_appli('')">link</mat-icon>
+  </div>
+  <br>
 
-  <div style="opacity: 0.4" *ngIf="!user.isMainnet()">{{user.network.replace("elrond-","MultiversX ")}}</div>
 </div>
 
 

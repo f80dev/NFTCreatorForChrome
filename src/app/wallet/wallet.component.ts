@@ -73,7 +73,6 @@ export class WalletComponent implements OnChanges {
       await this.user.init_balance(this.api)
       this.tokens=Object.keys(this.user.tokens)
     }
-
   }
 
 
