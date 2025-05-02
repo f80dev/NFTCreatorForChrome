@@ -1,4 +1,4 @@
-//Version official 0.97 - 30/04/2025
+//Version official 0.98 - 02/05/2025
 
 import {
   Address, BigUIntValue,
@@ -342,6 +342,9 @@ export async function get_sc_balance(addr:string,network:string)  {
 
 
 export async function set_roles_to_collection(collection_id:string, user:UserService,type_collection:string="SFT",burn=false,update=false) {
+  //voir https://docs.multiversx.com/tokens/nft-tokens/
+  //
+  debugger
   const entrypoint=getEntrypoint(user.network)
   let factory = entrypoint.createTokenManagementTransactionsFactory();
 
@@ -349,16 +352,16 @@ export async function set_roles_to_collection(collection_id:string, user:UserSer
   let setRoleTransaction=factory.createTransactionForSettingSpecialRoleOnNonFungibleToken( Address.fromBech32(user.address),{
     addRoleNFTAddURI: update,
     addRoleNFTUpdateAttributes: update,
-    user: Address.fromBech32(user.address),
+    user: Address.newFromBech32(user.address),
     tokenIdentifier: collection_id,
     addRoleESDTTransferRole: false,
     addRoleNFTBurn: burn,
     addRoleNFTCreate: true,
     addRoleESDTModifyCreator:update
   })
-  if(type_collection=="SFT"){
+  if(type_collection=="SFT" || type_collection.startsWith("Semi")){
     setRoleTransaction=factory.createTransactionForSettingSpecialRoleOnSemiFungibleToken(Address.fromBech32(user.address),{
-      user: Address.fromBech32(user.address),
+      user: Address.newFromBech32(user.address),
       tokenIdentifier: collection_id,
       addRoleESDTTransferRole: update,
       addRoleNFTAddQuantity: true,

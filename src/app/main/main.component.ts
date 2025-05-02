@@ -143,7 +143,7 @@ export class MainComponent implements OnInit,OnDestroy {
     if(params.fromlast){
       this.load_config()
     }else{
-      this.visual=params.url || localStorage.getItem("image") || ""
+      this.update_visual(params.url || localStorage.getItem("image") || "")
     }
 
 
@@ -397,7 +397,7 @@ export class MainComponent implements OnInit,OnDestroy {
           wait_message(this,"Collection building")
           let rc=await create_collection(r,this.user,this,collection_type.value)
           setTimeout(async ()=>{
-            await this.set_roles_to_collection(rc.collection_id)
+            await this.set_roles_to_collection(rc.collection_id,collection_type)
             this.open_collection(rc.collection_id)
           },2500)
         }catch (e:any){
@@ -426,11 +426,11 @@ export class MainComponent implements OnInit,OnDestroy {
   }
 
 
-  async set_roles_to_collection(collection_id:string) {
+  async set_roles_to_collection(collection_id:string,type_collection:string) {
     await this.user.login(this,"","",true)
     wait_message(this,"Setting roles to the collection")
     try{
-      await set_roles_to_collection(collection_id,this.user)
+      await set_roles_to_collection(collection_id,this.user,type_collection)
     }catch (e:any){
       showMessage(this,"Problem to setting the collection, retry")
     }
