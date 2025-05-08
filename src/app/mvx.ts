@@ -1,4 +1,4 @@
-//Version official 0.99 - 08/05/2025
+//Version official 0.991 - 08/05/2025
 
 import {
   Address, BigUIntValue,
@@ -241,8 +241,9 @@ export function create_transaction(function_name:string,args:any[],
       transaction=await ctrl.createTransactionForExecute(user.getAccount(),nonce,option)
     }else{
       //https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook-v14/#calling-a-smart-contract-using-the-factory
+      let chain_id=get_chain_id(user)
       let fact=new SmartContractTransactionsFactory({
-        config:new TransactionsFactoryConfig({chainID:user.getAccount().chainID}),
+        config:new TransactionsFactoryConfig({chainID:chain_id}),
         abi: await create_abi(abi)
       })
       transaction=fact.createTransactionForExecute(Address.newFromBech32(user.address),option)
@@ -566,8 +567,8 @@ export async function share_token(user:UserService,collection:string,nonce:numbe
     //let value=new U64Value(Math.round(amount))
     let value=new BigUIntValue(Math.round(amount))
     let t=await create_transaction("upload",[value], user,[token],user.get_sc_address(),abi,4078541n,cost*nb_user)
-    let t_signed=await signTransaction(t,user)
-    let rc=await execute_transaction(t_signed,user,"upload")
+    //let t_signed=await signTransaction(t,user)
+    let rc=await execute_transaction(t,user,"upload")
     return rc
   }catch (e:any){
     $$("Erreur ",e)
@@ -637,21 +638,11 @@ export async function share_token_wallet(vm:any,token: any,cost=0.0003,str_amoun
       let id =""
 
       let rc=await share_token(vm.user,token.collection,token.nonce,amount,nb_user,cost)
-      if(rc){
-        for(let v of rc.values){
-          if(v.startsWith("@6f6b")){
-            id=v.split("@")[2]
-            break
-          }
-        }
+      if(rc && rc.returnMessage=="ok"){
+        id=Number(rc.values[0]).toString(16)
       }else{
         showMessage(vm,"Transfer fail, retry")
         wait_message(vm)
-      }
-
-      if(id==""){
-        showMessage(vm,"Sharing link failure, retry")
-        return null
       }
 
       $$("Id du vault "+id)
