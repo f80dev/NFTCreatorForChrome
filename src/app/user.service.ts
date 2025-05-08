@@ -1,7 +1,7 @@
 import {inject, Injectable} from '@angular/core';
 import {Subject} from "rxjs";
 import {_ask_for_authent} from "./authent-dialog/authent-dialog.component";
-import {getEntrypoint, query, toAccount} from "./mvx";
+import {toAccount} from "./mvx";
 import {$$, showMessage} from "../tools";
 import {ApiService} from './api.service';
 import {DeviceService} from './device.service';
@@ -99,12 +99,6 @@ export class UserService {
   }
 
 
-  query(func:string,args:any[]=[]){
-    $$("Appel de la fonction "+func+" du smart contract "+this.get_sc_address()+" avec les arguments ",args)
-    let rc=query(func, args, this.get_domain(), this.get_sc_address())
-    //$$("Réponse ",rc)
-    return rc
-  }
 
 
   login(vm: any,subtitle="",pem_file="",strong=false,

@@ -1,4 +1,4 @@
-//Version official 0.98 - 02/05/2025
+//Version official 0.99 - 08/05/2025
 
 import {
   Address, BigUIntValue,
@@ -108,12 +108,15 @@ export function upload_content(content:any,filename="") : Promise<{url:string,fi
 
 
 
-export async function create_abi(abi_content:any,api:any=null): Promise<AbiRegistry> {
+export async function create_abi(abi_content:any,api:any=null,endpoint:any=null): Promise<AbiRegistry> {
   //voir https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook-v13/#load-the-abi-from-an-url
   return new Promise(async (resolve, reject) => {
     try{
-      if(!api)
-      {resolve(AbiRegistry.create(abi_content))}
+      if(!api) {
+        let rc=AbiRegistry.create(abi_content)
+        //if(endpoint)rc.endpoints=endpoint
+        resolve(rc)
+      }
       else{
         api._get(abi_content, { encoding: "utf8" }).subscribe({
           next:(r:string)=>{resolve(AbiRegistry.create(JSON.parse(r)))}
@@ -232,15 +235,19 @@ export function create_transaction(function_name:string,args:any[],
     }
 
     let transaction
+    let ctrl=entrypoint.createSmartContractController(await create_abi(abi))
     if(!user.provider){
       //voir https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook-v14/#calling-a-smart-contract-using-the-controller
-      let ctrl=entrypoint.createSmartContractController(await create_abi(abi))
       transaction=await ctrl.createTransactionForExecute(user.getAccount(),nonce,option)
     }else{
       //https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook-v14/#calling-a-smart-contract-using-the-factory
-      let fact=entrypoint.createSmartContractTransactionsFactory()
+      let fact=new SmartContractTransactionsFactory({
+        config:new TransactionsFactoryConfig({chainID:user.getAccount().chainID}),
+        abi: await create_abi(abi)
+      })
       transaction=fact.createTransactionForExecute(Address.newFromBech32(user.address),option)
       transaction.nonce=nonce
+      transaction=await user.provider.signTransaction(transaction)
     }
     resolve(transaction)
 
