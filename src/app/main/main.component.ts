@@ -75,6 +75,7 @@ export class MainComponent implements OnInit,OnDestroy {
   royalties=5
   content:any
 
+  _location=inject(Location)
   imageProcessor=inject(ImageProcessorService)
   imageUploader=inject(UploaderService)
   storage=inject(StorageService)
@@ -255,7 +256,7 @@ export class MainComponent implements OnInit,OnDestroy {
           try{
             if(this.user.action_after_mint.startsWith("redirect"))open(this.user.action_after_mint.replace("redirect:",""))
             if(this.user.action_after_mint=="close"){
-              location.href="close"
+              this._location.replaceState(".","close")
             }
             if(this.user.action_after_mint=="wallet")this.view_on_gallery(true)
 
