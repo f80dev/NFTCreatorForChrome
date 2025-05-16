@@ -120,7 +120,6 @@ export class MainComponent implements OnInit,OnDestroy {
 
     obj.metadata=this.user.data.metadata
     localStorage.setItem("save_parameters",JSON.stringify(obj))
-
   }
 
 
@@ -132,7 +131,6 @@ export class MainComponent implements OnInit,OnDestroy {
 
 
   async ngOnInit() {
-
     this.storage.service="pinata"
 
     let params:any=await getParams(this.routes)
@@ -256,7 +254,9 @@ export class MainComponent implements OnInit,OnDestroy {
         if(identifier!="error"){
           try{
             if(this.user.action_after_mint.startsWith("redirect"))open(this.user.action_after_mint.replace("redirect:",""))
-            if(this.user.action_after_mint=="close")window.close()
+            if(this.user.action_after_mint=="close"){
+              location.href="close"
+            }
             if(this.user.action_after_mint=="wallet")this.view_on_gallery(true)
 
             $$("Visibilité du NFT sur "+getExplorer(identifier,this.user.network,"nfts"))
@@ -436,6 +436,8 @@ export class MainComponent implements OnInit,OnDestroy {
     }
     wait_message(this)
   }
+
+
 
 
   view_on_gallery(self_window=false,explorer=environment.collection_viewer) {

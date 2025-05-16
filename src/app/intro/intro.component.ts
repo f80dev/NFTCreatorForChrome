@@ -1,19 +1,12 @@
 import {Component, inject, Input, OnInit} from '@angular/core';
-import {UserService} from '../user.service';
-import {$$, getParams} from '../../tools';
-import {ActivatedRoute, Router} from '@angular/router';
 import {MatButton} from '@angular/material/button';
-import {MatDialog} from '@angular/material/dialog';
-import {ApiService} from '../api.service';
 import {MatIcon} from '@angular/material/icon';
 import {settings} from '../../environments/settings';
 import {NgIf, NgOptimizedImage} from "@angular/common";
 
 @Component({
   selector: 'app-intro',
-  imports: [
-    MatButton, MatIcon, NgIf, NgOptimizedImage
-  ],
+  imports: [MatButton, MatIcon, NgIf, NgOptimizedImage],
   standalone:true,
   templateUrl: './intro.component.html',
   styleUrl: './intro.component.css'
