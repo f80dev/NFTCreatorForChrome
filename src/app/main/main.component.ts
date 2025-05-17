@@ -255,6 +255,7 @@ export class MainComponent implements OnInit,OnDestroy {
         if(identifier!="error"){
           try{
             if(this.user.action_after_mint.startsWith("redirect"))open(this.user.action_after_mint.replace("redirect:",""))
+            debugger
             if(this.user.action_after_mint=="close" && window.opener){
               window.opener.postMessage({ type: 'message', action: "toclose" }, '*');
             }
