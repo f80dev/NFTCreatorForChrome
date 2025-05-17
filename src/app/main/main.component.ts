@@ -255,8 +255,8 @@ export class MainComponent implements OnInit,OnDestroy {
         if(identifier!="error"){
           try{
             if(this.user.action_after_mint.startsWith("redirect"))open(this.user.action_after_mint.replace("redirect:",""))
-            if(this.user.action_after_mint=="close"){
-              this._location.replaceState(".","close")
+            if(this.user.action_after_mint=="close" && window.opener){
+              window.opener.postMessage({ type: 'message', action: "toclose" }, '*');
             }
             if(this.user.action_after_mint=="wallet")this.view_on_gallery(true)
 
