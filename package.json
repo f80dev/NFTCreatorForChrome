@@ -26,7 +26,7 @@
     "@helia/unixfs": "^4.0.2",
     "@libp2p/interface-peer-id": "^2.0.2",
     "@multiformats/base-x": "4.0.1",
-    "@multiversx/sdk-core": "14.1.1",
+    "@multiversx/sdk-core": "14.1.2",
     "@multiversx/sdk-extension-provider": "^5.0.0",
     "@multiversx/sdk-native-auth-client": "^1.0.9",
     "@multiversx/sdk-network-providers": "^2.9.3",
