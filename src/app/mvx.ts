@@ -354,7 +354,6 @@ export async function get_sc_balance(addr:string,network:string)  {
 export async function set_roles_to_collection(collection_id:string, user:UserService,type_collection:string="SFT",burn=false,update=false) {
   //voir https://docs.multiversx.com/tokens/nft-tokens/
   //
-  debugger
   const entrypoint=getEntrypoint(user.network)
   let factory = entrypoint.createTokenManagementTransactionsFactory();
 
