@@ -19,6 +19,11 @@
         {{content!.balance}} {{content!.name}}(s) available to share !
       </div>
       <br>
+      <small>{{user.balance | number:"1.0-4" }} egld in your wallet</small>
+      <br>
+      <strong style="color:red;"
+              *ngIf="environment.share_cost*Number(nb_users)>user.balance">You have not enough egld to pay for {{nb_users}} users</strong>
+      <br><br>
 
       <div *ngIf="(content.type.startsWith('Semi') || content.type.startsWith('Fungible')) && content!.balance>1"
            style="margin:40px;display: inline-block;max-width: 300px;" >
@@ -83,7 +88,7 @@
         <button mat-raised-button (click)="sell()" *ngIf="!content!.type.startsWith('Fungible')">
           <mat-icon>paid</mat-icon>Sell
         </button>
-        <button mat-raised-button (click)="transfer()">
+        <button mat-raised-button (click)="transfer()" [disabled]="environment.share_cost*Number(nb_users)>user.balance">
           <mat-icon>link</mat-icon>Link to share
         </button>
       </div>

@@ -4,7 +4,7 @@ import {getParams, showMessage} from "../../tools";
 import {ActivatedRoute} from "@angular/router";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
-import {Location, NgIf} from "@angular/common";
+import {DecimalPipe, Location, NgIf} from "@angular/common";
 import {QRCodeComponent} from "angularx-qrcode";
 import {InputComponent} from "../input/input.component";
 import {MatExpansionPanel, MatExpansionPanelHeader} from "@angular/material/expansion";
@@ -29,7 +29,7 @@ import {XportalSwitchComponent} from "../xportal-switch/xportal-switch.component
     NgIf,
     QRCodeComponent,
     InputComponent,
-    MatExpansionPanel, MatExpansionPanelHeader, HourglassComponent, XportalSwitchComponent
+    MatExpansionPanel, MatExpansionPanelHeader, HourglassComponent, XportalSwitchComponent, DecimalPipe
   ],
   templateUrl: './shareform.component.html',
   standalone: true,
@@ -83,11 +83,11 @@ export class ShareformComponent implements OnInit {
     if(r==="yes"){
       if (!await this.user.login(this,"","",true)){
         let obj=await share_token_wallet(this,this.content,environment.share_cost,this.amount.toString(),this.nb_users)
-        if(obj){
+        if(obj && obj.url!=''){
           this.url=await url_shorter(obj!.url)
         }
       }else{
-        this.user.logout(true)
+        //this.user.logout(true)
         this._location.back()
       }
 

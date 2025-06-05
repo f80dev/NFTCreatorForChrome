@@ -401,9 +401,10 @@ export class MainComponent implements OnInit,OnDestroy {
           setTimeout(async ()=>{
             await this.set_roles_to_collection(rc.collection_id,collection_type.value)
             this.open_collection(rc.collection_id)
-          },5500)
+            showMessage(this,"Your new collection is available")
+          },6000)
         }catch (e:any){
-          showMessage(this,"Collection not created")
+          showMessage(this,"Collection not created, retry")
           wait_message(this)
         }
 
