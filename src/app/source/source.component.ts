@@ -50,7 +50,6 @@ export class SourceComponent implements OnDestroy, OnChanges {
   show_scanner: boolean = false;
   handle:any
   generators=environment.generators
-  shareService=inject(ShareService)
 
   trigger = new Subject<void>();
   private image: WebcamImage | undefined;
@@ -172,11 +171,12 @@ export class SourceComponent implements OnDestroy, OnChanges {
   }
 
   protected readonly level = level
-  protected readonly share_token = share_token
 
   async on_share($event: any) {
     this.router.navigate(["share"],{queryParams:{p:setParams({visual:$event.visual,content:$event},"","")}})
   }
+
+
 
   async share_coin(content:any) {
     let token=content.token
@@ -184,15 +184,20 @@ export class SourceComponent implements OnDestroy, OnChanges {
     try{
       let nb_user=await _prompt(this,"How many users can receive this coin","1","","number","Ok","Cancel",false)
       if(nb_user && Number(nb_user)>0){
-        let result=await share_token_wallet(this,token, environment.share_cost,"",Number(nb_user))
-        if(result && result.url!='') {
-          this.router.navigate(["share"], {
-            queryParams: {
-              url: await url_shorter(result.url),
-              content: JSON.stringify(token)
-            }
-          })
+        if(this.user.balance<environment.share_cost*Number(nb_user)){
+          showMessage(this,"You have not enought eGld for this operation")
+        }else{
+          let result=await share_token_wallet(this,token, environment.share_cost,"",Number(nb_user))
+          if(result && result.url!='') {
+            this.router.navigate(["share"], {
+              queryParams: {
+                url: await url_shorter(result.url),
+                content: JSON.stringify(token)
+              }
+            })
+          }
         }
+
       }
     }catch (e:any){
       showMessage(this,"Retry")
