@@ -11,7 +11,7 @@ import {
 import {abi, settings} from "../../environments/settings";
 import {ApiService} from "../api.service";
 import {MatDialog} from "@angular/material/dialog";
-import {showMessage} from "../../tools";
+import {$$, showError, showMessage} from "../../tools";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {MatButton} from "@angular/material/button";
 import {HourglassComponent, wait_message} from "../hourglass/hourglass.component";
@@ -62,11 +62,18 @@ export class AdminComponent implements OnInit {
     let t=await create_transaction("fundback",args,this.user,[],settings.contract_addr,abi)
 
     wait_message(this,"Fund transfering ... ")
-    await getEntrypoint(this.user.network).signTransaction(t,this.user.provider)
-    let result=await execute_transaction(t,this.user,"fundback")
-    wait_message(this)
 
-    showMessage(this,result.returnMessage)
+    if(this.user.provider && this.user.network){
+      debugger
+      await getEntrypoint(this.user.network).signTransaction(t,this.user.provider)
+      let result=await execute_transaction(t,this.user,"fundback")
+      wait_message(this)
+      showMessage(this,result.returnMessage)
+
+    }else{
+      showError(this)
+    }
+
 
   }
 
