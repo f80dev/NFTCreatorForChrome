@@ -534,4 +534,18 @@ export class MainComponent implements OnInit,OnDestroy {
     this.save_config()
   }
 
+  build_collection_with_dinotools() {
+    let url="https://app.dinovox.com/collections"
+    if(this.user.isDevnet())url=url.replace("app.","devnet-app.")
+    if(this.user.isTestnet())url=url.replace("app.","testnet-app.")
+    open(url,"Create collection")
+  }
+
+  edit_collection() {
+    let col=this.sel_collection?.value
+    let url="https://app.dinovox.com/collections/"+col.ticker
+    if(this.user.isDevnet())url=url.replace("app.","devnet-app.")
+    if(this.user.isTestnet())url=url.replace("app.","testnet-app.")
+    open(url,"Edit collection")
+  }
 }

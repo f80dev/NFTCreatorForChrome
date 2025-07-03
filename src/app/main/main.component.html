@@ -168,7 +168,12 @@
 
       <div *ngIf="collections.length==0">You need a collection before mint a NFT<br><br></div>
 
-      <button mat-raised-button (click)="build_collection()"><div class="bloc-button">Create<br>Collection</div></button>
+      <div>
+        <h6>Manage your collection</h6>
+        <button mat-raised-button (click)="build_collection()">New Basic</button>
+<!--        <button mat-raised-button (click)="build_collection_with_dinotools()" title="Use dinotools to create your collection">New Advanced</button>-->
+        <button mat-raised-button (click)="edit_collection()" title="Use dinotools to edit your collection">Edit</button>
+      </div>
 
       <button mat-icon-button class="icon-button"*ngIf="sel_collection"
               (click)="set_roles_to_collection(sel_collection.value.collection,sel_collection.value.type)">
