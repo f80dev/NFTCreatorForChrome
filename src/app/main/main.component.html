@@ -135,13 +135,14 @@
   </div>
 
   <div *ngIf="visual && visual.length>0">
-    <button *ngIf="sel_collection && visual!='' && quantity>0" mat-raised-button
+    <button *ngIf="sel_collection?.value && visual!='' && quantity>0" mat-raised-button
+            [disabled]="!sel_collection?.value.role.canCreate"
             style="width:200px;height:70px;margin-top:-5px;margin-bottom: 15px;"
             (click)="Create_NFT()">
       <div style="font-size: medium;margin-bottom: -10px;">
         Build this
-        <span *ngIf="sel_collection.value.subType=='SemiFungibleESDT'">SFT</span>
-        <span *ngIf="sel_collection.value.subType!='SemiFungibleESDT'">NFT</span>
+        <span *ngIf="sel_collection!.value.subType=='SemiFungibleESDT'">SFT</span>
+        <span *ngIf="sel_collection!.value.subType!='SemiFungibleESDT'">NFT</span>
         <br>
         <mat-icon>arrow_downward</mat-icon>
       </div>

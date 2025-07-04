@@ -461,6 +461,9 @@ export class MainComponent implements OnInit,OnDestroy {
 
   update_sel_collection($event: any) {
     this.sel_collection=$event
+    if(!this.sel_collection || !this.sel_collection?.value.role.canCreate){
+      showMessage(this,"You can't create NFT or SFT in this collection")
+    }
   }
 
 
