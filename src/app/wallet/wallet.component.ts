@@ -36,6 +36,9 @@ export class WalletComponent implements OnChanges {
   nfts: any[] = []
 
   @Input() address=""
+  @Input() coin_font="normal"
+  @Input() icon_action: string="send"
+  @Input() title_action: string="Show your coin"
   @Input() help=""
   @Input() show : "coin" | "nft" | "coin,nft" ="coin,nft"
   @Input() strong_token=""
@@ -114,6 +117,7 @@ export class WalletComponent implements OnChanges {
 
 
   protected readonly view_account_on_gallery = view_account_on_gallery;
+
 
 
   show_account() {

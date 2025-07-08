@@ -15,19 +15,19 @@
     </h4>
 
     <div style="max-height: 200px;overflow: scroll;scrollbar-width: none;">
-      <table style="display:inline-block;margin-top:-10px;width:100%;max-width: 350px;">
-        <tr *ngFor="let k of tokens" style="width: 100%;height: 30px;">
+      <table style="display:inline-block;margin-top:-10px;width:100%;max-width: 350px;" [style.font-size]="coin_font">
+        <tr *ngFor="let k of tokens" style="width: 100%;height: 40px;" >
           <td style="text-align: left;" *ngIf="selected">
             <mat-icon class="small-icon-button" (click)="select_esdt(user.tokens[k])">arrow_right</mat-icon>
           </td>
-          <td style="text-align: left;font-size: small;width:40%;" [title]="user.tokens[k].identifier" [style.font-weight]="strong_token.indexOf(user.tokens[k].identifier)>-1 ? 'bold' : 'normal'" >
+          <td style="text-align: left;width:40%;" [title]="user.tokens[k].identifier" [style.font-weight]="strong_token.indexOf(user.tokens[k].identifier)>-1 ? 'bold' : 'normal'" >
             <img src="./assets/coin.png" style="width: 20px;height:20px;margin-bottom: -5px;" *ngIf="!selected">
             {{user.tokens[k].name}}
           </td>
           <td style="text-align: right;width:50%;">{{user.tokens[k].balance/1e18 | number:"1.0-4"}}</td>
           <td *ngIf="message==''">
-            <mat-icon class="icon-button" style="font-size: small;margin-bottom: -12px;" (click)="select_coin(k)"
-                      title="Show your coin">send</mat-icon>
+            <mat-icon class="icon-button" style="margin-left:5px;margin-bottom: -5px;" (click)="select_coin(k)"
+                      [title]="title_action">{{icon_action}}</mat-icon>
           </td>
         </tr>
       </table>
@@ -42,6 +42,7 @@
 
   </h4>
   <h4 *ngIf="show.indexOf('nft')>-1 && nfts.length==0">You don't have any NFT</h4>
+
   <div *ngIf="show.indexOf('nft')>-1" style="margin-top: -15px;max-height: 200px;overflow:scroll;scrollbar-width: none;">
     <img *ngFor="let nft of nfts"
          [title]="nft.balance+' '+nft.name+' ('+nft.collection+')\n'+(nft.metadata.description ? nft.metadata.description : '')"
@@ -51,7 +52,7 @@
          [style.width]="width"
          (dblclick)="select(nft)">
   </div>
-  <p *ngIf="help.length>0" style="font-size: small;">{{help}}</p>
+  <p *ngIf="help.length>0 && nfts.length>0" style="font-size: small;">{{help}}</p>
 
   <button mat-raised-button *ngIf="selected" (click)="cancel()">Cancel</button>
 
