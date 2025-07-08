@@ -40,6 +40,8 @@ import {ShareService} from "../share.service";
 import {analyse_clipboard, url_shorter} from "../../main";
 import {FormsModule} from "@angular/forms";
 import local = chrome.storage.local;
+import {DeviceService} from "../device.service";
+import {XportalSwitchComponent} from "../xportal-switch/xportal-switch.component";
 
 @Component({
   selector: 'app-main',
@@ -59,7 +61,7 @@ import local = chrome.storage.local;
     MatIconButton,
     MatExpansionPanel, MatExpansionPanelHeader,
     MatSlideToggle, FormsModule,
-    JsonEditorComponent, MatAccordion, MatCard, IntroComponent, SourceComponent, CropperComponent
+    JsonEditorComponent, MatAccordion, MatCard, IntroComponent, SourceComponent, CropperComponent, XportalSwitchComponent
   ],
   standalone:true,
   templateUrl: './main.component.html',
@@ -74,6 +76,7 @@ export class MainComponent implements OnInit,OnDestroy {
   quantity= 1
   royalties=5
   content:any
+  device=inject(DeviceService)
 
   _location=inject(Location)
   imageProcessor=inject(ImageProcessorService)
@@ -550,5 +553,9 @@ export class MainComponent implements OnInit,OnDestroy {
     if(this.user.isDevnet())url=url.replace("app.","devnet-app.")
     if(this.user.isTestnet())url=url.replace("app.","testnet-app.")
     open(url,"Edit collection")
+  }
+
+  open_xportal() {
+    open()
   }
 }

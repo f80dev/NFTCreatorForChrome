@@ -1,5 +1,12 @@
 <app-intro message="Create your NFT in one minute"></app-intro>
-<app-hourglass style="color:white" marginTop="20px" [message]="message"></app-hourglass>
+
+<div *ngIf="message.length>0">
+  <app-hourglass style="color:white" marginTop="20px" [message]="message"></app-hourglass>
+  <br>
+ <app-xportal-switch [uri]="user.uri_to_xportal"></app-xportal-switch>
+</div>
+
+
 <app-cropper *ngIf="showCrop" [visual]="visual" (update_visual)="crop($event)"></app-cropper>
 
 <div class="mainform" [style.pointer-events]="message=='' ? 'all' : 'none'" [style.opacity]="message=='' ? 1 : 0.3" *ngIf="!showCrop">
