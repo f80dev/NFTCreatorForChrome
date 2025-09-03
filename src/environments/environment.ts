@@ -75,7 +75,7 @@ export const environment = {
   accuracy_limit: 50,
   generators: [
     {label: "Emojis", value: "https://emojipedia.com/apple/",iframe:false},
-    {label: "Stable Diffusion", value: "https://gen.akash.network/",iframe:true},
+    {label: "Akash", value: "https://chat.akash.network/",iframe:false},
     {label: "Grok", value: "https://grok.com/",iframe:false},
     {label: "Pixabay", value: "https://pixabay.com/",iframe:false},
     {label: "Image Bank", value: "https://unsplash.com/fr",iframe:false},
