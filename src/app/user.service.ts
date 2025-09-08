@@ -8,9 +8,9 @@ import {DeviceService} from './device.service';
 import {Connexion} from '../operation';
 import {settings} from "../environments/settings";
 import {environment} from "../environments/environment";
-import {Account, KeyPair, UserSigner} from "@multiversx/sdk-core/out";
-import {Router} from "@angular/router";
+import {Account, ApiNetworkProvider, KeyPair, UserSigner} from "@multiversx/sdk-core/out";
 import {AccountOnNetwork} from "@multiversx/sdk-network-providers/out";
+import {Router} from "@angular/router";
 
 @Injectable({
   providedIn: 'root'
@@ -54,7 +54,7 @@ export class UserService {
   params: any={}
   uri_to_xportal=""
   data: any={}
-  pem_account:any
+  pem_account="";
 
   constructor() { }
 

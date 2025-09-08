@@ -494,7 +494,6 @@ export class AuthentComponent implements OnInit,OnChanges {
       $$("Connexion web wallet ok "+address)
 
     } catch (e) {
-      debugger
       this.strong=false;
       this.oninvalid.emit(false)
     }

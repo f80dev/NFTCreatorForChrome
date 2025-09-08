@@ -186,7 +186,7 @@ export function analyse_params(params:string):any {
 
     if(key=="params_file"){
       fetch(environment.server+"/api/yaml/?file="+value).then((content:any)=>{
-        debugger
+
       })
     }
 
