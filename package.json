@@ -1,6 +1,6 @@
 {
   "name": "nftcreator-for-chrome",
-  "version": "0.0.56",
+  "version": "0.0.57",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --configuration development --ssl true",
@@ -25,9 +25,7 @@
     "@angular/service-worker": "19.2.9",
     "@helia/unixfs": "^4.0.2",
     "@libp2p/interface-peer-id": "^2.0.2",
-
     "@multiformats/base-x": "^4.0.1",
-
     "@multiversx/sdk-core": "14.2.9",
     "@multiversx/sdk-extension-provider": "^5.1.1",
     "@multiversx/sdk-native-auth-client": "^2.0.1",
@@ -35,7 +33,6 @@
     "@multiversx/sdk-wallet": "^4.6.0",
     "@multiversx/sdk-wallet-connect-provider": "^6.1.2",
     "@multiversx/sdk-web-wallet-provider": "^5.1.1",
-
     "@mysten/sui": "^1.35.0",
     "@octokit/rest": "^21.0.0",
     "@tusky-io/ts-sdk": "^0.29.0",
